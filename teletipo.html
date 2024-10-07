@@ -39,9 +39,31 @@
 
     <script>
         (function() {
-            const sujetos = ["Samuel", "Julia", "Papi", "Mami", "Moncho", "Bagheera", "Abuelo", "Luisa", "Mónica", "Xiomara", "Nana", "Paco", "Abuelo Antonio", "Lolo", "Víctor", "Óscar el de la sortija", "La hija de Lolo", "El profe de Mate", "Goya", "Abby la peluquera"];
-            const acciones = ["hizo caca", "hizo una receta de espaguetis inventado", "se tiró de cabeza", "le encanta ir", "hizo un maratón de ladridos", "decidió vender limonada de sabores raros", "trató de arreglar una bici usando palillos chinos", "montó un karaoke en la cocina", "se inventó una receta con chocolate y patatas fritas", "llevó toda la clase a la plaza para estudiar geometría con tiza", "hizo una torre de almohadas", "insistió en que las mariposas se mueven más rápido en días nublados", "decidió dormir en la bañera", "creó una canción de rap sobre la tabla del 5", "ganó el concurso de saltos en la colchoneta", "se disfrazó de detective para resolver el misterio del bocadillo perdido", "organizó una carrera de caracoles en el arenero", "convenció a todos de que el Wi-Fi tiene sabor a plátano", "se atascó en la puerta giratoria y dio vueltas durante diez minutos", "hizo malabares con mandarinas en el mercado", "discutió con el viento durante toda la tarde", "intentó hablar con el loro en japonés", "se subió a una mesa pensando que era un barco", "perdió una pelea con una escoba", "ganó un campeonato de saltos de sofá", "organizó una fiesta sorpresa para sí mismo"];
-            const lugares = ["la colchoneta", "el arenero", "el cuarto de Julia", "el cuarto de Samuel", "el skatepark", "la Plaza del Charco", "el Tauro", "el Instituto", "la Playa del Socorro", "El Quinto Pino", "la casa de Abuelo", "la casa de Nana", "el Parque del Dragón", "el sofá", "el cuarto de baño", "el lago", "el parque marítimo", "la Playa de Punta Brava", "el muelle", "San Telmo", "la cueva del oso", "la azotea de los gritos", "el garaje encantado", "el túnel del susurro", "el árbol que habla", "la plaza de los charcos mágicos", "la nube flotante"];
+            const sujetos = [
+                "Samuel", "Julia", "Papi", "Mami", "Moncho", "Bagheera", "Abuelo", "Luisa", 
+                "Mónica", "Xiomara", "Nana", "Paco", "Abuelo Antonio", "Lolo", "Víctor", 
+                "Óscar", "La hija de Lolo", "El profe de Mate", "Goya", "Abby la peluquera", 
+                "El vecino", "El guaña", "Las amigas de Mami", "El alcalde", 
+                "Un tío que conoces, pero ahora no caes", "El entrenador de béisbol", 
+                "Esteban Eric D. Esgrima"
+            ];
+
+            const acciones = [
+                "hizo caca", "hizo una receta de espaguetis inventado", "Está ganando el papel del baño", 
+                "Está prendiendo fuego", "Va a prender fuego", "Lo pillaron robando", 
+                "Se fugó de la casa y ahora está escondido en...", "Lo están buscando para meterle una cuerada",
+                "Suspendió dos exámenes y se fue a vivir a...", "Lo vieron aparcando coches en..."
+            ];
+
+            const lugares = [
+                "la colchoneta", "el arenero", "el cuarto de Julia", "el cuarto de Samuel", "el skatepark", 
+                "la Plaza del Charco", "el Taoro", "el Instituto", "la Playa del Socorro", 
+                "El Quinto Pino", "la casa de Abuelo", "la casa de Nana", "el Parque del Dragón", 
+                "el sofá", "el cuarto de baño", "el lago", "el parque marítimo", "la Playa de Punta Brava", 
+                "el muelle", "San Telmo", "la punta del muelle", "el guachinche de la cabra", 
+                "Los asadores", "Brunellis", "La iglesia de San Amaro", "El Salmorejo", "La gasolinera", 
+                "El pabellón", "El campo de béisbol", "El pez azul"
+            ];
 
             function shuffle(array) {
                 for (let i = array.length - 1; i > 0; i--) {
@@ -75,7 +97,6 @@
                 });
             }
 
-            // Función para inicializar el teletipo
             function inicializarTeletipo() {
                 if (document.readyState === 'complete' || document.readyState === 'interactive') {
                     iniciarTeletipo();
@@ -84,10 +105,7 @@
                 }
             }
 
-            // Exponer la función de inicialización al ámbito global
             window.inicializarTeletipo = inicializarTeletipo;
-
-            // Iniciar el teletipo automáticamente
             inicializarTeletipo();
         })();
     </script>
