@@ -366,9 +366,10 @@
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = '🗑️';
-            deleteBtn.onclick = () => deleteMessage(id);
+deleteBtn.onclick = () => deleteMessage(id);
 
-actions.appendChild(dislikeBtn);
+            actions.appendChild(likeBtn);
+            actions.appendChild(dislikeBtn);
             actions.appendChild(replyBtn);
             actions.appendChild(deleteBtn);
 
@@ -439,11 +440,15 @@ actions.appendChild(dislikeBtn);
                 dislikes: 0
             };
 
-            db.collection("messages").add(reply).then(() => {
-                loadMessages();
-            }).catch((error) => {
-                console.error("Error adding reply: ", error);
-            });
+            db.collection("messages").add(reply)
+                .then(() => {
+                    console.log("Respuesta añadida con éxito");
+                    loadMessages(); // Recarga todos los mensajes para mostrar la nueva respuesta
+                })
+                .catch((error) => {
+                    console.error("Error al añadir la respuesta: ", error);
+                    alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
+                });
         }
 
         function updateLikes(id, field) {
@@ -583,6 +588,33 @@ actions.appendChild(dislikeBtn);
         }
 
         window.onload = initApp;
+
+        // Código de depuración
+        function debugLog(message) {
+            console.log(message);
+            const debugOutput = document.createElement('div');
+            debugOutput.textContent = message;
+            document.body.appendChild(debugOutput);
+        }
+
+        // Sobrescribir console.log y console.error
+        const originalLog = console.log;
+        const originalError = console.error;
+
+        console.log = function() {
+            debugLog('LOG: ' + Array.from(arguments).join(' '));
+            originalLog.apply(console, arguments);
+        };
+
+        console.error = function() {
+            debugLog('ERROR: ' + Array.from(arguments).join(' '));
+            originalError.apply(console, arguments);
+        };
+
+        // Capturar errores no manejados
+        window.addEventListener('error', function(event) {
+            debugLog('UNHANDLED ERROR: ' + event.message + ' at ' + event.filename + ':' + event.lineno);
+        });
     </script>
 </body>
 </html>
