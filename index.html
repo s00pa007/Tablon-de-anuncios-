@@ -183,47 +183,6 @@
             from { transform: translateY(-20px); }
             to { transform: translateY(0); }
         }
-
-        @media (min-width: 600px) {
-            .counters {
-                flex-direction: row;
-            }
-
-            #message-form h2 {
-                font-size: 24px;
-            }
-
-            #bulletin-board {
-                max-width: 600px;
-            }
-        }
-
-        #emoji-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: -1;
-            background-color: var(--background-color);
-        }
-
-        .emoji-line {
-            position: absolute;
-            display: flex;
-            animation: moveDiagonal linear infinite;
-        }
-
-        @keyframes moveDiagonal {
-            from {
-                transform: translateX(0) translateY(0);
-            }
-            to {
-                transform: translateX(-100%) translateY(100%);
-            }
-        }
     </style>
 </head>
 <body>
@@ -259,40 +218,25 @@
         </aside>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
     <script>
-        const spacing = 30; 
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
+            authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
+            databaseURL: "https://tablon-de-anuncios-d5dea-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "tablon-de-anuncios-d5dea",
+            storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
+            messagingSenderId: "67910184237",
+            appId: "1:67910184237:web:e43d424657a948ae5d77a4",
+            measurementId: "G-YL5W1VNM9Z"
+        };
 
-        function getRandomColor() {
-            const colors = ['#ffeb3b', '#8bc34a', '#03a9f4', '#ff5722', '#9c27b0', '#e91e63', '#00bcd4'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        function getEmoji(tone) {
-            const emojis = {
-                alegre: '😊',
-                triste: '😢',
-                amor: '❤️',
-                sorpresa: '😲',
-                enojado: '😡'
-            };
-            return emojis[tone] || '📌';
-        }
-
-        const startDate = new Date('2023-01-01'); 
-        const daysGoalInitial = 1000;
-
-        function updateCounters() {
-            const today = new Date();
-            const diffTime = Math.abs(today - startDate);
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            document.getElementById('days-operating').textContent = `Días en funcionamiento: ${diffDays}`;
-
-            const daysGoal = daysGoalInitial - diffDays;
-            document.getElementById('days-goal').textContent = `Días hasta el objetivo: ${daysGoal >=0 ? daysGoal : 0}`;
-        }
-
-        updateCounters();
-        setInterval(updateCounters, 86400000); 
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         const bulletin = document.getElementById('bulletin-board');
         const postButton = document.getElementById('post-button');
@@ -301,24 +245,31 @@
         const messagesPublished = document.getElementById('messages-published');
 
         function loadMessages() {
-            const messages = JSON.parse(localStorage.getItem('messages')) || [];
-            messages.forEach(msg => {
-                if (new Date(msg.storedTimestamp) > new Date(Date.now() - 24*60*60*1000)) {
-                    createMessageElement(msg);
-                }
+            bulletin.innerHTML = '';
+            db.collection("messages").orderBy("storedTimestamp", "desc").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    const message = doc.data();
+                    createMessageElement(message);
+                });
             });
         }
 
         function saveMessage(message) {
-            const messages = JSON.parse(localStorage.getItem('messages')) || [];
-            messages.push(message);
-            localStorage.setItem('messages', JSON.stringify(messages));
+            db.collection("messages").add(message)
+                .then(() => console.log("Mensaje guardado en Firebase"))
+                .catch((error) => console.error("Error al guardar el mensaje: ", error));
         }
 
-        function deleteMessage(id) {
-            let messages = JSON.parse(localStorage.getItem('messages')) || [];
-            messages = messages.filter(msg => msg.id !== id);
-            localStorage.setItem('messages', JSON.stringify(messages));
+function deleteMessage(id) {
+            db.collection("messages").where("id", "==", id).get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    db.collection("messages").doc(doc.id).delete().then(() => {
+                        console.log("Mensaje eliminado en Firebase");
+                    }).catch((error) => {
+                        console.error("Error al eliminar el mensaje: ", error);
+                    });
+                });
+            });
         }
 
         function createMessageElement(message) {
@@ -346,29 +297,21 @@
             deleteBtn.classList.add('delete-btn');
             deleteBtn.title = 'Eliminar mensaje';
             deleteBtn.addEventListener('click', () => {
-                if(confirm(`¿Seguro que quieres borrar este mensaje publicado el ${message.timestamp}?`)){
+                if (confirm(`¿Seguro que quieres borrar este mensaje publicado el ${message.timestamp}?`)) {
                     bulletin.removeChild(msgDiv);
                     deleteMessage(message.id);
-                    updateMessagesPublished(); 
+                    updateMessagesPublished();
                 }
             });
             msgDiv.appendChild(deleteBtn);
 
             bulletin.prepend(msgDiv);
-
-            setTimeout(() => {
-                if(bulletin.contains(msgDiv)){
-                    bulletin.removeChild(msgDiv);
-                    deleteMessage(message.id);
-                    updateMessagesPublished(); 
-                }
-            }, 24*60*60*1000);
         }
 
         postButton.addEventListener('click', () => {
             const text = messageInput.value.trim();
             const tone = toneSelect.value;
-            if(text === '') return;
+            if (text === '') return;
 
             const now = new Date();
             const formattedDate = now.toLocaleString('es-ES', {
@@ -391,127 +334,17 @@
             saveMessage(message);
             createMessageElement(message);
             messageInput.value = '';
-            updateMessagesPublished(); 
+            updateMessagesPublished();
         });
 
         function updateMessagesPublished() {
-            const messages = JSON.parse(localStorage.getItem('messages')) || [];
-            messagesPublished.textContent = `Mensajes publicados: ${messages.length}`;
+            db.collection("messages").get().then((querySnapshot) => {
+                messagesPublished.textContent = `Mensajes publicados: ${querySnapshot.size}`;
+            });
         }
 
         loadMessages();
-
-        const emojiCategories = {
-            corazones: ['❤️', '💖', '💕', '💓', '💗'],
-            caritas: ['😊', '😄', '😁', '😃', '🙂'],
-            estrellas: ['✨', '⭐️', '🌟', '💫', '🌠'],
-            flores: ['🌸', '🌼', '🌺', '🌻', '💐'],
-            animales: ['🐶', '🐱', '🐰', '🦊', '🐻']
-        };
-
-        function getRandomCategory() {
-            const categories = Object.keys(emojiCategories);
-            return categories[Math.floor(Math.random() * categories.length)];
-        }
-
-        function getRandomEmoji(category) {
-            const emojis = emojiCategories[category];
-            return emojis[Math.floor(Math.random() * emojis.length)];
-        }
-
-        function initEmojiBackground() {
-            const emojiContainer = document.getElementById('emoji-background');
-            const numDiagonals = Math.floor(Math.max(window.innerWidth, window.innerHeight) / (spacing * 2)); 
-
-            for (let i = 0; i < numDiagonals; i++) {
-                createEmojiLine(emojiContainer, i, numDiagonals);
-            }
-        }
-
-        function createEmojiLine(container, index, total) {
-            const line = document.createElement('div');
-            line.classList.add('emoji-line');
-
-            const startX = (index * spacing * 2) % window.innerWidth;
-            const startY = 0;
-
-            line.style.left = `${startX}px`;
-            line.style.top = `${startY}px`;
-
-            const category = getRandomCategory();
-            let currentEmoji = getRandomEmoji(category);
-
-            const numEmojis = Math.floor(window.innerHeight / (spacing * 2)) + 1;
-            for (let j = 0; j < numEmojis; j++) {
-                const emoji = document.createElement('span');
-                emoji.textContent = currentEmoji;
-                emoji.style.position = 'absolute';
-                emoji.style.left = `${j * spacing * 2}px`;
-                emoji.style.top = `${j * spacing * 2}px`;
-                emoji.style.fontSize = '20px';
-                line.appendChild(emoji);
-            }
-
-            container.appendChild(line);
-
-            animateEmojiLine(line, category, currentEmoji, spacing * 2);
-        }
-
-        function animateEmojiLine(line, category, currentEmoji, spacing) {
-            const emojis = emojiCategories[category];
-            let nextEmojiIndex = emojis.indexOf(currentEmoji) + 1;
-
-            if (nextEmojiIndex >= emojis.length) {
-                nextEmojiIndex = 0;
-            }
-
-            const nextEmoji = emojis[nextEmojiIndex];
-
-            function changeEmojis() {
-                const emojiElements = line.querySelectorAll('span');
-                emojiElements.forEach(emojiEl => {
-                    emojiEl.textContent = nextEmoji;
-                });
-
-                currentEmoji = nextEmoji;
-                nextEmojiIndex = (nextEmojiIndex + 1) % emojis.length;
-
-                const interval = getRandomInterval();
-                setTimeout(() => {
-                    requestAnimationFrame(changeEmojis);
-                }, interval);
-            }
-
-            setTimeout(() => {
-                requestAnimationFrame(changeEmojis);
-            }, getRandomInterval());
-        }
-
-        function getRandomInterval() {
-            return Math.random() * 2500 + 500;
-        }
-
-        window.addEventListener('resize', () => {
-            const emojiContainer = document.getElementById('emoji-background');
-            clearTimeout(window.resizeTimeout);
-            window.resizeTimeout = setTimeout(() => {
-                emojiContainer.innerHTML = '';
-                initEmojiBackground();
-            }, 500);
-        });
-
-        window.addEventListener('DOMContentLoaded', initEmojiBackground);
-
-        const themeToggle = document.getElementById('theme-toggle');
-
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            if(document.body.classList.contains('dark-mode')){
-                themeToggle.textContent = '☀️';
-            } else {
-                themeToggle.textContent = '🌙';
-            }
-        });
+        updateMessagesPublished();
     </script>
 </body>
 </html>
