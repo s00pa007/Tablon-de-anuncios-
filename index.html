@@ -234,32 +234,10 @@
             font-size: 18px;
         }
 
-        /* Estilos para el teletipo */
-        .teletipo-container {
+        /* Estilo para el contenedor del teletipo */
+        #teletipo-container {
             width: 100%;
-            height: 20px;
-            overflow: hidden;
-            background: #fff;
-            color: #000;
-            font-size: 8px;
-            font-family: "Courier New", Courier, monospace;
-            font-weight: bold;
-            border: 1px solid #000;
-            position: relative;
             margin-bottom: 20px;
-        }
-
-        .teletipo-text {
-            white-space: nowrap;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            animation: moverIzquierda linear infinite;
-            animation-delay: 0s;
-        }
-
-        @keyframes moverIzquierda {
-            to { transform: translateY(-50%) translateX(-100%); }
         }
     </style>
 </head>
@@ -270,10 +248,8 @@
         <button id="theme-toggle">🌓</button>
     </header>
 
-    <!-- Teletipo de noticias -->
-    <div class="teletipo-container">
-        <div id="teletipo" class="teletipo-text"></div>
-    </div>
+    <!-- Contenedor para el teletipo -->
+    <div id="teletipo-container"></div>
 
     <div class="container">
         <form id="message-form">
@@ -388,7 +364,7 @@
             timestamp.textContent = new Date(message.timestamp.toDate()).toLocaleString();
 
             const actions = document.createElement('div');
-actions.className = 'message-actions';
+            actions.className = 'message-actions';
 
             const likeBtn = document.createElement('button');
             likeBtn.className = 'like-btn';
@@ -403,7 +379,7 @@ actions.className = 'message-actions';
             const replyBtn = document.createElement('button');
             replyBtn.className = 'reply-btn';
             replyBtn.textContent = '↩️';
-            replyBtn.onclick = () => showReplyForm(message.id, message);
+replyBtn.onclick = () => showReplyForm(message.id, message);
 
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
@@ -626,41 +602,17 @@ actions.className = 'message-actions';
             document.body.appendChild(emojiContainer);
         }
         
-        // Funciones para el teletipo
-        const sujetos = ["Samuel", "Julia", "Papi", "Mami", "Moncho", "Bagheera", "Abuelo", "Luisa", "Mónica", "Xiomara", "Nana", "Paco", "Abuelo Antonio", "Lolo", "Víctor", "Óscar el de la sortija", "La hija de Lolo", "El profe de Mate", "Goya", "Abby la peluquera"];
-        const acciones = ["hizo caca", "hizo una receta de espaguetis inventado", "se tiró de cabeza", "le encanta ir", "hizo un maratón de ladridos", "decidió vender limonada de sabores raros", "trató de arreglar una bici usando palillos chinos", "montó un karaoke en la cocina", "se inventó una receta con chocolate y patatas fritas", "llevó toda la clase a la plaza para estudiar geometría con tiza", "hizo una torre de almohadas", "insistió en que las mariposas se mueven más rápido en días nublados", "decidió dormir en la bañera", "creó una canción de rap sobre la tabla del 5", "ganó el concurso de saltos en la colchoneta", "se disfrazó de detective para resolver el misterio del bocadillo perdido", "organizó una carrera de caracoles en el arenero", "convenció a todos de que el Wi-Fi tiene sabor a plátano", "se atascó en la puerta giratoria y dio vueltas durante diez minutos", "hizo malabares con mandarinas en el mercado", "discutió con el viento durante toda la tarde", "intentó hablar con el loro en japonés", "se subió a una mesa pensando que era un barco", "perdió una pelea con una escoba", "ganó un campeonato de saltos de sofá", "organizó una fiesta sorpresa para sí mismo"];
-        const lugares = ["la colchoneta", "el arenero", "el cuarto de Julia", "el cuarto de Samuel", "el skatepark", "la Plaza del Charco", "el Tauro", "el Instituto", "la Playa del Socorro", "El Quinto Pino", "la casa de Abuelo", "la casa de Nana", "el Parque del Dragón", "el sofá", "el cuarto de baño", "el lago", "el parque marítimo", "la Playa de Punta Brava", "el muelle", "San Telmo", "la cueva del oso", "la azotea de los gritos", "el garaje encantado", "el túnel del susurro", "el árbol que habla", "la plaza de los charcos mágicos", "la nube flotante"];
-
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function generarFrases(cantidad) {
-            const sujetosBarajados = shuffle([...sujetos]);
-            const accionesBarajadas = shuffle([...acciones]);
-            const lugaresBarajados = shuffle([...lugares]);
-            
-            let frases = [];
-            for (let i = 0; i < cantidad; i++) {
-                frases.push(`${sujetosBarajados[i % sujetos.length]} ${accionesBarajadas[i % acciones.length]} en ${lugaresBarajados[i % lugares.length]}.`);
-            }
-            return frases.join(' ');
-        }
-
-        function iniciarTeletipo() {
-            const teletipo = document.getElementById('teletipo');
-            const texto = generarFrases(20); // Generamos 20 frases aleatorias
-            teletipo.textContent = texto + ' ' + texto;
-
-            requestAnimationFrame(() => {
-                const anchuraTexto = teletipo.offsetWidth;
-                const duracionAnimacion = anchuraTexto / 50;
-                teletipo.style.animation = `moverIzquierda ${duracionAnimacion}s linear infinite`;
-            });
+        function cargarTeletipo() {
+            fetch('teletipo.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('teletipo-container').innerHTML = data;
+                    // Ejecutar el script del teletipo después de cargarlo
+                    const script = document.createElement('script');
+                    script.textContent = `iniciarTeletipo();`;
+                    document.body.appendChild(script);
+                })
+                .catch(error => console.error('Error al cargar el teletipo:', error));
         }
         
         function initApp() {
@@ -668,7 +620,7 @@ actions.className = 'message-actions';
             changeSlogan();
             createEmojiBackground();
             updateMessagesDeleted();
-            iniciarTeletipo(); // Iniciar el teletipo
+            cargarTeletipo(); // Cargar el teletipo
             
             const startDate = new Date('2023-06-08');
             const today = new Date();
