@@ -8,23 +8,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --background-color: #f9f9f9;
+            --background-color: #f0f0f0;
             --text-color: #333333;
             --header-bg: #ffffff;
-            --counter-bg: #ffffff;
+            --counter-bg: #e0e0e0;
+            --message-bg-1: #ffecb3;
+            --message-bg-2: #b3e5fc;
             --button-bg: #4caf50;
             --button-text: #ffffff;
-            --border-color: #ff6f61;
         }
-
+        
         body.dark-mode {
             --background-color: #121212;
             --text-color: #ffffff;
             --header-bg: #1e1e1e;
             --counter-bg: #333333;
+            --message-bg-1: #2c2c2c;
+            --message-bg-2: #3c3c3c;
             --button-bg: #bb86fc;
             --button-text: #000000;
-            --border-color: #8e9eab;
         }
 
         body {
@@ -51,7 +53,7 @@
 
         h1 {
             margin: 0;
-            font-size: 32px;
+            font-size: 28px;
             color: #ff6347;
         }
 
@@ -61,7 +63,7 @@
             padding: 10px;
             margin-top: 10px;
             border-radius: 5px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
         }
 
@@ -79,19 +81,6 @@
             padding: 10px;
             width: 100%;
             max-width: 800px;
-        }
-
-        .counters {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .counter {
-            background-color: var(--counter-bg);
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 16px;
         }
 
         #message-form {
@@ -130,35 +119,22 @@
         #bulletin-board {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .message {
             display: flex;
             align-items: flex-start;
-            padding: 15px;
-            border-radius: 15px;
-            position: relative;
-            background-clip: padding-box;
-            overflow: hidden;
-            font-size: 18px;
-            font-weight: bold;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-            border: 2px solid var(--border-color);
-        }
-
-        .message::before {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; bottom: -2px; right: -2px;
-            background: linear-gradient(45deg, var(--border-color), #de6262);
-            z-index: -1;
-            border-radius: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #333;
         }
 
         .message-emoji {
-            font-size: 48px;
-            margin-right: 15px;
+            font-size: 36px;
+            margin-right: 10px;
         }
 
         .message-content {
@@ -166,26 +142,46 @@
         }
 
         .message-text {
-            margin-bottom: 10px;
-            line-height: 1.6;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .message-timestamp {
+            font-size: 10px;
+            color: #888;
+            text-align: right;
+            margin-top: 5px;
         }
 
         .message-actions {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            margin-top: 5px;
         }
 
-        .like-btn, .dislike-btn, .delete-btn {
+        .like-btn, .dislike-btn, .reply-btn, .delete-btn {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 18px;
         }
 
-        .like-btn:hover, .dislike-btn:hover, .delete-btn:hover {
-            transform: scale(1.2);
-            transition: transform 0.2s;
+        .replies {
+            margin-left: 15px;
+            margin-top: 10px;
+        }
+
+        .statistics {
+            background-color: var(--counter-bg);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .statistics div {
+            margin-bottom: 5px;
         }
 
         @keyframes float {
@@ -210,18 +206,18 @@
         <button id="theme-toggle">🌓</button>
     </header>
     <div class="container">
-        <div class="counters">
-            <div class="counter" id="days-operating">Días en funcionamiento: 0</div>
-            <div class="counter" id="messages-published">Mensajes publicados: 0</div>
-        </div>
         <form id="message-form">
             <textarea id="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
             <button type="submit">Publicar</button>
         </form>
         <div id="bulletin-board"></div>
     </div>
+    <div class="statistics">
+        <div id="days-operating">Días en funcionamiento: 1</div>
+        <div id="messages-published">Mensajes publicados: 0</div>
+        <div id="messages-deleted">Mensajes borrados: 0</div>
+    </div>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
@@ -245,6 +241,7 @@
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
         const messagesPublished = document.getElementById('messages-published');
+        const messagesDeleted = document.getElementById('messages-deleted');
         const themeToggle = document.getElementById('theme-toggle');
         const daysOperating = document.getElementById('days-operating');
         const slogan = document.getElementById('slogan');
@@ -262,103 +259,30 @@
             "El muro digital",
             "Exprésate sin barreras",
             "Tu mensaje importa",
-            "La página favorita de Moncho",
-            "Cómprate un Maichi",
-            "Donde tus ideas vuelan alto",
-            "Tu rincón secreto",
-            "Anónimamente genial",
-            "Comparte sin filtros",
-            "Tu espacio, tus reglas",
-            "Publica y desaparece",
-            "El lugar de tus pensamientos",
-            "Dilo todo sin miedo",
-            "Anónimos pero presentes",
-            "Donde todo es posible",
-            "Tu voz en el viento",
-            "Expresiones sin fronteras",
-            "Donde nadie te juzga",
-            "Tu espacio invisible",
-            "Publica y deja que fluya"
+            "Anunciado en TV",
+            "Donde hasta Moncho opina",
+            "¡Cuéntalo, que nadie se entera!",
+            "El rincón de las ocurrencias familiares",
+            "Secretos de familia: ahora públicos",
+            "Anónimo... pero sabemos que es cosa de Samuel",
+            "Donde mamá pide caviar",
+            "¡Aquí se venden gatos pesados!",
+            "El tablón de los valientes",
+            "El diario secreto de la familia (versión pública)",
+            "La página de la gente que no se peina",
+            "Dilo, Julia... Dilo!",
+            "Escribe lo que quieras, que no hay consecuencias",
+            "Al final seguro que papi se enfada"
         ];
 
-        // Lista de colores de fondo que contrastan bien con el texto
-        const bgColorsLight = [
-            '#FFCDD2', '#C8E6C9', '#BBDEFB', '#FFF9C4', '#D1C4E9',
-            '#F0F4C3', '#FFECB3', '#B2DFDB', '#DCEDC8', '#FFE0B2',
-            '#F8BBD0', '#C5CAE9', '#B3E5FC', '#D7CCC8', '#F0F4C3',
-            '#FFE0B2', '#FFCCBC', '#D7CCC8', '#E1BEE7', '#C8E6C9'
-        ];
-
-        const bgColorsDark = [
-            '#B71C1C', '#1B5E20', '#0D47A1', '#F57F17', '#4A148C',
-            '#33691E', '#FF6F00', '#006064', '#004D40', '#BF360C',
-            '#880E4F', '#283593', '#01579B', '#3E2723', '#1B5E20',
-            '#D84315', '#004D40', '#1A237E', '#004D40', '#3E2723'
-        ];
-
-        // Referencia a la colección metadata y al documento específico
-        const metadataDocRef = db.collection('metadata').doc('general');
-
-        let startDate = null;
-        let totalMessages = 0;
-
-        // Escuchar cambios en metadata
-        metadataDocRef.onSnapshot((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
-                if (data.startDate && data.startDate.toDate) {
-                    startDate = data.startDate.toDate();
-                    updateDaysOperating();
-                }
-                if (data.totalMessages !== undefined) {
-                    totalMessages = data.totalMessages;
-                    updateMessagesPublishedDisplay();
-                }
-            }
-        }, (error) => {
-            console.error("Error al escuchar metadata: ", error);
-        });
-
-        // Inicializar metadata si no existe
-        metadataDocRef.get().then((doc) => {
-            if (!doc.exists) {
-                const now = firebase.firestore.FieldValue.serverTimestamp();
-                metadataDocRef.set({
-                    startDate: now,
-                    totalMessages: 0
-                }).then(() => {
-                    console.log("Metadata inicial establecida.");
-                }).catch((error) => {
-                    console.error("Error al establecer metadata inicial: ", error);
-                });
-            }
-        }).catch((error) => {
-            console.error("Error al obtener metadata: ", error);
-        });
-
-        function updateDaysOperating() {
-            if (!startDate) return;
-            const today = new Date();
-            // Calcular la diferencia en días
-            const timeDiff = today - startDate;
-            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-            daysOperating.textContent = `Días en funcionamiento: ${days}`;
-        }
-
-        function updateMessagesPublishedDisplay() {
-            messagesPublished.textContent = `Mensajes publicados: ${totalMessages}`;
-        }
-
-        // Escuchar cambios en los mensajes
         function loadMessages() {
-            db.collection("messages").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+            db.collection("messages").orderBy("timestamp", "desc").get().then((querySnapshot) => {
                 bulletinBoard.innerHTML = '';
                 querySnapshot.forEach((doc) => {
                     const message = doc.data();
                     createMessageElement(message, doc.id);
                 });
-            }, (error) => {
-                console.error("Error al cargar los mensajes: ", error);
+                updateMessagesPublished(querySnapshot.size);
             });
         }
 
@@ -366,13 +290,7 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
             messageDiv.dataset.id = id;
-
-            // Asignar un color de fondo aleatorio que contraste
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const bgColor = isDarkMode 
-                ? bgColorsDark[Math.floor(Math.random() * bgColorsDark.length)]
-                : bgColorsLight[Math.floor(Math.random() * bgColorsLight.length)];
-            messageDiv.style.backgroundColor = bgColor;
+            messageDiv.style.backgroundColor = message.bgColor;
 
             const emoji = document.createElement('div');
             emoji.className = 'message-emoji';
@@ -384,6 +302,10 @@
             const text = document.createElement('div');
             text.className = 'message-text';
             text.textContent = message.text;
+
+            const timestamp = document.createElement('div');
+            timestamp.className = 'message-timestamp';
+            timestamp.textContent = new Date(message.timestamp.toDate()).toLocaleString();
 
             const actions = document.createElement('div');
             actions.className = 'message-actions';
@@ -398,6 +320,11 @@
             dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
             dislikeBtn.onclick = () => updateLikes(id, 'dislikes');
 
+            const replyBtn = document.createElement('button');
+            replyBtn.className = 'reply-btn';
+            replyBtn.textContent = '↩️';
+            replyBtn.onclick = () => showReplyForm(id);
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = '🗑️';
@@ -405,37 +332,117 @@
 
             actions.appendChild(likeBtn);
             actions.appendChild(dislikeBtn);
+            actions.appendChild(replyBtn);
             actions.appendChild(deleteBtn);
 
             content.appendChild(text);
+            content.appendChild(timestamp);
             content.appendChild(actions);
 
             messageDiv.appendChild(emoji);
             messageDiv.appendChild(content);
 
+            if (message.replies) {
+                const repliesDiv = document.createElement('div');
+                repliesDiv.className = 'replies';
+                message.replies.forEach(reply => {
+                    const replyElement = createReplyElement(reply);
+                    repliesDiv.appendChild(replyElement);
+                });
+                content.appendChild(repliesDiv);
+            }
+
             bulletinBoard.appendChild(messageDiv);
+        }
+
+        function createReplyElement(reply) {
+            const replyDiv = document.createElement('div');
+            replyDiv.className = 'message reply';
+
+            const emoji = document.createElement('div');
+            emoji.className = 'message-emoji';
+            emoji.textContent = reply.emoji;
+
+const content = document.createElement('div');
+            content.className = 'message-content';
+
+            const text = document.createElement('div');
+            text.className = 'message-text';
+            text.textContent = reply.text;
+
+            const timestamp = document.createElement('div');
+            timestamp.className = 'message-timestamp';
+            timestamp.textContent = new Date(reply.timestamp.toDate()).toLocaleString();
+
+            content.appendChild(text);
+            content.appendChild(timestamp);
+
+            replyDiv.appendChild(emoji);
+            replyDiv.appendChild(content);
+
+            return replyDiv;
+        }
+
+        function showReplyForm(parentId) {
+            const parentMessage = document.querySelector(`[data-id="${parentId}"]`);
+            const replyForm = document.createElement('form');
+            replyForm.innerHTML = `
+                <textarea placeholder="Escribe tu respuesta..."></textarea>
+                <button type="submit">Responder</button>
+            `;
+            replyForm.onsubmit = (e) => {
+                e.preventDefault();
+                const replyText = e.target.querySelector('textarea').value;
+                if (replyText.trim()) {
+                    addReply(parentId, replyText);
+                }
+                parentMessage.removeChild(replyForm);
+            };
+            parentMessage.appendChild(replyForm);
+        }
+
+        function addReply(parentId, replyText) {
+            const reply = {
+                text: replyText,
+                emoji: getRandomAnimalEmoji(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            db.collection("messages").doc(parentId).update({
+                replies: firebase.firestore.FieldValue.arrayUnion(reply)
+            }).then(() => {
+                loadMessages();
+            }).catch((error) => {
+                console.error("Error adding reply: ", error);
+            });
         }
 
         function updateLikes(id, field) {
             db.collection("messages").doc(id).update({
                 [field]: firebase.firestore.FieldValue.increment(1)
-            })
-            .then(() => {
-                console.log(`Actualizado ${field} para el mensaje ${id}.`);
-            })
-            .catch((error) => {
-                console.error(`Error al actualizar ${field}: `, error);
+            }).then(() => {
+                db.collection("messages").doc(id).get().then((doc) => {
+                    if (doc.exists) {
+                        const message = doc.data();
+                        const messageElement = document.querySelector(`[data-id="${id}"]`);
+                        const likeBtn = messageElement.querySelector('.like-btn');
+                        const dislikeBtn = messageElement.querySelector('.dislike-btn');
+                        likeBtn.textContent = `👍 ${message.likes || 0}`;
+                        dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
+                    }
+                });
+            }).catch((error) => {
+                console.error("Error updating likes: ", error);
             });
         }
 
         function deleteMessage(id) {
             if (confirm("¿Estás seguro de que quieres borrar este mensaje?")) {
-                db.collection("messages").doc(id).delete()
-                .then(() => {
-                    console.log(`Mensaje ${id} borrado correctamente.`);
-                })
-                .catch((error) => {
-                    console.error("Error al borrar el mensaje: ", error);
+                db.collection("messages").doc(id).delete().then(() => {
+                    loadMessages();
+                    updateMessagesDeleted();
+                }).catch((error) => {
+                    console.error("Error removing message: ", error);
                 });
             }
         }
@@ -449,15 +456,12 @@
                     emoji: getRandomAnimalEmoji(),
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     likes: 0,
-                    dislikes: 0
+                    dislikes: 0,
+                    bgColor: getRandomColor()
                 };
-                db.collection("messages").add(message)
-                .then(() => {
+                db.collection("messages").add(message).then(() => {
                     messageInput.value = '';
-                    incrementTotalMessages();
-                })
-                .catch((error) => {
-                    console.error("Error al publicar el mensaje: ", error);
+                    loadMessages();
                 });
             }
         });
@@ -466,15 +470,29 @@
             return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
         }
 
-        function incrementTotalMessages() {
-            metadataDocRef.update({
-                totalMessages: firebase.firestore.FieldValue.increment(1)
-            })
-            .then(() => {
-                console.log("Contador de mensajes incrementado.");
-            })
-            .catch((error) => {
-                console.error("Error al incrementar el contador de mensajes: ", error);
+        function getRandomColor() {
+            const colors = ['#ffecb3', '#b3e5fc'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function updateMessagesPublished(count) {
+            messagesPublished.textContent = `Mensajes publicados: ${count}`;
+        }
+
+        function updateMessagesDeleted() {
+            db.collection("statistics").doc("counters").get().then((doc) => {
+                if (doc.exists) {
+                    const deletedCount = doc.data().messagesDeleted || 0;
+                    messagesDeleted.textContent = `Mensajes borrados: ${deletedCount}`;
+                }
+            });
+        }
+
+        function incrementMessagesDeleted() {
+            db.collection("statistics").doc("counters").update({
+                messagesDeleted: firebase.firestore.FieldValue.increment(1)
+            }).then(() => {
+                updateMessagesDeleted();
             });
         }
 
@@ -515,14 +533,13 @@
             loadMessages();
             changeSlogan();
             createEmojiBackground();
+            updateMessagesDeleted();
 
-            // Actualizar días en funcionamiento cada día a medianoche
-            const now = new Date();
-            const millisTillMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0,0,0,0) - now;
-            setTimeout(function(){
-                updateDaysOperating();
-                setInterval(updateDaysOperating, 1000 * 60 * 60 * 24);
-            }, millisTillMidnight);
+            // Actualizar días en funcionamiento
+            const startDate = new Date('2023-06-08'); // Fecha de inicio del proyecto
+            const today = new Date();
+            const daysOperating = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById('days-operating').textContent = `Días en funcionamiento: ${daysOperating}`;
 
             // Cambiar el slogan cada 10 segundos
             setInterval(changeSlogan, 10000);
