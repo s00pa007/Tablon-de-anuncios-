@@ -265,7 +265,7 @@
     </header>
     <div class="container">
         <div class="counters">
-            <div class="counter" id="days-operating">Días en funcionamiento: 1</div>
+            <div class="counter" id="days-operating">Días en funcionamiento: 0</div>
             <div class="counter" id="messages-published">Mensajes publicados: 0</div>
         </div>
         <form id="message-form">
@@ -331,6 +331,56 @@
             '#880E4F', '#283593', '#01579B', '#3E2723', '#1B5E20'
         ];
 
+        // Referencia a la colección metadata y al documento específico
+        const metadataDocRef = db.collection('metadata').doc('general');
+
+        let startDate = null;
+        let totalMessages = 0;
+
+        function loadMetadata() {
+            metadataDocRef.get().then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    startDate = data.startDate.toDate();
+                    totalMessages = data.totalMessages;
+                    updateDaysOperating();
+                    updateMessagesPublishedDisplay();
+                } else {
+                    // Si no existe, establecer startDate como hoy y totalMessages como 0
+                    const now = firebase.firestore.FieldValue.serverTimestamp();
+                    metadataDocRef.set({
+                        startDate: now,
+                        totalMessages: 0
+                    }).then(() => {
+                        // Después de establecer, obtener la fecha real
+                        metadataDocRef.get().then((docNew) => {
+                            startDate = docNew.data().startDate.toDate();
+                            totalMessages = docNew.data().totalMessages;
+                            updateDaysOperating();
+                            updateMessagesPublishedDisplay();
+                        });
+                    }).catch((error) => {
+                        console.error("Error al establecer metadata inicial: ", error);
+                    });
+                }
+            }).catch((error) => {
+                console.error("Error al obtener metadata: ", error);
+            });
+        }
+
+        function updateDaysOperating() {
+            if (!startDate) return;
+            const today = new Date();
+            // Calcular la diferencia en días
+            const timeDiff = today - startDate;
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+            daysOperating.textContent = `Días en funcionamiento: ${days}`;
+        }
+
+        function updateMessagesPublishedDisplay() {
+            messagesPublished.textContent = `Mensajes publicados: ${totalMessages}`;
+        }
+
         function loadMessages() {
             db.collection("messages").orderBy("timestamp", "desc").get()
                 .then((querySnapshot) => {
@@ -339,7 +389,6 @@
                         const message = doc.data();
                         createMessageElement(message, doc.id);
                     });
-                    updateMessagesPublished(querySnapshot.size);
                 })
                 .catch((error) => {
                     console.error("Error al cargar los mensajes: ", error);
@@ -517,7 +566,7 @@
                 db.collection("messages").add(message)
                 .then(() => {
                     messageInput.value = '';
-                    loadMessages();
+                    incrementTotalMessages();
                 })
                 .catch((error) => {
                     console.error("Error al publicar el mensaje: ", error);
@@ -529,8 +578,18 @@
             return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
         }
 
-        function updateMessagesPublished(count) {
-            messagesPublished.textContent = `Mensajes publicados: ${count}`;
+        function incrementTotalMessages() {
+            metadataDocRef.update({
+                totalMessages: firebase.firestore.FieldValue.increment(1)
+            })
+            .then(() => {
+                totalMessages += 1;
+                updateMessagesPublishedDisplay();
+                loadMessages();
+            })
+            .catch((error) => {
+                console.error("Error al incrementar el contador de mensajes: ", error);
+            });
         }
 
         function changeSlogan() {
@@ -568,15 +627,13 @@
         }
 
         function initApp() {
+            loadMetadata();
             loadMessages();
             changeSlogan();
             createEmojiBackground();
 
-            // Actualizar días en funcionamiento
-            const startDate = new Date('2023-06-08'); // Fecha de inicio del proyecto
-            const today = new Date();
-            const days = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-            document.getElementById('days-operating').textContent = `Días en funcionamiento: ${days}`;
+            // Actualizar días en funcionamiento cada día
+            setInterval(updateDaysOperating, 1000 * 60 * 60 * 24);
 
             // Cambiar el slogan cada 10 segundos
             setInterval(changeSlogan, 10000);
