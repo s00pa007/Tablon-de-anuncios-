@@ -4,25 +4,27 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablón de anuncios</title>
+    <title>Tablón de anuncios anónimos</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
-            --background-color: rgba(255, 255, 255, 0.8);
+            --background-color: #ffffff;
             --text-color: #000000;
             --header-bg: #f0f0f0;
             --counter-bg: #ffefd5;
-            --message-bg: #ffe4e1;
+            --message-bg-1: #ffe4e1;
+            --message-bg-2: #e0ffff;
             --button-bg: #fffacd;
             --button-text: #000000;
         }
         
         body.dark-mode {
-            --background-color: rgba(18, 18, 18, 0.8);
+            --background-color: #121212;
             --text-color: #e0e0e0;
             --header-bg: #1e1e1e;
             --counter-bg: #333333;
-            --message-bg: #2c2c2c;
+            --message-bg-1: #2c2c2c;
+            --message-bg-2: #3c3c3c;
             --button-bg: #424242;
             --button-text: #ffffff;
         }
@@ -30,32 +32,17 @@
         body {
             background-color: var(--background-color);
             color: var(--text-color);
-            font-family: 'Press Start 2P', cursive;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.1;
-            pointer-events: none;
         }
 
         header {
             text-align: center;
-            position: relative;
             margin-bottom: 20px;
             width: 100%;
             background-color: var(--header-bg);
@@ -68,27 +55,27 @@
             margin: 0;
             font-size: 24px;
             color: #ff6347;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #slogan {
+            background-color: #ffff00;
+            color: #000000;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
         }
 
         #theme-toggle {
             margin-top: 10px;
-            width: 40px;
-            height: 40px;
+            padding: 5px 10px;
             background-color: var(--button-bg);
             border: none;
-            border-radius: 50%;
+            border-radius: 5px;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
-
-        #theme-toggle:hover {
-            transform: scale(1.1);
+            font-size: 16px;
         }
 
         .container {
@@ -97,174 +84,103 @@
             padding: 10px;
             width: 100%;
             max-width: 800px;
-            background-color: var(--background-color);
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         .counters {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            font-size: 14px;
-            color: var(--text-color);
+            justify-content: space-between;
             margin-bottom: 20px;
         }
 
         .counter {
             background-color: var(--counter-bg);
-            padding: 10px 20px;
-            border: 2px solid #ff69b4;
-            border-radius: 8px;
-            animation: fadeIn 1s ease-in-out;
-            text-align: center;
-            color: var(--text-color);
-            flex: 1;
-            min-width: 200px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
         }
 
         #message-form {
-            background-color: var(--message-bg);
+            background-color: var(--message-bg-1);
             padding: 20px;
-            border: 2px dashed #ffa07a;
             border-radius: 10px;
-            width: 100%;
-            box-sizing: border-box;
-            margin-bottom: 30px;
-            animation: slideIn 1s ease-in-out;
-        }
-
-        #message-form h2 {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #ff4500;
-            font-size: 16px;
+            margin-bottom: 20px;
         }
 
         #message-form textarea {
             width: 100%;
             height: 80px;
             padding: 10px;
-            border: 2px solid #ff6347;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            resize: none;
+            resize: vertical;
             font-size: 14px;
-            box-sizing: border-box;
         }
 
         #message-form button {
             width: 100%;
+            padding: 10px;
             margin-top: 10px;
-            padding: 12px;
-            border: 2px solid #ff6347;
-            border-radius: 5px;
             background-color: var(--button-bg);
             color: var(--button-text);
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            box-sizing: border-box;
-            transition: transform 0.3s ease;
-        }
-
-        #message-form button:hover {
-            transform: scale(1.05);
         }
 
         #bulletin-board {
-            width: 100%;
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column;
             gap: 15px;
         }
 
         .message {
-            position: relative;
-            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            padding: 10px;
             border-radius: 10px;
-            color: var(--text-color);
-            animation: stick 0.5s ease-out, fadeIn 1s ease-in-out;
-            word-wrap: break-word;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+            font-size: 14px;
         }
 
-        .message:hover {
-            transform: translateY(-5px);
+        .message:nth-child(odd) {
+            background-color: var(--message-bg-1);
+            flex-direction: row;
         }
 
-        .message .timestamp {
-            font-size: 12px;
+        .message:nth-child(even) {
+            background-color: var(--message-bg-2);
+            flex-direction: row-reverse;
+        }
+
+        .message-emoji {
+            font-size: 40px;
+            margin: 0 10px;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-text {
             margin-bottom: 5px;
-            color: var(--text-color);
-            text-align: right;
         }
 
-        .message .expiry {
-            font-size: 10px;
-            margin-top: 5px;
-            color: var(--text-color);
-            text-align: right;
-            font-style: italic;
-        }
-
-        .delete-btn {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            width: 30px;
-            height: 30px;
-            background: url('https://www.svgrepo.com/show/13656/trash.svg') no-repeat center;
-            background-size: contain;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .delete-btn:hover {
-            transform: rotate(20deg);
-        }
-
-        .info-text {
-            font-size: 12px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-
-        .like-buttons {
+        .message-actions {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            margin-top: 10px;
         }
 
-        .like-btn, .dislike-btn {
+        .like-btn, .dislike-btn, .reply-btn, .delete-btn {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            transition: transform 0.3s ease;
+            font-size: 16px;
         }
 
-        .like-btn:hover, .dislike-btn:hover {
-            transform: scale(1.2);
-        }
-
-        .like-count, .dislike-count {
-            font-size: 14px;
-            margin-left: 5px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes stick {
-            from { transform: translateY(-20px); }
-            to { transform: translateY(0); }
+        .replies {
+            margin-left: 20px;
+            margin-top: 10px;
         }
 
         @keyframes float {
@@ -284,30 +200,27 @@
 </head>
 <body>
     <header>
-        <h1>Tablón de anuncios</h1>
-        <button id="theme-toggle" aria-label="Cambiar modo">🌙</button>
+        <h1>Tablón de anuncios anónimos</h1>
+        <div id="slogan"></div>
+        <button id="theme-toggle">Cambiar modo</button>
     </header>
     <div class="container">
         <div class="counters">
             <div class="counter" id="days-operating">Días en funcionamiento: 1</div>
             <div class="counter" id="messages-published">Mensajes publicados: 0</div>
         </div>
-        <section id="message-form">
-            <h2>Publicar Mensaje</h2>
+        <form id="message-form">
             <textarea id="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
-            <button id="post-button">Publicar</button>
-        </section>
-        <p class="info-text">Los mensajes se borrarán automáticamente después de 48 horas.</p>
-        <main id="bulletin-board">
-            <!-- Messages will aparecer aquí -->
-        </main>
+            <button type="submit">Publicar</button>
+        </form>
+        <div id="bulletin-board"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // Configuración de Firebase
+        // Configuración de Firebase (usa tu propia configuración)
         const firebaseConfig = {
             apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
             authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
@@ -322,179 +235,214 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const bulletin = document.getElementById('bulletin-board');
-        const postButton = document.getElementById('post-button');
+        const bulletinBoard = document.getElementById('bulletin-board');
+        const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
         const messagesPublished = document.getElementById('messages-published');
         const themeToggle = document.getElementById('theme-toggle');
         const daysOperating = document.getElementById('days-operating');
+        const slogan = document.getElementById('slogan');
+
+        const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐈‍⬛', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
+
+        const slogans = [
+            "Ahora más anónimo",
+            "Lo nunca visto",
+            "Publica sin miedo",
+            "Cuidado, no se pueden borrar",
+            "Tu voz, tu espacio",
+            "Comparte libremente",
+            "Ideas sin límites",
+            "El muro digital",
+            "Exprésate sin barreras",
+            "Tu mensaje importa"
+        ];
 
         function loadMessages() {
-            bulletin.innerHTML = '';
-            db.collection("messages")
-                .where("expiryTime", ">", firebase.firestore.Timestamp.now())
-                .orderBy("expiryTime", "desc")
-                .get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        const message = { ...doc.data(), docId: doc.id };
-                        createMessageElement(message);
-                    });
-                })
-                .catch((error) => {
-                    alert("Error al cargar los mensajes. Por favor, recarga la página.");
+            db.collection("messages").orderBy("timestamp", "desc").get().then((querySnapshot) => {
+                bulletinBoard.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const message = doc.data();
+                    createMessageElement(message, doc.id);
                 });
+                updateMessagesPublished(querySnapshot.size);
+            });
         }
 
-        function saveMessage(message) {
-            db.collection("messages").add(message)
-                .then((docRef) => {
-                    message.docId = docRef.id;
-                    createMessageElement(message);
-                    messageInput.value = '';
-                    updateMessagesPublished();
-                })
-                .catch((error) => {
-                    alert("Error al publicar el mensaje. Por favor, inténtalo de nuevo.");
-                });
-        }
+        function createMessageElement(message, id) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.dataset.id = id;
 
-        function deleteMessage(id) {
-            db.collection("messages").doc(id).delete()
-                .then(() => {
-                    updateMessagesPublished();
-                }).catch((error) => {
-                    alert("Error al eliminar el mensaje. Por favor, inténtalo de nuevo.");
-                });
-        }
+            const emoji = document.createElement('div');
+            emoji.className = 'message-emoji';
+            emoji.textContent = message.emoji;
 
-        function createMessageElement(message) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message');
-            msgDiv.style.backgroundColor = message.bgColor;
-            msgDiv.setAttribute('data-id', message.docId);
+            const content = document.createElement('div');
+            content.className = 'message-content';
 
-            const timestampDiv = document.createElement('div');
-            timestampDiv.classList.add('timestamp');
-            timestampDiv.textContent = message.timestamp;
-            msgDiv.appendChild(timestampDiv);
+            const text = document.createElement('div');
+            text.className = 'message-text';
+            text.textContent = message.text;
 
-            const textDiv = document.createElement('div');
-            textDiv.classList.add('text');
-            textDiv.textContent = message.text;
-            msgDiv.appendChild(textDiv);
-
-            const expiryDiv = document.createElement('div');
-            expiryDiv.classList.add('expiry');
-            const expiryTime = new Date(message.expiryTime.seconds * 1000);
-            expiryDiv.textContent = `Expira: ${expiryTime.toLocaleString('es-ES')}`;
-            msgDiv.appendChild(expiryDiv);
-
-            const likeButtons = document.createElement('div');
-            likeButtons.classList.add('like-buttons');
+            const actions = document.createElement('div');
+            actions.className = 'message-actions';
 
             const likeBtn = document.createElement('button');
-            likeBtn.classList.add('like-btn');
-            likeBtn.innerHTML = '👍 <span class="like-count">' + (message.likes || 0) + '</span>';
-            likeBtn.onclick = () => updateLikes(message.docId, 'likes');
+            likeBtn.className = 'like-btn';
+            likeBtn.textContent = `👍 ${message.likes || 0}`;
+            likeBtn.onclick = () => updateLikes(id, 'likes');
 
             const dislikeBtn = document.createElement('button');
-            dislikeBtn.classList.add('dislike-btn');
-            dislikeBtn.innerHTML = '👎 <span class="dislike-count">' + (message.dislikes || 0) + '</span>';
-            dislikeBtn.onclick = () => updateLikes(message.docId, 'dislikes');
+            dislikeBtn.className = 'dislike-btn';
+            dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
+            dislikeBtn.onclick = () => updateLikes(id, 'dislikes');
 
-            likeButtons.appendChild(likeBtn);
-            likeButtons.appendChild(dislikeBtn);
-            msgDiv.appendChild(likeButtons);
+            const replyBtn = document.createElement('button');
+            replyBtn.className = 'reply-btn';
+            replyBtn.textContent = '↩️ Responder';
+            replyBtn.onclick = () => showReplyForm(id);
 
-            const deleteBtn = document.createElement('div');
-            deleteBtn.classList.add('delete-btn');
-            deleteBtn.title = 'Eliminar mensaje';
-            deleteBtn.addEventListener('click', () => {
-                if (confirm(`¿Seguro que quieres borrar este mensaje publicado el ${message.timestamp}?`)) {
-                    bulletin.removeChild(msgDiv);
-                    deleteMessage(message.docId);
-                }
-            });
-            msgDiv.appendChild(deleteBtn);
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '🗑️ Borrar';
+            deleteBtn.onclick = () => deleteMessage(id);
 
-            bulletin.prepend(msgDiv);
-        }
+            actions.appendChild(likeBtn);
+            actions.appendChild(dislikeBtn);
+            actions.appendChild(replyBtn);
+            actions.appendChild(deleteBtn);
 
-function updateLikes(docId, field) {
-            const messageRef = db.collection("messages").doc(docId);
-            return db.runTransaction((transaction) => {
-                return transaction.get(messageRef).then((doc) => {
-                    if (!doc.exists) {
-                        throw "Document does not exist!";
-                    }
-                    let newCount = (doc.data()[field] || 0) + 1;
-                    transaction.update(messageRef, { [field]: newCount });
-                    return newCount;
+            content.appendChild(text);
+            content.appendChild(actions);
+
+            messageDiv.appendChild(emoji);
+            messageDiv.appendChild(content);
+
+            if (message.replies) {
+                const repliesDiv = document.createElement('div');
+                repliesDiv.className = 'replies';
+                message.replies.forEach(reply => {
+                    const replyElement = createReplyElement(reply);
+                    repliesDiv.appendChild(replyElement);
                 });
-            }).then((newCount) => {
-                const messageElement = document.querySelector(`[data-id="${docId}"]`);
-                const countElement = messageElement.querySelector(`.${field}-count`);
-                countElement.textContent = newCount;
-            }).catch((error) => {
-                console.error("Error updating likes/dislikes: ", error);
-            });
-        }
-
-        postButton.addEventListener('click', () => {
-            const text = messageInput.value.trim();
-            if (text === '') {
-                alert("Por favor, escribe un mensaje antes de publicar.");
-                return;
+                content.appendChild(repliesDiv);
             }
 
-            const now = new Date();
-            const expiryTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 horas después
-            const formattedDate = now.toLocaleString('es-ES', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            bulletinBoard.appendChild(messageDiv);
+        }
 
-            const message = {
-                timestamp: formattedDate,
-                text: text,
-                bgColor: getRandomColor(),
-                storedTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                expiryTime: firebase.firestore.Timestamp.fromDate(expiryTime),
-                likes: 0,
-                dislikes: 0
+        function createReplyElement(reply) {
+            const replyDiv = document.createElement('div');
+            replyDiv.className = 'message reply';
+
+            const emoji = document.createElement('div');
+            emoji.className = 'message-emoji';
+            emoji.textContent = reply.emoji;
+
+            const content = document.createElement('div');
+            content.className = 'message-content';
+
+            const text = document.createElement('div');
+            text.className = 'message-text';
+            text.textContent = reply.text;
+
+            content.appendChild(text);
+
+            replyDiv.appendChild(emoji);
+            replyDiv.appendChild(content);
+
+            return replyDiv;
+        }
+
+        function showReplyForm(parentId) {
+            const parentMessage = document.querySelector(`[data-id="${parentId}"]`);
+            const replyForm = document.createElement('form');
+            replyForm.innerHTML = `
+                <textarea placeholder="Escribe tu respuesta..."></textarea>
+                <button type="submit">Responder</button>
+            `;
+            replyForm.onsubmit = (e) => {
+                e.preventDefault();
+                const replyText = e.target.querySelector('textarea').value;
+                if (replyText.trim()) {
+                    addReply(parentId, replyText);
+                }
+                parentMessage.removeChild(replyForm);
+            };
+            parentMessage.appendChild(replyForm);
+        }
+
+        function addReply(parentId, replyText) {
+            const reply = {
+                text: replyText,
+                emoji: getRandomAnimalEmoji(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            saveMessage(message);
-        });
-
-        function updateMessagesPublished() {
-            db.collection("messages")
-                .where("expiryTime", ">", firebase.firestore.Timestamp.now())
-                .get()
-                .then((querySnapshot) => {
-                    messagesPublished.textContent = `Mensajes publicados: ${querySnapshot.size}`;
-                });
-        }
-
-        function getRandomColor() {
-            const colors = ['#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFDFBA'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        // Implementación del modo oscuro
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-        });
-
-        // Crear fondo de emojis
-        function createEmojiBackground() {
-            const emojis = ['😀', '😂', '🤣', '😊', '😍', '🤩', '😎', '🤔', '🤗', '🤭', '🤫', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '☹️', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😓', '😩', '😫', '🥱', '😤', '😡', '😠', '🤬', '😈', '👿', '💀', '☠️', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
+            db.collection("messages").doc(parentId).update({replies: firebase.firestore.FieldValue.arrayUnion(reply)
+            }).then(() => {
+            loadMessages();
+            }).catch((error) => {
+            console.error("Error adding reply: ", error);
+            });
+            }
             
+            function updateLikes(id, field) {
+            db.collection("messages").doc(id).update({
+            [field]: firebase.firestore.FieldValue.increment(1)
+            }).then(() => {
+            loadMessages();
+            }).catch((error) => {
+            console.error("Error updating likes: ", error);
+            });
+            }
+            
+            function deleteMessage(id) {
+            if (confirm("¿Estás seguro de que quieres borrar este mensaje?")) {
+            db.collection("messages").doc(id).delete().then(() => {
+            loadMessages();
+            }).catch((error) => {
+            console.error("Error removing message: ", error);
+            });
+            }
+            }
+            
+            messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (text) {
+            const message = {
+            text: text,
+            emoji: getRandomAnimalEmoji(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            likes: 0,
+            dislikes: 0
+            };
+            db.collection("messages").add(message).then(() => {
+            messageInput.value = '';
+            loadMessages();
+            });
+            }
+            });
+            
+            function getRandomAnimalEmoji() {
+            return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
+            }
+            
+            function updateMessagesPublished(count) {
+            messagesPublished.textContent = `Mensajes publicados: ${count}`;
+            }
+            
+            function changeSlogan() {
+            slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
+            }
+            
+            themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            });
+            
+            function createEmojiBackground() {
             const emojiContainer = document.createElement('div');
             emojiContainer.style.position = 'fixed';
             emojiContainer.style.top = '0';
@@ -503,51 +451,37 @@ function updateLikes(docId, field) {
             emojiContainer.style.height = '100%';
             emojiContainer.style.pointerEvents = 'none';
             emojiContainer.style.zIndex = '-1';
-
+            
             for (let i = 0; i < 50; i++) {
-                const emoji = document.createElement('div');
-                emoji.className = 'floating-emoji';
-                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                emoji.style.left = `${Math.random() * 100}vw`;
-                emoji.style.top = `${Math.random() * 100}vh`;
-                emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                emoji.style.animationDelay = `${Math.random() * 2}s`;
-                emojiContainer.appendChild(emoji);
+            const emoji = document.createElement('div');
+            emoji.className = 'floating-emoji';
+            emoji.textContent = getRandomAnimalEmoji();
+            emoji.style.left = `${Math.random() * 100}vw`;
+            emoji.style.top = `${Math.random() * 100}vh`;
+            emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            emoji.style.animationDelay = `${Math.random() * 2}s`;
+            emojiContainer.appendChild(emoji);
             }
-
+            
             document.body.appendChild(emojiContainer);
-        }
-
-        // Inicializar la aplicación
-        function initApp() {
+            }
+            
+            function initApp() {
             loadMessages();
-            updateMessagesPublished();
+            changeSlogan();
             createEmojiBackground();
-
+            
             // Actualizar días en funcionamiento
-            const startDate = new Date(); // Fecha actual
+            const startDate = new Date('2023-06-08'); // Fecha de inicio del proyecto
             const today = new Date();
             const daysOperating = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-            daysOperating.textContent = `Días en funcionamiento: ${daysOperating}`;
-        }
-
-        // Limpiar mensajes expirados cada minuto
-        setInterval(() => {
-            db.collection("messages")
-                .where("expiryTime", "<=", firebase.firestore.Timestamp.now())
-                .get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        doc.ref.delete();
-                    });
-                    loadMessages();
-                    updateMessagesPublished();
-                });
-        }, 60000);
-
-        // Iniciar la aplicación cuando se carga la página
-        window.onload = initApp;
-    </script>
-</body>
-</html>
-
+            document.getElementById('days-operating').textContent = `Días en funcionamiento: ${daysOperating}`;
+            
+            // Cambiar el slogan cada 10 segundos
+            setInterval(changeSlogan, 10000);
+            }
+            
+            window.onload = initApp;
+            </script>
+            </body>
+            </html>
