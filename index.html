@@ -229,7 +229,6 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
             authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
-            databaseURL: "https://tablon-de-anuncios-d5dea-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "tablon-de-anuncios-d5dea",
             storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
             messagingSenderId: "67910184237",
@@ -238,172 +237,166 @@
         };
 
         // Inicializar Firebase
-        if (typeof firebase !== 'undefined') {
-            firebase.initializeApp(firebaseConfig);
-            console.log("Firebase inicializado correctamente");
-            const db = firebase.firestore();
-            console.log("Firestore inicializado");
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        console.log("Firestore inicializado");
 
-            const bulletin = document.getElementById('bulletin-board');
-            const postButton = document.getElementById('post-button');
-            const messageInput = document.getElementById('message-input');
-            const toneSelect = document.getElementById('tone-select');
-            const messagesPublished = document.getElementById('messages-published');
-            const themeToggle = document.getElementById('theme-toggle');
+        const bulletin = document.getElementById('bulletin-board');
+        const postButton = document.getElementById('post-button');
+        const messageInput = document.getElementById('message-input');
+        const toneSelect = document.getElementById('tone-select');
+        const messagesPublished = document.getElementById('messages-published');
+        const themeToggle = document.getElementById('theme-toggle');
 
-            function loadMessages() {
-                console.log("Intentando cargar mensajes...");
-                bulletin.innerHTML = '';
-                db.collection("messages").orderBy("storedTimestamp", "desc").get()
-                    .then((querySnapshot) => {
-                        querySnapshot.forEach((doc) => {
-                            const message = doc.data();
-                            createMessageElement(message);
-                        });
-                        console.log("Mensajes cargados correctamente");
-                    })
-                    .catch((error) => {
-                        console.error("Error al cargar los mensajes: ", error);
-                        alert("Error al cargar los mensajes. Por favor, recarga la página.");
-                    });
-            }
-
-            function saveMessage(message) {
-                console.log("Intentando guardar mensaje:", message);
-                db.collection("messages").add(message)
-                    .then((docRef) => {
-                        console.log("Mensaje guardado en Firebase con ID: ", docRef.id);
-                        createMessageElement(message);
-                        messageInput.value = '';
-                        updateMessagesPublished();
-                    })
-                    .catch((error) => {
-                        console.error("Error al guardar el mensaje: ", error);
-                        alert("Error al publicar el mensaje. Por favor, inténtalo de nuevo.");
-                    });
-            }
-
-            function deleteMessage(id) {
-                console.log("Intentando eliminar mensaje con ID:", id);
-                db.collection("messages").where("id", "==", id).get().then((querySnapshot) => {
+        function loadMessages() {
+            console.log("Intentando cargar mensajes...");
+            bulletin.innerHTML = '';
+            db.collection("messages").orderBy("storedTimestamp", "desc").get()
+                .then((querySnapshot) => {
                     querySnapshot.forEach((doc) => {
-                        db.collection("messages").doc(doc.id).delete().then(() => {
-                            console.log("Mensaje eliminado en Firebase");
-                        }).catch((error) => {
-                            console.error("Error al eliminar el mensaje: ", error);
-                        });
+                        const message = doc.data();
+                        createMessageElement(message);
+                    });
+                    console.log("Mensajes cargados correctamente");
+                })
+                .catch((error) => {
+                    console.error("Error al cargar los mensajes: ", error);
+                    alert("Error al cargar los mensajes. Por favor, recarga la página.");
+                });
+        }
+
+        function saveMessage(message) {
+            console.log("Intentando guardar mensaje:", message);
+            db.collection("messages").add(message)
+                .then((docRef) => {
+                    console.log("Mensaje guardado en Firestore con ID: ", docRef.id);
+                    createMessageElement(message);
+                    messageInput.value = '';
+                    updateMessagesPublished();
+                })
+                .catch((error) => {
+                    console.error("Error al guardar el mensaje: ", error);
+                    alert("Error al publicar el mensaje. Por favor, inténtalo de nuevo.");
+                });
+        }
+
+        function deleteMessage(id) {
+            console.log("Intentando eliminar mensaje con ID:", id);
+            db.collection("messages").where("id", "==", id).get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    doc.ref.delete().then(() => {
+                        console.log("Mensaje eliminado en Firestore");
+                    }).catch((error) => {
+                        console.error("Error al eliminar el mensaje: ", error);
                     });
                 });
-            }
-
-            function createMessageElement(message) {
-                console.log("Creando elemento de mensaje:", message);
-                const msgDiv = document.createElement('div');
-                msgDiv.classList.add('message');
-                msgDiv.style.backgroundColor = message.bgColor;
-                msgDiv.setAttribute('data-id', message.id);
-
-                const emojiSpan = document.createElement('span');
-                emojiSpan.classList.add('emoji');
-                emojiSpan.textContent = message.emoji;
-                msgDiv.appendChild(emojiSpan);
-
-                const timestampDiv = document.createElement('div');
-                timestampDiv.classList.add('timestamp');
-                timestampDiv.textContent = message.timestamp;
-                msgDiv.appendChild(timestampDiv);
-
-                const textDiv = document.createElement('div');
-                textDiv.classList.add('text');
-                textDiv.textContent = message.text;
-                msgDiv.appendChild(textDiv);
-
-                const deleteBtn = document.createElement('div');
-                deleteBtn.classList.add('delete-btn');
-                deleteBtn.title = 'Eliminar mensaje';
-                deleteBtn.addEventListener('click', () => {
-                    if (confirm(`¿Seguro que quieres borrar este mensaje publicado el ${message.timestamp}?`)) {
-                        bulletin.removeChild(msgDiv);
-                        deleteMessage(message.id);
-                        updateMessagesPublished();
-                    }
-                });
-                msgDiv.appendChild(deleteBtn);
-
-                bulletin.prepend(msgDiv);
-            }
-
-            postButton.addEventListener('click', () => {
-                console.log("Botón de publicar presionado");
-                const text = messageInput.value.trim();
-                const tone = toneSelect.value;
-                if (text === '') {
-                    alert("Por favor, escribe un mensaje antes de publicar.");
-                    return;
-                }
-
-                const now = new Date();
-                const formattedDate = now.toLocaleString('es-ES', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-                const message = {
-                    id: Date.now(),
-                    timestamp: formattedDate,
-                    emoji: getEmoji(tone),
-                    text: text,
-                    bgColor: getRandomColor(),
-                    storedTimestamp: now.toISOString()
-                };
-
-                saveMessage(message);
             });
-
-            function updateMessagesPublished() {
-                console.log("Actualizando contador de mensajes publicados");
-                db.collection("messages").get().then((querySnapshot) => {
-                    messagesPublished.textContent = `Mensajes publicados: ${querySnapshot.size}`;
-                });
-            }
-
-            function getEmoji(tone) {
-                const emojis = {
-                    'alegre': '❤️',
-                    'triste': '😢',
-                    'amor': '💕',
-                    'sorpresa': '😲',
-                    'enojado': '😡'
-                };
-                return emojis[tone] || '❤️';
-            }
-
-            function getRandomColor() {
-                const colors = ['#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFDFBA'];
-                return colors[Math.floor(Math.random() * colors.length)];
-            }
-
-            // Implementación del modo oscuro
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-            });
-
-            loadMessages();
-            updateMessagesPublished();
-        } else {
-            console.error("Firebase no se ha cargado correctamente");
-            alert("Error: No se pudo cargar Firebase. Por favor, recarga la página o contacta al administrador.");
         }
+
+        function createMessageElement(message) {
+            console.log("Creando elemento de mensaje:", message);
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            msgDiv.style.backgroundColor = message.bgColor;
+            msgDiv.setAttribute('data-id', message.id);
+
+            const emojiSpan = document.createElement('span');
+            emojiSpan.classList.add('emoji');
+            emojiSpan.textContent = message.emoji;
+            msgDiv.appendChild(emojiSpan);
+
+            const timestampDiv = document.createElement('div');
+            timestampDiv.classList.add('timestamp');
+            timestampDiv.textContent = message.timestamp;
+            msgDiv.appendChild(timestampDiv);
+
+            const textDiv = document.createElement('div');
+            textDiv.classList.add('text');
+            textDiv.textContent = message.text;
+            msgDiv.appendChild(textDiv);
+
+            const deleteBtn = document.createElement('div');
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.title = 'Eliminar mensaje';
+            deleteBtn.addEventListener('click', () => {
+                if (confirm(`¿Seguro que quieres borrar este mensaje publicado el ${message.timestamp}?`)) {
+                    bulletin.removeChild(msgDiv);
+                    deleteMessage(message.id);
+                    updateMessagesPublished();
+                }
+            });
+            msgDiv.appendChild(deleteBtn);
+
+            bulletin.prepend(msgDiv);
+        }
+
+        postButton.addEventListener('click', () => {
+            console.log("Botón de publicar presionado");
+            const text = messageInput.value.trim();
+            const tone = toneSelect.value;
+            if (text === '') {
+                alert("Por favor, escribe un mensaje antes de publicar.");
+                return;
+            }
+
+            const now = new Date();
+            const formattedDate = now.toLocaleString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const message = {
+                id: Date.now().toString(),
+                timestamp: formattedDate,
+                emoji: getEmoji(tone),
+                text: text,
+                bgColor: getRandomColor(),
+                storedTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            saveMessage(message);
+        });
+
+        function updateMessagesPublished() {
+            console.log("Actualizando contador de mensajes publicados");
+            db.collection("messages").get().then((querySnapshot) => {
+                messagesPublished.textContent = `Mensajes publicados: ${querySnapshot.size}`;
+            });
+        }
+
+        function getEmoji(tone) {
+            const emojis = {
+                'alegre': '❤️',
+                'triste': '😢',
+                'amor': '💕',
+                'sorpresa': '😲',
+                'enojado': '😡'
+            };
+            return emojis[tone] || '❤️';
+        }
+
+        function getRandomColor() {
+            const colors = ['#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFDFBA'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Implementación del modo oscuro
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+
+        loadMessages();
+        updateMessagesPublished();
     </script>
 
     <!-- Código de depuración -->
     <div id="debug-output" style="background-color: #f0f0f0; padding: 10px; margin-top: 20px; border: 1px solid #ccc; font-family: monospace; font-size: 12px;"></div>
 
-<script>
+    <script>
         function debugLog(message) {
             const debugOutput = document.getElementById('debug-output');
             const logMessage = document.createElement('p');
@@ -420,28 +413,27 @@
             debugLog('ERROR: ' + Array.from(arguments).join(' '));
         };
 
-        window.addEventListener('error', function(event) {
-            debugLog('UNHANDLED ERROR: ' + event.message + ' at ' + event.filename + ':' + event.lineno);
-        });
-
-        if (typeof firebase !== 'undefined') {
-            debugLog('Firebase está definido');
-            if (typeof firebase.firestore === 'function') {
-                debugLog('Firestore está disponible');
-                firebase.firestore().collection('messages').get()
-                    .then(() => debugLog('Conexión a Firestore exitosa'))
-                    .catch(error => debugLog('Error de conexión a Firestore: ' + error.message));
-            } else {
-                debugLog('Firestore no está disponible');
-            }
-        } else {
-            debugLog('Firebase no está definido');
-        }
-
-        document.getElementById('post-button').addEventListener('click', function() {
-            debugLog('Botón de publicar presionado');
-        });
-    </script>
-</body>
-</html>
-
+ window.addEventListener('error', function(event) {
+ debugLog('UNHANDLED ERROR: ' + event.message + ' at ' + event.filename + ':' + event.lineno);
+ });
+ 
+ if (typeof firebase !== 'undefined') {
+ debugLog('Firebase está definido');
+ if (typeof firebase.firestore === 'function') {
+ debugLog('Firestore está disponible');
+ firebase.firestore().collection('messages').get()
+ .then(() => debugLog('Conexión a Firestore exitosa'))
+ .catch(error => debugLog('Error de conexión a Firestore: ' + error.message));
+ } else {
+ debugLog('Firestore no está disponible');
+ }
+ } else {
+ debugLog('Firebase no está definido');
+ }
+ 
+ document.getElementById('post-button').addEventListener('click', function() {
+ debugLog('Botón de publicar presionado');
+ });
+ </script>
+ </body>
+ </html>
