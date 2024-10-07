@@ -8,16 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --background-color: #f0f0f0;
+            --background-color: #f9f9f9;
             --text-color: #333333;
             --header-bg: #ffffff;
-            --counter-bg: #e0e0e0;
-            --message-bg-1: #ffecb3;
-            --message-bg-2: #b3e5fc;
+            --counter-bg: #ffffff;
+            --message-bg-1: #e8f0fe;
+            --message-bg-2: #fce8e6;
             --button-bg: #4caf50;
             --button-text: #ffffff;
         }
-        
+
         body.dark-mode {
             --background-color: #121212;
             --text-color: #ffffff;
@@ -53,7 +53,7 @@
 
         h1 {
             margin: 0;
-            font-size: 28px;
+            font-size: 32px;
             color: #ff6347;
         }
 
@@ -63,7 +63,7 @@
             padding: 10px;
             margin-top: 10px;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
         }
 
@@ -139,10 +139,22 @@
             display: flex;
             align-items: flex-start;
             padding: 15px;
-            border-radius: 10px;
-            font-size: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border: 2px solid #333;
+            border-radius: 15px;
+            position: relative;
+            background-clip: padding-box;
+            overflow: hidden;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .message::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; bottom: -2px; right: -2px;
+            background: linear-gradient(45deg, #ff6f61, #de6262);
+            z-index: -1;
+            border-radius: 15px;
         }
 
         .message:nth-child(odd) {
@@ -164,25 +176,49 @@
 
         .message-text {
             margin-bottom: 10px;
-            line-height: 1.4;
+            line-height: 1.6;
         }
 
         .message-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 15px;
+            gap: 10px;
         }
 
         .like-btn, .dislike-btn, .reply-btn, .delete-btn {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 20px;
+        }
+
+        .like-btn:hover, .dislike-btn:hover, .reply-btn:hover, .delete-btn:hover {
+            transform: scale(1.2);
+            transition: transform 0.2s;
         }
 
         .replies {
-            margin-left: 20px;
+            margin-left: 60px;
             margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .reply {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 10px;
+            position: relative;
+        }
+
+        .reply::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; bottom: -2px; right: -2px;
+            background: linear-gradient(45deg, #8e9eab, #eef2f3);
+            z-index: -1;
+            border-radius: 10px;
         }
 
         @keyframes float {
@@ -197,6 +233,36 @@
             animation: float 3s ease-in-out infinite;
             pointer-events: none;
             z-index: -1;
+        }
+
+        /* Ajustes para formularios de respuesta */
+        .reply-form {
+            margin-top: 10px;
+        }
+
+        .reply-form textarea {
+            width: 100%;
+            height: 60px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+            font-size: 16px;
+            font-family: 'Comfortaa', cursive;
+        }
+
+        .reply-form button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'Comfortaa', cursive;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -224,13 +290,14 @@
     <script>
         // Configuración de Firebase (usa tu propia configuración)
         const firebaseConfig = {
-            apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
-            authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
-            projectId: "tablon-de-anuncios-d5dea",
-            storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
-            messagingSenderId: "67910184237",
-            appId: "1:67910184237:web:e43d424657a948ae5d77a4",
-            measurementId: "G-YL5W1VNM9Z"
+            // Tu configuración de Firebase aquí
+            apiKey: "API_KEY",
+            authDomain: "AUTH_DOMAIN",
+            projectId: "PROJECT_ID",
+            storageBucket: "STORAGE_BUCKET",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID",
+            measurementId: "MEASUREMENT_ID"
         };
 
         // Inicializar Firebase
@@ -318,9 +385,6 @@
             content.appendChild(text);
             content.appendChild(actions);
 
-            messageDiv.appendChild(emoji);
-            messageDiv.appendChild(content);
-
             if (message.replies) {
                 const repliesDiv = document.createElement('div');
                 repliesDiv.className = 'replies';
@@ -330,6 +394,9 @@
                 });
                 content.appendChild(repliesDiv);
             }
+
+            messageDiv.appendChild(emoji);
+            messageDiv.appendChild(content);
 
             bulletinBoard.appendChild(messageDiv);
         }
@@ -359,7 +426,11 @@
 
         function showReplyForm(parentId) {
             const parentMessage = document.querySelector(`[data-id="${parentId}"]`);
+            const existingForm = parentMessage.querySelector('.reply-form');
+            if (existingForm) return;
+
             const replyForm = document.createElement('form');
+            replyForm.className = 'reply-form';
             replyForm.innerHTML = `
                 <textarea placeholder="Escribe tu respuesta..."></textarea>
                 <button type="submit">Responder</button>
@@ -374,7 +445,8 @@
             };
             parentMessage.appendChild(replyForm);
         }
-function addReply(parentId, replyText) {
+
+        function addReply(parentId, replyText) {
             const reply = {
                 text: replyText,
                 emoji: getRandomAnimalEmoji(),
@@ -477,8 +549,8 @@ function addReply(parentId, replyText) {
             // Actualizar días en funcionamiento
             const startDate = new Date('2023-06-08'); // Fecha de inicio del proyecto
             const today = new Date();
-            const daysOperating = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-            document.getElementById('days-operating').textContent = `Días en funcionamiento: ${daysOperating}`;
+            const days = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById('days-operating').textContent = `Días en funcionamiento: ${days}`;
 
             // Cambiar el slogan cada 10 segundos
             setInterval(changeSlogan, 10000);
@@ -488,4 +560,3 @@ function addReply(parentId, replyText) {
     </script>
 </body>
 </html>
-
