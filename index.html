@@ -176,47 +176,16 @@
             gap: 10px;
         }
 
-        .like-btn, .dislike-btn, .reply-btn, .delete-btn {
+        .like-btn, .dislike-btn, .delete-btn {
             background: none;
             border: none;
             cursor: pointer;
             font-size: 20px;
         }
 
-        .like-btn:hover, .dislike-btn:hover, .reply-btn:hover, .delete-btn:hover {
+        .like-btn:hover, .dislike-btn:hover, .delete-btn:hover {
             transform: scale(1.2);
             transition: transform 0.2s;
-        }
-
-        .replies {
-            margin-left: 60px;
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .reply {
-            display: flex;
-            align-items: flex-start;
-            padding: 10px;
-            border-radius: 10px;
-            position: relative;
-            background-clip: padding-box;
-            overflow: hidden;
-            font-size: 16px;
-            font-weight: normal;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border: 1px solid #ccc;
-        }
-
-        .reply::before {
-            content: '';
-            position: absolute;
-            top: -1px; left: -1px; bottom: -1px; right: -1px;
-            background: linear-gradient(45deg, #8e9eab, #eef2f3);
-            z-index: -1;
-            border-radius: 10px;
         }
 
         @keyframes float {
@@ -231,36 +200,6 @@
             animation: float 3s ease-in-out infinite;
             pointer-events: none;
             z-index: -1;
-        }
-
-        /* Ajustes para formularios de respuesta */
-        .reply-form {
-            margin-top: 10px;
-        }
-
-        .reply-form textarea {
-            width: 100%;
-            height: 60px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            resize: vertical;
-            font-size: 16px;
-            font-family: 'Comfortaa', cursive;
-        }
-
-        .reply-form button {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-family: 'Comfortaa', cursive;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -459,11 +398,6 @@
             dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
             dislikeBtn.onclick = () => updateLikes(id, 'dislikes');
 
-            const replyBtn = document.createElement('button');
-            replyBtn.className = 'reply-btn';
-            replyBtn.textContent = '↩️';
-            replyBtn.onclick = () => showReplyForm(id);
-
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = '🗑️';
@@ -471,89 +405,15 @@
 
             actions.appendChild(likeBtn);
             actions.appendChild(dislikeBtn);
-            actions.appendChild(replyBtn);
             actions.appendChild(deleteBtn);
 
             content.appendChild(text);
             content.appendChild(actions);
 
-            // Mostrar respuestas si existen
-            if (message.replies && Array.isArray(message.replies)) {
-                const repliesDiv = document.createElement('div');
-                repliesDiv.className = 'replies';
-                message.replies.forEach(reply => {
-                    const replyElement = createReplyElement(reply);
-                    repliesDiv.appendChild(replyElement);
-                });
-                content.appendChild(repliesDiv);
-            }
-
             messageDiv.appendChild(emoji);
             messageDiv.appendChild(content);
 
             bulletinBoard.appendChild(messageDiv);
-        }
-
-        function createReplyElement(reply) {
-            const replyDiv = document.createElement('div');
-            replyDiv.className = 'reply';
-
-            const emoji = document.createElement('div');
-            emoji.className = 'message-emoji';
-            emoji.textContent = reply.emoji;
-
-            const content = document.createElement('div');
-            content.className = 'message-content';
-
-            const text = document.createElement('div');
-            text.className = 'message-text';
-            text.textContent = reply.text;
-
-            content.appendChild(text);
-
-            replyDiv.appendChild(emoji);
-            replyDiv.appendChild(content);
-
-            return replyDiv;
-        }
-
-        function showReplyForm(parentId) {
-            const parentMessage = document.querySelector(`[data-id="${parentId}"]`);
-            const existingForm = parentMessage.querySelector('.reply-form');
-            if (existingForm) return;
-
-            const replyForm = document.createElement('form');
-            replyForm.className = 'reply-form';
-            replyForm.innerHTML = `
-                <textarea placeholder="Escribe tu respuesta..."></textarea>
-                <button type="submit">Responder</button>
-            `;
-            replyForm.onsubmit = (e) => {
-                e.preventDefault();
-                const replyText = e.target.querySelector('textarea').value;
-                if (replyText.trim()) {
-                    addReply(parentId, replyText);
-                }
-            };
-            parentMessage.appendChild(replyForm);
-        }
-
-        function addReply(parentId, replyText) {
-            const reply = {
-                text: replyText,
-                emoji: getRandomAnimalEmoji(),
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            db.collection("messages").doc(parentId).update({
-                replies: firebase.firestore.FieldValue.arrayUnion(reply)
-            })
-            .then(() => {
-                console.log("Respuesta agregada correctamente.");
-            })
-            .catch((error) => {
-                console.error("Error al agregar la respuesta: ", error);
-            });
         }
 
         function updateLikes(id, field) {
@@ -589,8 +449,7 @@
                     emoji: getRandomAnimalEmoji(),
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     likes: 0,
-                    dislikes: 0,
-                    replies: []
+                    dislikes: 0
                 };
                 db.collection("messages").add(message)
                 .then(() => {
