@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teletipo de Noticias Optimizado</title>
+    <title>Teletipo de Noticias</title>
     <style>
         .teletipo-container {
             width: 100%;
@@ -74,7 +74,20 @@
             });
         }
 
-        iniciarTeletipo();
+        // Función para inicializar el teletipo
+        function inicializarTeletipo() {
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                iniciarTeletipo();
+            } else {
+                document.addEventListener('DOMContentLoaded', iniciarTeletipo);
+            }
+        }
+
+        // Inicializar el teletipo cuando se cargue la página
+        inicializarTeletipo();
+
+        // Exponer la función de inicialización al ámbito global para que pueda ser llamada desde el exterior si es necesario
+        window.inicializarTeletipo = inicializarTeletipo;
     </script>
 </body>
 </html>
