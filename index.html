@@ -49,26 +49,27 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        h1 {
-            margin: 0;
-            font-size: 28px;
-            color: #ff6347;
+        #header-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
 
-#slogan {
-    background-color: #ffff00;
-    color: #000000;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
-    height: 40px; /* Añade esta línea */
-    display: flex; /* Añade esta línea */
-    align-items: center; /* Añade esta línea */
-    justify-content: center; /* Añade esta línea */
-    overflow: hidden; /* Añade esta línea */
-}
+        #slogan {
+            background-color: #ffff00;
+            color: #000000;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
         #theme-toggle {
             margin-top: 10px;
@@ -239,7 +240,6 @@
             font-size: 18px;
         }
 
-        /* Estilo para el contenedor del teletipo */
         #teletipo-container {
             width: 100%;
             margin-bottom: 20px;
@@ -248,17 +248,16 @@
 </head>
 <body>
     <header>
-        <h1>Tablón de anuncios anónimos</h1>
+        <img src="cabecera.jpg" alt="Tablón de anuncios anónimos" id="header-image">
         <div id="slogan"></div>
         <button id="theme-toggle">🌓</button>
     </header>
 
-    <!-- Contenedor para el teletipo -->
     <div id="teletipo-container"></div>
 
     <div class="container">
         <form id="message-form">
-            <textarea id="message-input" placeholder="Pide un deseo, quéjate de algo... Escribe aquí lo primero que te salga de la cabeza..."></textarea>
+            <textarea id="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
             <button type="submit">Publicar</button>
         </form>
         <div id="bulletin-board"></div>
@@ -380,12 +379,11 @@
             dislikeBtn.className = 'dislike-btn';
             dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
             dislikeBtn.onclick = () => updateLikes(message.id, 'dislikes');
-
             const replyBtn = document.createElement('button');
             replyBtn.className = 'reply-btn';
-replyBtn.textContent = '↩️';
+            replyBtn.textContent = '↩️';
             replyBtn.onclick = () => showReplyForm(message.id, message);
-
+            
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = '🗑️';
@@ -401,9 +399,9 @@ replyBtn.textContent = '↩️';
             messageDiv.appendChild(actions);
             
             return messageDiv;
-        }
-        
-        function createQuotedMessage(originalMessage) {
+            }
+            
+            function createQuotedMessage(originalMessage) {
             const quotedDiv = document.createElement('div');
             quotedDiv.className = 'quoted-message';
             quotedDiv.style.backgroundColor = originalMessage.bgColor;
@@ -411,95 +409,95 @@ replyBtn.textContent = '↩️';
             quotedDiv.textContent = `${originalMessage.emoji} ${originalMessage.text}`;
             quotedDiv.onclick = () => scrollToMessage(originalMessage.id);
             return quotedDiv;
-        }
-        
-        function scrollToMessage(messageId) {
+            }
+            
+            function scrollToMessage(messageId) {
             const targetMessage = document.getElementById(`message-${messageId}`);
             if (targetMessage) {
-                targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                targetMessage.style.animation = 'highlight 2s';
+            targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetMessage.style.animation = 'highlight 2s';
             }
-        }
-        
-        function showReplyForm(parentId, parentMessage) {
+            }
+            
+            function showReplyForm(parentId, parentMessage) {
             const parentMessageElement = document.querySelector(`[data-id="${parentId}"]`);
             let replyForm = parentMessageElement.querySelector('.reply-form');
             
             if (replyForm) {
-                parentMessageElement.removeChild(replyForm);
-                return;
+            parentMessageElement.removeChild(replyForm);
+            return;
             }
             
             replyForm = document.createElement('form');
             replyForm.className = 'reply-form';
             replyForm.innerHTML = `
-                <textarea placeholder="Escribe tu respuesta..."></textarea>
-                <button type="submit">Responder</button>
+            <textarea placeholder="Escribe tu respuesta..."></textarea>
+            <button type="submit">Responder</button>
             `;
             replyForm.onsubmit = (e) => {
-                e.preventDefault();
-                const replyText = e.target.querySelector('textarea').value;
-                if (replyText.trim()) {
-                    addReply(parentId, replyText, parentMessage);
-                }
-                parentMessageElement.removeChild(replyForm);
+            e.preventDefault();
+            const replyText = e.target.querySelector('textarea').value;
+            if (replyText.trim()) {
+            addReply(parentId, replyText, parentMessage);
+            }
+            parentMessageElement.removeChild(replyForm);
             };
             parentMessageElement.appendChild(replyForm);
-        }
-        
-        function addReply(parentId, replyText, parentMessage) {
+            }
+            
+            function addReply(parentId, replyText, parentMessage) {
             const reply = {
-                text: replyText,
-                emoji: getRandomAnimalEmoji(),
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                replyTo: {
-                    id: parentId,
-                    text: parentMessage.text,
-                    emoji: parentMessage.emoji,
-                    bgColor: parentMessage.bgColor
-                },
-                bgColor: getRandomContrastColor(),
-                likes: 0,
-                dislikes: 0
+            text: replyText,
+            emoji: getRandomAnimalEmoji(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            replyTo: {
+            id: parentId,
+            text: parentMessage.text,
+            emoji: parentMessage.emoji,
+            bgColor: parentMessage.bgColor
+            },
+            bgColor: getRandomContrastColor(),
+            likes: 0,
+            dislikes: 0
             };
             
             db.collection("messages").add(reply)
-                .then(() => {
-                    console.log("Respuesta añadida con éxito");
-                })
-                .catch((error) => {
-                    console.error("Error al añadir la respuesta: ", error);
-                    alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
-                });
-        }
-        
-        function updateLikes(id, field) {
-            db.collection("messages").doc(id).update({
-                [field]: firebase.firestore.FieldValue.increment(1)
-            }).then(() => {
-                db.collection("messages").doc(id).get().then((doc) => {
-                    if (doc.exists) {
-                        const message = doc.data();
-                        const messageElement = document.querySelector(`[data-id="${id}"]`);
-                        const likeBtn = messageElement.querySelector('.like-btn');
-                        const dislikeBtn = messageElement.querySelector('.dislike-btn');
-                        likeBtn.textContent = `👍 ${message.likes || 0}`;
-                        dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
-                    }
-                });
-            }).catch((error) => {
-                console.error("Error updating likes: ", error);
+            .then(() => {
+            console.log("Respuesta añadida con éxito");
+            })
+            .catch((error) => {
+            console.error("Error al añadir la respuesta: ", error);
+            alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
             });
-        }
-        
-        function showDeleteConfirmation(id) {
+            }
+            
+            function updateLikes(id, field) {
+            db.collection("messages").doc(id).update({
+            [field]: firebase.firestore.FieldValue.increment(1)
+            }).then(() => {
+            db.collection("messages").doc(id).get().then((doc) => {
+            if (doc.exists) {
+            const message = doc.data();
+            const messageElement = document.querySelector(`[data-id="${id}"]`);
+            const likeBtn = messageElement.querySelector('.like-btn');
+            const dislikeBtn = messageElement.querySelector('.dislike-btn');
+            likeBtn.textContent = `👍 ${message.likes || 0}`;
+            dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
+            }
+            });
+            }).catch((error) => {
+            console.error("Error updating likes: ", error);
+            });
+            }
+            
+            function showDeleteConfirmation(id) {
             const messageElement = document.querySelector(`[data-id="${id}"]`);
             const actions = messageElement.querySelector('.message-actions');
             const deleteConfirmation = document.createElement('div');
             deleteConfirmation.className = 'delete-confirmation';
             deleteConfirmation.innerHTML = `
-                <button class="confirm-delete">✅</button>
-                <button class="cancel-delete">❌</button>
+            <button class="confirm-delete">✅</button>
+            <button class="cancel-delete">❌</button>
             `;
             actions.appendChild(deleteConfirmation);
             
@@ -508,82 +506,82 @@ replyBtn.textContent = '↩️';
             
             confirmDelete.onclick = () => deleteMessage(id);
             cancelDelete.onclick = () => actions.removeChild(deleteConfirmation);
-        }
-        
-        function deleteMessage(id) {
+            }
+            
+            function deleteMessage(id) {
             db.collection("messages").doc(id).delete().then(() => {
-                incrementMessagesDeleted();
+            incrementMessagesDeleted();
             }).catch((error) => {
-                console.error("Error removing message: ", error);
+            console.error("Error removing message: ", error);
             });
-        }
-        
-        messageForm.addEventListener('submit', (e) => {
+            }
+            
+            messageForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
             if (text) {
-                const message = {
-                    text: text,
-                    emoji: getRandomAnimalEmoji(),
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    bgColor: getRandomContrastColor(),
-                    likes: 0,
-                    dislikes: 0
-                };
-                db.collection("messages").add(message).then(() => {
-                    messageInput.value = '';
-                });
+            const message = {
+            text: text,
+            emoji: getRandomAnimalEmoji(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            bgColor: getRandomContrastColor(),
+            likes: 0,
+            dislikes: 0
+            };
+            db.collection("messages").add(message).then(() => {
+            messageInput.value = '';
+            });
             }
-        });
-        
-        function getRandomAnimalEmoji() {
+            });
+            
+            function getRandomAnimalEmoji() {
             return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
-        }
-        
-        function getRandomContrastColor() {
+            }
+            
+            function getRandomContrastColor() {
             const hue = Math.floor(Math.random() * 360);
             const saturation = 70 + Math.random() * 30;
             const lightness = 65 + Math.random() * 25;
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-        }
-        
-        function getContrastingTextColor(bgColor) {
+            }
+            
+            function getContrastingTextColor(bgColor) {
             const rgb = bgColor.match(/\d+/g).map(Number);
             const luminance = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
             return luminance > 0.5 ? '#000000' : '#FFFFFF';
-        }
-        
-        function updateMessagesPublished(count) {
+            }
+            
+            function updateMessagesPublished(count) {
             messagesPublished.textContent = `Mensajes publicados: ${count}`;
-        }
-        
-        function updateMessagesDeleted() {
+            }
+            
+            function updateMessagesDeleted() {
             db.collection("statistics").doc("counters").get().then((doc) => {
-                if (doc.exists) {
-                    const deletedCount = doc.data().messagesDeleted || 0;
-                    messagesDeleted.textContent = `Mensajes borrados: ${deletedCount}`;
-                }
+            if (doc.exists) {
+            const deletedCount = doc.data().messagesDeleted || 0;
+            messagesDeleted.textContent = `Mensajes borrados: ${deletedCount}`;
+            }
             });
-        }
-        
-        function incrementMessagesDeleted() {
+            }
+            
+            function incrementMessagesDeleted() {
             db.collection("statistics").doc("counters").update({
-                messagesDeleted: firebase.firestore.FieldValue.increment(1)
+            messagesDeleted: firebase.firestore.FieldValue.increment(1)
             }).then(() => {
-                updateMessagesDeleted();
+            updateMessagesDeleted();
             });
-        }
-        
-        function changeSlogan() {
+            }
+            
+            function changeSlogan() {
             slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
-        }
-        
-        themeToggle.addEventListener('click', () => {
+            }
+            
+            themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             themeToggle.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌓';
-        });
-        
-        function createEmojiBackground() {
+            });
+            
+            function createEmojiBackground() {
             const emojiContainer = document.createElement('div');
             emojiContainer.style.position = 'fixed';
             emojiContainer.style.top = '0';
@@ -594,70 +592,70 @@ replyBtn.textContent = '↩️';
             emojiContainer.style.zIndex = '-1';
             
             for (let i = 0; i < 50; i++) {
-                const emoji = document.createElement('div');
-                emoji.className = 'floating-emoji';
-                emoji.textContent = getRandomAnimalEmoji();
-                emoji.style.left = `${Math.random() * 100}vw`;
-                emoji.style.top = `${Math.random() * 100}vh`;
-                emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                emoji.style.animationDelay = `${Math.random() * 2}s`;
-                emojiContainer.appendChild(emoji);
+            const emoji = document.createElement('div');
+            emoji.className = 'floating-emoji';
+            emoji.textContent = getRandomAnimalEmoji();
+            emoji.style.left = `${Math.random() * 100}vw`;
+            emoji.style.top = `${Math.random() * 100}vh`;
+            emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            emoji.style.animationDelay = `${Math.random() * 2}s`;
+            emojiContainer.appendChild(emoji);
             }
             
             document.body.appendChild(emojiContainer);
-        }
-        
-        function cargarTeletipo() {
+            }
+            
+            function cargarTeletipo() {
             fetch('teletipo.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = data;
-                    
-                    // Extraer y aplicar los estilos
-                    const styleTag = tempDiv.querySelector('style');
-                    if (styleTag) {
-                        document.head.appendChild(styleTag);
-                    }
-                    
-                    // Extraer y aplicar el HTML del teletipo
-                    const teletipoContainer = tempDiv.querySelector('.teletipo-container');
-                    if (teletipoContainer) {
-                        document.getElementById('teletipo-container').appendChild(teletipoContainer);
-                    }
-                    
-                    // Extraer y ejecutar el script
-                    const scriptTag = tempDiv.querySelector('script');
-                    if (scriptTag) {
-                        const newScript = document.createElement('script');
-                        newScript.textContent = scriptTag.textContent;
-                        document.body.appendChild(newScript);
-                    }
-                    
-                    // Inicializar el teletipo
-                    if (typeof window.inicializarTeletipo === 'function') {
-                        window.inicializarTeletipo();
-                    } else {
-                        console.error('La función inicializarTeletipo no está disponible');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al cargar el teletipo:', error);
-                    document.getElementById('teletipo-container').textContent = 'Error al cargar el teletipo';
-                });
-        }
-        
-        function initApp() {
+            .then(response => {
+            if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+            })
+            .then(data => {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = data;
+            
+            // Extraer y aplicar los estilos
+            const styleTag = tempDiv.querySelector('style');
+            if (styleTag) {
+            document.head.appendChild(styleTag);
+            }
+            
+            // Extraer y aplicar el HTML del teletipo
+            const teletipoContainer = tempDiv.querySelector('.teletipo-container');
+            if (teletipoContainer) {
+            document.getElementById('teletipo-container').appendChild(teletipoContainer);
+            }
+            
+            // Extraer y ejecutar el script
+            const scriptTag = tempDiv.querySelector('script');
+            if (scriptTag) {
+            const newScript = document.createElement('script');
+            newScript.textContent = scriptTag.textContent;
+            document.body.appendChild(newScript);
+            }
+            
+            // Inicializar el teletipo
+            if (typeof window.inicializarTeletipo === 'function') {
+            window.inicializarTeletipo();
+            } else {
+            console.error('La función inicializarTeletipo no está disponible');
+            }
+            })
+            .catch(error => {
+            console.error('Error al cargar el teletipo:', error);
+            document.getElementById('teletipo-container').textContent = 'Error al cargar el teletipo';
+            });
+            }
+            
+            function initApp() {
             loadMessages();
             changeSlogan();
             createEmojiBackground();
             updateMessagesDeleted();
-            cargarTeletipo(); // Cargar el teletipo
+            cargarTeletipo();
             
             const startDate = new Date('2023-06-08');
             const today = new Date();
@@ -665,9 +663,9 @@ replyBtn.textContent = '↩️';
             document.getElementById('days-operating').textContent = `Días en funcionamiento: ${daysOperating}`;
             
             setInterval(changeSlogan, 10000);
-        }
-        
-        window.onload = initApp;
-    </script>
-</body>
-</html>
+            }
+            
+            window.onload = initApp;
+            </script>
+            </body>
+            </html>
