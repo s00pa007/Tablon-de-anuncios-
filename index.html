@@ -284,23 +284,21 @@
         <div id="bulletin-board"></div>
     </div>
 
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
         // Configuración de Firebase (usa tu propia configuración)
         const firebaseConfig = {
-            // Tu configuración de Firebase aquí
-const firebaseConfig = {
-    apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
-    authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
-    projectId: "tablon-de-anuncios-d5dea",
-    storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
-    messagingSenderId: "67910184237",
-    appId: "1:67910184237:web:e43d424657a948ae5d77a4",
-    measurementId: "G-YL5W1VNM9Z"
-};
-
+            apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
+            authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
+            projectId: "tablon-de-anuncios-d5dea",
+            storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
+            messagingSenderId: "67910184237",
+            appId: "1:67910184237:web:e43d424657a948ae5d77a4",
+            measurementId: "G-YL5W1VNM9Z"
+        };
 
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
@@ -330,14 +328,18 @@ const firebaseConfig = {
         ];
 
         function loadMessages() {
-            db.collection("messages").orderBy("timestamp", "desc").get().then((querySnapshot) => {
-                bulletinBoard.innerHTML = '';
-                querySnapshot.forEach((doc) => {
-                    const message = doc.data();
-                    createMessageElement(message, doc.id);
+            db.collection("messages").orderBy("timestamp", "desc").get()
+                .then((querySnapshot) => {
+                    bulletinBoard.innerHTML = '';
+                    querySnapshot.forEach((doc) => {
+                        const message = doc.data();
+                        createMessageElement(message, doc.id);
+                    });
+                    updateMessagesPublished(querySnapshot.size);
+                })
+                .catch((error) => {
+                    console.error("Error al cargar los mensajes: ", error);
                 });
-                updateMessagesPublished(querySnapshot.size);
-            });
         }
 
         function createMessageElement(message, id) {
@@ -387,7 +389,7 @@ const firebaseConfig = {
             content.appendChild(text);
             content.appendChild(actions);
 
-            if (message.replies) {
+            if (message.replies && Array.isArray(message.replies)) {
                 const repliesDiv = document.createElement('div');
                 repliesDiv.className = 'replies';
                 message.replies.forEach(reply => {
@@ -457,29 +459,35 @@ const firebaseConfig = {
 
             db.collection("messages").doc(parentId).update({
                 replies: firebase.firestore.FieldValue.arrayUnion(reply)
-            }).then(() => {
+            })
+            .then(() => {
                 loadMessages();
-            }).catch((error) => {
-                console.error("Error adding reply: ", error);
+            })
+            .catch((error) => {
+                console.error("Error al agregar la respuesta: ", error);
             });
         }
 
         function updateLikes(id, field) {
             db.collection("messages").doc(id).update({
                 [field]: firebase.firestore.FieldValue.increment(1)
-            }).then(() => {
+            })
+            .then(() => {
                 loadMessages();
-            }).catch((error) => {
-                console.error("Error updating likes: ", error);
+            })
+            .catch((error) => {
+                console.error(`Error al actualizar ${field}: `, error);
             });
         }
 
         function deleteMessage(id) {
             if (confirm("¿Estás seguro de que quieres borrar este mensaje?")) {
-                db.collection("messages").doc(id).delete().then(() => {
+                db.collection("messages").doc(id).delete()
+                .then(() => {
                     loadMessages();
-                }).catch((error) => {
-                    console.error("Error removing message: ", error);
+                })
+                .catch((error) => {
+                    console.error("Error al borrar el mensaje: ", error);
                 });
             }
         }
@@ -495,9 +503,13 @@ const firebaseConfig = {
                     likes: 0,
                     dislikes: 0
                 };
-                db.collection("messages").add(message).then(() => {
+                db.collection("messages").add(message)
+                .then(() => {
                     messageInput.value = '';
                     loadMessages();
+                })
+                .catch((error) => {
+                    console.error("Error al publicar el mensaje: ", error);
                 });
             }
         });
