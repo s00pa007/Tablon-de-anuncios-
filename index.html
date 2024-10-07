@@ -366,255 +366,255 @@
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = '🗑️';
-deleteBtn.onclick = () => deleteMessage(id);
-
-            actions.appendChild(likeBtn);
-            actions.appendChild(dislikeBtn);
-            actions.appendChild(replyBtn);
-            actions.appendChild(deleteBtn);
-
-            messageDiv.appendChild(contentDiv);
-            messageDiv.appendChild(timestamp);
-            messageDiv.appendChild(actions);
-
-            return messageDiv;
-        }
-
-        function createQuotedMessage(originalMessage) {
-            const quotedDiv = document.createElement('div');
-            quotedDiv.className = 'quoted-message';
-            quotedDiv.style.backgroundColor = originalMessage.bgColor;
-            quotedDiv.style.color = getContrastingTextColor(originalMessage.bgColor);
-            quotedDiv.textContent = `${originalMessage.emoji} ${originalMessage.text}`;
-            quotedDiv.onclick = () => scrollToMessage(originalMessage.id);
-            return quotedDiv;
-        }
-
-        function scrollToMessage(messageId) {
-            const targetMessage = document.getElementById(`message-${messageId}`);
-            if (targetMessage) {
-                targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                targetMessage.style.animation = 'highlight 2s';
-            }
-        }
-
-        function showReplyForm(parentId, parentMessage) {
-            const parentMessageElement = document.querySelector(`[data-id="${parentId}"]`);
-            let replyForm = parentMessageElement.querySelector('.reply-form');
-            
-            if (replyForm) {
-                parentMessageElement.removeChild(replyForm);
-                return;
-            }
-
-            replyForm = document.createElement('form');
-            replyForm.className = 'reply-form';
-            replyForm.innerHTML = `
-                <textarea placeholder="Escribe tu respuesta..."></textarea>
-                <button type="submit">Responder</button>
-            `;
-            replyForm.onsubmit = (e) => {
-                e.preventDefault();
-                const replyText = e.target.querySelector('textarea').value;
-                if (replyText.trim()) {
-                    addReply(parentId, replyText, parentMessage);
-                }
-                parentMessageElement.removeChild(replyForm);
-            };
-            parentMessageElement.appendChild(replyForm);
-        }
-
-        function addReply(parentId, replyText, parentMessage) {
-            const reply = {
-                text: replyText,
-                emoji: getRandomAnimalEmoji(),
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                replyTo: {
-                    id: parentId,
-                    text: parentMessage.text,
-                    emoji: parentMessage.emoji,
-                    bgColor: parentMessage.bgColor
-                },
-                bgColor: getRandomContrastColor(),
-                likes: 0,
-                dislikes: 0
-            };
-
-            db.collection("messages").add(reply)
-                .then(() => {
-                    console.log("Respuesta añadida con éxito");
-                    loadMessages(); // Recarga todos los mensajes para mostrar la nueva respuesta
-                })
-                .catch((error) => {
-                    console.error("Error al añadir la respuesta: ", error);
-                    alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
-                });
-        }
-
-        function updateLikes(id, field) {
-            db.collection("messages").doc(id).update({
-                [field]: firebase.firestore.FieldValue.increment(1)
-            }).then(() => {
-                db.collection("messages").doc(id).get().then((doc) => {
-                    if (doc.exists) {
-                        const message = doc.data();
-                        const messageElement = document.querySelector(`[data-id="${id}"]`);
-                        const likeBtn = messageElement.querySelector('.like-btn');
-                        const dislikeBtn = messageElement.querySelector('.dislike-btn');
-                        likeBtn.textContent = `👍 ${message.likes || 0}`;
-                        dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
-                    }
-                });
-            }).catch((error) => {
-                console.error("Error updating likes: ", error);
-            });
-        }
-
-        function deleteMessage(id) {
-            if (confirm("¿Estás seguro de que quieres borrar este mensaje?")) {
-                db.collection("messages").doc(id).delete().then(() => {
-                    loadMessages();
-                    incrementMessagesDeleted();
-                }).catch((error) => {
-                    console.error("Error removing message: ", error);
-                });
-            }
-        }
-
-        messageForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const text = messageInput.value.trim();
-            if (text) {
-                const message = {
-                    text: text,
-                    emoji: getRandomAnimalEmoji(),
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    bgColor: getRandomContrastColor(),
-                    likes: 0,
-                    dislikes: 0
-                };
-                db.collection("messages").add(message).then(() => {
-                    messageInput.value = '';
-                    loadMessages();
-                });
-            }
-        });
-
-        function getRandomAnimalEmoji() {
-            return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
-        }
-
-        function getRandomContrastColor() {
-            const hue = Math.floor(Math.random() * 360);
-            const saturation = 70 + Math.random() * 30; // 70-100%
-            const lightness = 65 + Math.random() * 25; // 65-90%
-            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-        }
-
-        function getContrastingTextColor(bgColor) {
-            const rgb = bgColor.match(/\d+/g).map(Number);
-            const luminance = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-            return luminance > 0.5 ? '#000000' : '#FFFFFF';
-        }
-
-        function updateMessagesPublished(count) {
-            messagesPublished.textContent = `Mensajes publicados: ${count}`;
-        }
-
-        function updateMessagesDeleted() {
-            db.collection("statistics").doc("counters").get().then((doc) => {
-                if (doc.exists) {
-                    const deletedCount = doc.data().messagesDeleted || 0;
-                    messagesDeleted.textContent = `Mensajes borrados: ${deletedCount}`;
-                }
-            });
-        }
-
-        function incrementMessagesDeleted() {
-            db.collection("statistics").doc("counters").update({
-                messagesDeleted: firebase.firestore.FieldValue.increment(1)
-            }).then(() => {
-                updateMessagesDeleted();
-            });
-        }
-
-        function changeSlogan() {
-            slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
-        }
-
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌓';
-        });
-
-        function createEmojiBackground() {
-            const emojiContainer = document.createElement('div');
-            emojiContainer.style.position = 'fixed';
-            emojiContainer.style.top = '0';
-            emojiContainer.style.left = '0';
-            emojiContainer.style.width = '100%';
-            emojiContainer.style.height = '100%';
-            emojiContainer.style.pointerEvents = 'none';
-            emojiContainer.style.zIndex = '-1';
-
-            for (let i = 0; i < 50; i++) {
-                const emoji = document.createElement('div');
-                emoji.className = 'floating-emoji';
-                emoji.textContent = getRandomAnimalEmoji();
-                emoji.style.left = `${Math.random() * 100}vw`;
-                emoji.style.top = `${Math.random() * 100}vh`;
-                emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                emoji.style.animationDelay = `${Math.random() * 2}s`;
-                emojiContainer.appendChild(emoji);
-            }
-
-            document.body.appendChild(emojiContainer);
-        }
-
-        function initApp() {
-            loadMessages();
-            changeSlogan();
-            createEmojiBackground();
-            updateMessagesDeleted();
-
-            // Actualizar días en funcionamiento
-            const startDate = new Date('2023-06-08'); // Fecha de inicio del proyecto
-            const today = new Date();
-            const daysOperating = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-            document.getElementById('days-operating').textContent = `Días en funcionamiento: ${daysOperating}`;
-
-            // Cambiar el slogan cada 10 segundos
-            setInterval(changeSlogan, 10000);
-        }
-
-        window.onload = initApp;
-
-        // Código de depuración
-        function debugLog(message) {
-            console.log(message);
-            const debugOutput = document.createElement('div');
-            debugOutput.textContent = message;
-            document.body.appendChild(debugOutput);
-        }
-
-        // Sobrescribir console.log y console.error
-        const originalLog = console.log;
-        const originalError = console.error;
-
-        console.log = function() {
-            debugLog('LOG: ' + Array.from(arguments).join(' '));
-            originalLog.apply(console, arguments);
-        };
-
-        console.error = function() {
-            debugLog('ERROR: ' + Array.from(arguments).join(' '));
-            originalError.apply(console, arguments);
-        };
-
-        // Capturar errores no manejados
-        window.addEventListener('error', function(event) {
-            debugLog('UNHANDLED ERROR: ' + event.message + ' at ' + event.filename + ':' + event.lineno);
-        });
-    </script>
-</body>
-</html>
+      deleteBtn.onclick = () => deleteMessage(id);
+      
+      actions.appendChild(likeBtn);
+      actions.appendChild(dislikeBtn);
+      actions.appendChild(replyBtn);
+      actions.appendChild(deleteBtn);
+      
+      messageDiv.appendChild(contentDiv);
+      messageDiv.appendChild(timestamp);
+      messageDiv.appendChild(actions);
+      
+      return messageDiv;
+      }
+      
+      function createQuotedMessage(originalMessage) {
+      const quotedDiv = document.createElement('div');
+      quotedDiv.className = 'quoted-message';
+      quotedDiv.style.backgroundColor = originalMessage.bgColor;
+      quotedDiv.style.color = getContrastingTextColor(originalMessage.bgColor);
+      quotedDiv.textContent = `${originalMessage.emoji} ${originalMessage.text}`;
+      quotedDiv.onclick = () => scrollToMessage(originalMessage.id);
+      return quotedDiv;
+      }
+      
+      function scrollToMessage(messageId) {
+      const targetMessage = document.getElementById(`message-${messageId}`);
+      if (targetMessage) {
+      targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetMessage.style.animation = 'highlight 2s';
+      }
+      }
+      
+      function showReplyForm(parentId, parentMessage) {
+      const parentMessageElement = document.querySelector(`[data-id="${parentId}"]`);
+      let replyForm = parentMessageElement.querySelector('.reply-form');
+      
+      if (replyForm) {
+      parentMessageElement.removeChild(replyForm);
+      return;
+      }
+      
+      replyForm = document.createElement('form');
+      replyForm.className = 'reply-form';
+      replyForm.innerHTML = `
+      <textarea placeholder="Escribe tu respuesta..."></textarea>
+      <button type="submit">Responder</button>
+      `;
+      replyForm.onsubmit = (e) => {
+      e.preventDefault();
+      const replyText = e.target.querySelector('textarea').value;
+      if (replyText.trim()) {
+      addReply(parentId, replyText, parentMessage);
+      }
+      parentMessageElement.removeChild(replyForm);
+      };
+      parentMessageElement.appendChild(replyForm);
+      }
+      
+      function addReply(parentId, replyText, parentMessage) {
+      const reply = {
+      text: replyText,
+      emoji: getRandomAnimalEmoji(),
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      replyTo: {
+      id: parentId,
+      text: parentMessage.text,
+      emoji: parentMessage.emoji,
+      bgColor: parentMessage.bgColor
+      },
+      bgColor: getRandomContrastColor(),
+      likes: 0,
+      dislikes: 0
+      };
+      
+      db.collection("messages").add(reply)
+      .then(() => {
+      console.log("Respuesta añadida con éxito");
+      loadMessages(); // Recarga todos los mensajes para mostrar la nueva respuesta
+      })
+      .catch((error) => {
+      console.error("Error al añadir la respuesta: ", error);
+      alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
+      });
+      }
+      
+      function updateLikes(id, field) {
+      db.collection("messages").doc(id).update({
+      [field]: firebase.firestore.FieldValue.increment(1)
+      }).then(() => {
+      db.collection("messages").doc(id).get().then((doc) => {
+      if (doc.exists) {
+      const message = doc.data();
+      const messageElement = document.querySelector(`[data-id="${id}"]`);
+      const likeBtn = messageElement.querySelector('.like-btn');
+      const dislikeBtn = messageElement.querySelector('.dislike-btn');
+      likeBtn.textContent = `👍 ${message.likes || 0}`;
+      dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
+      }
+      });
+      }).catch((error) => {
+      console.error("Error updating likes: ", error);
+      });
+      }
+      
+      function deleteMessage(id) {
+      if (confirm("¿Estás seguro de que quieres borrar este mensaje?")) {
+      db.collection("messages").doc(id).delete().then(() => {
+      loadMessages();
+      incrementMessagesDeleted();
+      }).catch((error) => {
+      console.error("Error removing message: ", error);
+      });
+      }
+      }
+      
+      messageForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = messageInput.value.trim();
+      if (text) {
+      const message = {
+      text: text,
+      emoji: getRandomAnimalEmoji(),
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      bgColor: getRandomContrastColor(),
+      likes: 0,
+      dislikes: 0
+      };
+      db.collection("messages").add(message).then(() => {
+      messageInput.value = '';
+      loadMessages();
+      });
+      }
+      });
+      
+      function getRandomAnimalEmoji() {
+      return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
+      }
+      
+      function getRandomContrastColor() {
+      const hue = Math.floor(Math.random() * 360);
+      const saturation = 70 + Math.random() * 30; // 70-100%
+      const lightness = 65 + Math.random() * 25; // 65-90%
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      }
+      
+      function getContrastingTextColor(bgColor) {
+      const rgb = bgColor.match(/\d+/g).map(Number);
+      const luminance = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+      return luminance > 0.5 ? '#000000' : '#FFFFFF';
+      }
+      
+      function updateMessagesPublished(count) {
+      messagesPublished.textContent = `Mensajes publicados: ${count}`;
+      }
+      
+      function updateMessagesDeleted() {
+      db.collection("statistics").doc("counters").get().then((doc) => {
+      if (doc.exists) {
+      const deletedCount = doc.data().messagesDeleted || 0;
+      messagesDeleted.textContent = `Mensajes borrados: ${deletedCount}`;
+      }
+      });
+      }
+      
+      function incrementMessagesDeleted() {
+      db.collection("statistics").doc("counters").update({
+      messagesDeleted: firebase.firestore.FieldValue.increment(1)
+      }).then(() => {
+      updateMessagesDeleted();
+      });
+      }
+      
+      function changeSlogan() {
+      slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
+      }
+      
+      themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      themeToggle.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌓';
+      });
+      
+      function createEmojiBackground() {
+      const emojiContainer = document.createElement('div');
+      emojiContainer.style.position = 'fixed';
+      emojiContainer.style.top = '0';
+      emojiContainer.style.left = '0';
+      emojiContainer.style.width = '100%';
+      emojiContainer.style.height = '100%';
+      emojiContainer.style.pointerEvents = 'none';
+      emojiContainer.style.zIndex = '-1';
+      
+      for (let i = 0; i < 50; i++) {
+      const emoji = document.createElement('div');
+      emoji.className = 'floating-emoji';
+      emoji.textContent = getRandomAnimalEmoji();
+      emoji.style.left = `${Math.random() * 100}vw`;
+      emoji.style.top = `${Math.random() * 100}vh`;
+      emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
+      emoji.style.animationDelay = `${Math.random() * 2}s`;
+      emojiContainer.appendChild(emoji);
+      }
+      
+      document.body.appendChild(emojiContainer);
+      }
+      
+      function initApp() {
+      loadMessages();
+      changeSlogan();
+      createEmojiBackground();
+      updateMessagesDeleted();
+      
+      // Actualizar días en funcionamiento
+      const startDate = new Date('2023-06-08'); // Fecha de inicio del proyecto
+      const today = new Date();
+      const daysOperating = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      document.getElementById('days-operating').textContent = `Días en funcionamiento: ${daysOperating}`;
+      
+      // Cambiar el slogan cada 10 segundos
+      setInterval(changeSlogan, 10000);
+      }
+      
+      window.onload = initApp;
+      
+      // Código de depuración
+      function debugLog(message) {
+      console.log(message);
+      const debugOutput = document.createElement('div');
+      debugOutput.textContent = message;
+      document.body.appendChild(debugOutput);
+      }
+      
+      // Sobrescribir console.log y console.error
+      const originalLog = console.log;
+      const originalError = console.error;
+      
+      console.log = function() {
+      debugLog('LOG: ' + Array.from(arguments).join(' '));
+      originalLog.apply(console, arguments);
+      };
+      
+      console.error = function() {
+      debugLog('ERROR: ' + Array.from(arguments).join(' '));
+      originalError.apply(console, arguments);
+      };
+      
+      // Capturar errores no manejados
+      window.addEventListener('error', function(event) {
+      debugLog('UNHANDLED ERROR: ' + event.message + ' at ' + event.filename + ':' + event.lineno);
+      });
+      </script>
+      </body>
+      </html>
