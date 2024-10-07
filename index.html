@@ -378,8 +378,8 @@
 
             const replyBtn = document.createElement('button');
             replyBtn.className = 'reply-btn';
-            replyBtn.textContent = '↩️';
-replyBtn.onclick = () => showReplyForm(message.id, message);
+replyBtn.textContent = '↩️';
+            replyBtn.onclick = () => showReplyForm(message.id, message);
 
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
@@ -604,15 +604,47 @@ replyBtn.onclick = () => showReplyForm(message.id, message);
         
         function cargarTeletipo() {
             fetch('teletipo.html')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('teletipo-container').innerHTML = data;
-                    // Ejecutar el script del teletipo después de cargarlo
-                    const script = document.createElement('script');
-                    script.textContent = `iniciarTeletipo();`;
-                    document.body.appendChild(script);
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
                 })
-                .catch(error => console.error('Error al cargar el teletipo:', error));
+                .then(data => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = data;
+                    
+                    // Extraer y aplicar los estilos
+                    const styleTag = tempDiv.querySelector('style');
+                    if (styleTag) {
+                        document.head.appendChild(styleTag);
+                    }
+                    
+                    // Extraer y aplicar el HTML del teletipo
+                    const teletipoContainer = tempDiv.querySelector('.teletipo-container');
+                    if (teletipoContainer) {
+                        document.getElementById('teletipo-container').appendChild(teletipoContainer);
+                    }
+                    
+                    // Extraer y ejecutar el script
+                    const scriptTag = tempDiv.querySelector('script');
+                    if (scriptTag) {
+                        const newScript = document.createElement('script');
+                        newScript.textContent = scriptTag.textContent;
+                        document.body.appendChild(newScript);
+                    }
+                    
+                    // Inicializar el teletipo
+                    if (typeof window.inicializarTeletipo === 'function') {
+                        window.inicializarTeletipo();
+                    } else {
+                        console.error('La función inicializarTeletipo no está disponible');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar el teletipo:', error);
+                    document.getElementById('teletipo-container').textContent = 'Error al cargar el teletipo';
+                });
         }
         
         function initApp() {
