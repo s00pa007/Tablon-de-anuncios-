@@ -399,5 +399,49 @@
             alert("Error: No se pudo cargar Firebase. Por favor, recarga la página o contacta al administrador.");
         }
     </script>
+
+    <!-- Código de depuración -->
+    <div id="debug-output" style="background-color: #f0f0f0; padding: 10px; margin-top: 20px; border: 1px solid #ccc; font-family: monospace; font-size: 12px;"></div>
+
+<script>
+        function debugLog(message) {
+            const debugOutput = document.getElementById('debug-output');
+            const logMessage = document.createElement('p');
+            logMessage.style.margin = '5px 0';
+            logMessage.textContent = new Date().toISOString() + ': ' + message;
+            debugOutput.appendChild(logMessage);
+        }
+
+        console.log = function() {
+            debugLog('LOG: ' + Array.from(arguments).join(' '));
+        };
+
+        console.error = function() {
+            debugLog('ERROR: ' + Array.from(arguments).join(' '));
+        };
+
+        window.addEventListener('error', function(event) {
+            debugLog('UNHANDLED ERROR: ' + event.message + ' at ' + event.filename + ':' + event.lineno);
+        });
+
+        if (typeof firebase !== 'undefined') {
+            debugLog('Firebase está definido');
+            if (typeof firebase.firestore === 'function') {
+                debugLog('Firestore está disponible');
+                firebase.firestore().collection('messages').get()
+                    .then(() => debugLog('Conexión a Firestore exitosa'))
+                    .catch(error => debugLog('Error de conexión a Firestore: ' + error.message));
+            } else {
+                debugLog('Firestore no está disponible');
+            }
+        } else {
+            debugLog('Firebase no está definido');
+        }
+
+        document.getElementById('post-button').addEventListener('click', function() {
+            debugLog('Botón de publicar presionado');
+        });
+    </script>
 </body>
 </html>
+
