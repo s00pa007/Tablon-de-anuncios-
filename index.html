@@ -289,8 +289,7 @@
     </header>
     <div class="container">
         <div class="counters">
-            <div class="counter" id="days-operating">Días en funcionamiento: 0</div>
-            <div class="counter" id="days-goal">Días hasta el objetivo: 1000</div>
+            <div class="counter" id="days-operating">Días en funcionamiento: 1</div>
             <div class="counter" id="messages-published">Mensajes publicados: 0</div>
         </div>
         <section id="message-form">
@@ -328,6 +327,7 @@
         const messageInput = document.getElementById('message-input');
         const messagesPublished = document.getElementById('messages-published');
         const themeToggle = document.getElementById('theme-toggle');
+        const daysOperating = document.getElementById('days-operating');
 
         function loadMessages() {
             bulletin.innerHTML = '';
@@ -459,7 +459,6 @@ function updateLikes(docId, field) {
             });
 
             const message = {
-                id: Date.now().toString(),
                 timestamp: formattedDate,
                 text: text,
                 bgColor: getRandomColor(),
@@ -526,15 +525,10 @@ function updateLikes(docId, field) {
             createEmojiBackground();
 
             // Actualizar días en funcionamiento
-            const startDate = new Date('2023-06-01'); // Ajusta esta fecha al día que iniciaste el proyecto
+            const startDate = new Date(); // Fecha actual
             const today = new Date();
-            const daysOperating = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-            document.getElementById('days-operating').textContent = `Días en funcionamiento: ${daysOperating}`;
-
-            // Actualizar días hasta el objetivo
-            const goalDate = new Date('2026-06-01'); // Ajusta esta fecha a tu objetivo
-            const daysUntilGoal = Math.max(0, Math.floor((goalDate - today) / (1000 * 60 * 60 * 24)));
-            document.getElementById('days-goal').textContent = `Días hasta el objetivo: ${daysUntilGoal}`;
+            const daysOperating = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            daysOperating.textContent = `Días en funcionamiento: ${daysOperating}`;
         }
 
         // Limpiar mensajes expirados cada minuto
@@ -556,3 +550,4 @@ function updateLikes(docId, field) {
     </script>
 </body>
 </html>
+
