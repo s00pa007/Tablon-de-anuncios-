@@ -42,17 +42,24 @@
             text-align: center;
             position: relative;
             margin-bottom: 20px;
+            width: 100%;
         }
 
         #theme-toggle {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: none;
+            width: 40px;
+            height: 40px;
+            background-color: var(--button-bg);
             border: none;
-            font-size: 24px;
+            border-radius: 50%;
             cursor: pointer;
-            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .container {
@@ -60,10 +67,7 @@
             flex-direction: column;
             padding: 10px;
             width: 100%;
-        }
-
-        .left-column, .center-column, .right-column {
-            width: 100%;
+            max-width: 800px;
         }
 
         .counters {
@@ -73,6 +77,7 @@
             justify-content: center;
             font-size: 14px;
             color: var(--text-color);
+            margin-bottom: 20px;
         }
 
         .counter {
@@ -91,7 +96,6 @@
             border: 2px dashed #ffa07a;
             border-radius: 10px;
             width: 100%;
-            max-width: 400px;
             box-sizing: border-box;
             margin-bottom: 30px;
             animation: slideIn 1s ease-in-out;
@@ -130,7 +134,6 @@
 
         #bulletin-board {
             width: 100%;
-            max-width: 600px;
             display: flex;
             flex-direction: column-reverse;
             gap: 15px;
@@ -152,6 +155,14 @@
             text-align: right;
         }
 
+        .message .expiry {
+            font-size: 10px;
+            margin-top: 5px;
+            color: var(--text-color);
+            text-align: right;
+            font-style: italic;
+        }
+
         .delete-btn {
             position: absolute;
             right: 15px;
@@ -168,6 +179,13 @@
             transform: rotate(20deg);
         }
 
+        .info-text {
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -180,29 +198,25 @@
     </style>
 </head>
 <body>
-    <div id="emoji-background"></div>
     <header>
         <h1>Tablón de anuncios</h1>
         <button id="theme-toggle" aria-label="Cambiar modo">🌙</button>
     </header>
     <div class="container">
-        <aside class="left-column">
-            <section id="message-form">
-                <h2>Publicar Mensaje</h2>
-                <textarea id="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
-                <button id="post-button">Publicar</button>
-            </section>
-        </aside>
-        <main class="center-column" id="bulletin-board">
+        <div class="counters">
+            <div class="counter" id="days-operating">Días en funcionamiento: 0</div>
+            <div class="counter" id="days-goal">Días hasta el objetivo: 1000</div>
+            <div class="counter" id="messages-published">Mensajes publicados: 0</div>
+        </div>
+        <section id="message-form">
+            <h2>Publicar Mensaje</h2>
+            <textarea id="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
+            <button id="post-button">Publicar</button>
+        </section>
+        <p class="info-text">Los mensajes se borrarán automáticamente después de 48 horas.</p>
+        <main id="bulletin-board">
             <!-- Messages will aparecer aquí -->
         </main>
-        <aside class="right-column">
-            <div class="counters">
-                <div class="counter" id="days-operating">Días en funcionamiento: 0</div>
-                <div class="counter" id="days-goal">Días hasta el objetivo: 1000</div>
-                <div class="counter" id="messages-published">Mensajes publicados: 0</div>
-            </div>
-        </aside>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -232,7 +246,10 @@
 
         function loadMessages() {
             bulletin.innerHTML = '';
-            db.collection("messages").orderBy("storedTimestamp", "desc").get()
+            db.collection("messages")
+                .where("expiryTime", ">", firebase.firestore.Timestamp.now())
+                .orderBy("expiryTime", "desc")
+                .get()
                 .then((querySnapshot) => {
                     querySnapshot.forEach((doc) => {
                         const message = doc.data();
@@ -284,6 +301,12 @@
             textDiv.textContent = message.text;
             msgDiv.appendChild(textDiv);
 
+            const expiryDiv = document.createElement('div');
+            expiryDiv.classList.add('expiry');
+            const expiryTime = new Date(message.expiryTime.seconds * 1000);
+            expiryDiv.textContent = `Expira: ${expiryTime.toLocaleString('es-ES')}`;
+            msgDiv.appendChild(expiryDiv);
+
             const deleteBtn = document.createElement('div');
             deleteBtn.classList.add('delete-btn');
             deleteBtn.title = 'Eliminar mensaje';
@@ -306,6 +329,7 @@
             }
 
             const now = new Date();
+            const expiryTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 horas después
             const formattedDate = now.toLocaleString('es-ES', {
                 year: 'numeric',
                 month: 'short',
@@ -319,16 +343,20 @@
                 timestamp: formattedDate,
                 text: text,
                 bgColor: getRandomColor(),
-                storedTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+                storedTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                expiryTime: firebase.firestore.Timestamp.fromDate(expiryTime)
             };
 
             saveMessage(message);
         });
 
         function updateMessagesPublished() {
-            db.collection("messages").get().then((querySnapshot) => {
-                messagesPublished.textContent = `Mensajes publicados: ${querySnapshot.size}`;
-            });
+            db.collection("messages")
+                .where("expiryTime", ">", firebase.firestore.Timestamp.now())
+                .get()
+                .then((querySnapshot) => {
+                    messagesPublished.textContent = `Mensajes publicados: ${querySnapshot.size}`;
+                });
         }
 
         function getRandomColor() {
@@ -344,6 +372,20 @@
 
         loadMessages();
         updateMessagesPublished();
+
+        // Limpiar mensajes expirados cada minuto
+        setInterval(() => {
+            db.collection("messages")
+                .where("expiryTime", "<=", firebase.firestore.Timestamp.now())
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        doc.ref.delete();
+                    });
+                    loadMessages();
+                    updateMessagesPublished();
+                });
+        }, 60000);
     </script>
 </body>
 </html>
