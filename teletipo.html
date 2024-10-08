@@ -88,12 +88,21 @@
             function iniciarTeletipo() {
                 const teletipo = document.getElementById('teletipo');
                 const texto = generarFrases(20); // Generamos 20 frases aleatorias
-                teletipo.textContent = texto + ' ' + texto;
+                teletipo.textContent = texto;
 
-                requestAnimationFrame(() => {
-                    const anchuraTexto = teletipo.offsetWidth;
-                    const duracionAnimacion = anchuraTexto / 50;
-                    teletipo.style.animation = `moverIzquierda ${duracionAnimacion}s linear infinite`;
+                // Configurar la animación
+                const anchuraTexto = teletipo.offsetWidth;
+                const duracionAnimacion = anchuraTexto / 50;
+                teletipo.style.animation = `moverIzquierda ${duracionAnimacion}s linear infinite`;
+
+                // Regenerar el texto al finalizar el ciclo
+                teletipo.addEventListener('animationiteration', () => {
+                    const nuevoTexto = generarFrases(20);
+                    teletipo.textContent = nuevoTexto;
+                    teletipo.style.animation = 'none';
+                    requestAnimationFrame(() => {
+                        teletipo.style.animation = `moverIzquierda ${duracionAnimacion}s linear infinite`;
+                    });
                 });
             }
 
