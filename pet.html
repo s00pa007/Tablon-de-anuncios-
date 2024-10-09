@@ -641,6 +641,25 @@ body {
   lightSwitch.textContent = isLightOn ? '💡' : '🌙';
   }
  
+ function updatePetLevels() {
+ console.log("Intentando actualizar niveles de mascota");
+ db.collection("pet").doc("status").onSnapshot((doc) => {
+ if (doc.exists) {
+ const status = doc.data().status; // Nota el cambio aquí
+ console.log("Datos de mascota recibidos:", status);
+ document.querySelector('#hunger-bar .level-fill').style.height = `${status.hunger}%`;
+ document.querySelector('#fun-bar .level-fill').style.height = `${status.fun}%`;
+ document.querySelector('#hygiene-bar .level-fill').style.height = `${status.hygiene}%`;
+ 
+ updatePetEmoji(status);
+ } else {
+ console.log("No se encontró el documento de estado de la mascota");
+ }
+ }, (error) => {
+ console.error("Error getting pet status:", error);
+ });
+ }
+ 
  function updatePetStatus(hunger, fun, hygiene) {
  db.collection("pet").doc("status").update({
  hunger: hunger,
