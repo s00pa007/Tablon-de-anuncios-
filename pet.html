@@ -640,6 +640,22 @@ body {
   background.style.background = backgrounds[currentBackground];
   lightSwitch.textContent = isLightOn ? '💡' : '🌙';
   }
+ 
+ function updatePetStatus(hunger, fun, hygiene) {
+ db.collection("pet").doc("status").update({
+ hunger: hunger,
+ fun: fun,
+ hygiene: hygiene
+ }).then(() => {
+ console.log("Pet status updated successfully");
+ }).catch((error) => {
+ console.error("Error updating pet status:", error);
+ });
+ }
+ 
+ // Llamar a esta función cada vez que cambie el estado de la mascota
+ // Por ejemplo:
+ // updatePetStatus(newHunger, newFun, newHygiene);
   
   function decreaseStats() {
   if (!isGameActive) return;
