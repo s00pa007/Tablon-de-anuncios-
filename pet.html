@@ -34,6 +34,7 @@
         flex-direction: column;
         padding: 10px;
         position: relative;
+        overflow: hidden; /* Agregado para controlar el desbordamiento */
     }
     .frame {
         border: 2px solid var(--neon-blue);
@@ -47,25 +48,30 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 10px;
+        flex-wrap: wrap; /* Permite que los elementos se ajusten en pantallas pequeñas */
     }
     .currency, .xp, .weather {
-        font-size: 18px;
+        font-size: 1.2em;
         font-weight: bold;
         color: var(--neon-yellow);
         text-shadow: 0 0 5px var(--neon-yellow);
+        margin: 5px 0; /* Agregado para separación vertical en pantallas pequeñas */
     }
     .status-bars {
         display: flex;
         justify-content: space-around;
         margin-bottom: 10px;
+        flex-wrap: wrap; /* Permite ajuste en pantallas pequeñas */
     }
     .status-bar {
         width: 30%;
+        min-width: 80px; /* Asegura un ancho mínimo */
         height: 20px;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
         overflow: hidden;
         position: relative;
+        margin-bottom: 5px; /* Espacio entre barras en pantallas pequeñas */
     }
     .status-fill {
         height: 100%;
@@ -82,7 +88,7 @@
         justify-content: flex-start;
         align-items: flex-start;
         overflow-y: hidden;
-        height: 60px; /* Aumentado para mostrar dos notificaciones completas */
+        height: 60px; /* Ajustado para mostrar dos notificaciones completas */
         padding: 5px;
         margin-bottom: 10px;
         border: 2px solid var(--neon-blue);
@@ -92,7 +98,7 @@
         flex-shrink: 0;
     }
     .event-icon {
-        font-size: 14px; /* Reducido ligeramente */
+        font-size: 0.9em; /* Tamaño relativo para mejor escalabilidad */
         margin-bottom: 5px;
         color: var(--neon-yellow);
         text-shadow: 0 0 5px var(--neon-yellow);
@@ -100,25 +106,25 @@
         transition: opacity 0.5s ease;
     }
 
-    /* Incrementar el área de juego en un 15% */
+    /* Ajustes en el área de juego */
     .pet-frame {
         display: flex;
         justify-content: center;
         align-items: center;
         position: relative;
         overflow: hidden;
-        height: calc(345px * 1.15); /* Incrementado en un 15% */
+        flex-shrink: 0;
+        height: 35vh; /* Altura relativa al viewport */
         margin-bottom: 10px;
-        flex-shrink: 0; /* Evita que se contraiga en pantallas pequeñas */
     }
     .pet-container {
         position: relative;
-        width: calc(200px * 1.15); /* Incrementado en un 15% */
-        height: calc(200px * 1.15); /* Incrementado en un 15% */
+        width: 30vh; /* Ancho y alto relativo al viewport */
+        height: 30vh;
         transition: transform 0.5s ease;
     }
     .pet {
-        font-size: calc(120px * 1.15); /* Incrementado en un 15% */
+        font-size: 15vh; /* Tamaño de fuente relativo */
         position: absolute;
         top: 50%;
         left: 50%;
@@ -129,24 +135,25 @@
     }
     .pet-accessory {
         position: absolute;
-        font-size: calc(80px * 1.15); /* Incrementado en un 15% */
+        font-size: 10vh; /* Tamaño relativo */
         z-index: 1;
         user-select: none;
         cursor: move;
         transition: all 0.5s ease;
     }
-    .accessory-crown { top: calc(-50px * 1.15); left: 50%; transform: translateX(-50%); }
-    .accessory-glasses { top: calc(40px * 1.15); left: 50%; transform: translateX(-50%); font-size: calc(90px * 1.15); }
-    .accessory-hat { top: calc(-55px * 1.15); left: 50%; transform: translateX(-50%); }
+    .accessory-crown { top: -5vh; left: 50%; transform: translateX(-50%); }
+    .accessory-glasses { top: 4vh; left: 50%; transform: translateX(-50%); font-size: 11vh; }
+    .accessory-hat { top: -5.5vh; left: 50%; transform: translateX(-50%); }
 
     .action-buttons {
         display: flex;
         justify-content: space-around;
         padding: 10px;
         margin-bottom: 10px;
+        flex-wrap: wrap; /* Permite que los botones se ajusten en múltiples líneas */
     }
     .action-btn {
-        font-size: 30px;
+        font-size: 2em; /* Tamaño relativo para escalabilidad */
         background: rgba(255, 255, 255, 0.1);
         border: 2px solid var(--neon-blue);
         border-radius: 10px;
@@ -154,10 +161,16 @@
         color: white;
         text-shadow: 0 0 5px var(--neon-blue);
         transition: transform 0.2s ease;
+        margin: 5px; /* Espacio entre botones */
+        flex: 1 1 30%; /* Permite que los botones se ajusten y ocupen espacio disponible */
+        max-width: 100px; /* Ancho máximo para evitar botones demasiado grandes */
+        text-align: center; /* Centrar el contenido del botón */
     }
     .action-btn:active {
         transform: scale(0.9);
     }
+
+    /* Estilos para los modales */
     .modal {
         display: none;
         position: fixed;
@@ -183,7 +196,7 @@
     .close, .close-chest {
         color: var(--neon-pink);
         float: right;
-        font-size: 28px;
+        font-size: 1.5em;
         font-weight: bold;
         cursor: pointer;
     }
@@ -194,12 +207,12 @@
     }
     .shop-items, .food-items {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
         gap: 10px;
         margin-top: 20px;
     }
     .shop-item, .food-item {
-        font-size: 24px;
+        font-size: 1.2em;
         text-align: center;
         padding: 10px;
         background: rgba(255, 255, 255, 0.1);
@@ -212,18 +225,18 @@
     }
     .mini-game-board {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
         gap: 10px;
         margin-top: 20px;
     }
     .mini-game-card {
-        aspect-ratio: 1;
+        aspect-ratio: 1 / 1;
         background-color: var(--neon-blue);
         border-radius: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 24px;
+        font-size: 1.5em;
         cursor: pointer;
         transition: transform 0.3s ease;
     }
@@ -233,21 +246,14 @@
     .mini-game-card.matched {
         background-color: var(--neon-green);
     }
-    .debug-button {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        font-size: 20px;
-        background: none;
-        border: none;
-        color: rgba(255, 255, 255, 0.5);
-        cursor: pointer;
-    }
+
+    /* Eliminado .debug-button ya que mencionaste que no es necesario */
+
     .chest {
         position: absolute;
         right: 10px;
         bottom: 10px;
-        font-size: 40px;
+        font-size: 2em;
         cursor: pointer;
         z-index: 10;
     }
@@ -272,7 +278,7 @@
     }
     .chest-item {
         display: inline-block;
-        font-size: 30px;
+        font-size: 1.5em;
         margin: 5px;
         cursor: pointer;
     }
@@ -280,13 +286,13 @@
         position: absolute;
         top: 10px;
         right: 10px;
-        font-size: 24px;
+        font-size: 1.5em;
         cursor: pointer;
         z-index: 10;
     }
     .poop {
         position: absolute;
-        font-size: 24px;
+        font-size: 1.5em;
         cursor: pointer;
         z-index: 5;
     }
@@ -299,6 +305,28 @@
         background-size: cover;
         background-position: center;
         transition: opacity 1s ease;
+    }
+
+    /* Media Queries para pantallas pequeñas */
+    @media (max-width: 600px) {
+        .currency, .xp, .weather {
+            font-size: 1em;
+        }
+        .action-btn {
+            font-size: 1.5em;
+            padding: 8px;
+            max-width: 80px;
+        }
+        .pet {
+            font-size: 12vh;
+        }
+        .pet-container {
+            width: 25vh;
+            height: 25vh;
+        }
+        .event-icon {
+            font-size: 0.8em;
+        }
     }
 </style>
         <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
