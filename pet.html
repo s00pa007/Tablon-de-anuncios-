@@ -1294,7 +1294,20 @@ body {
   poops[0].remove();
   }
   }, 60000);
-  
+
+window.addEventListener('message', (event) => {
+    if (event.data === 'initializePet') {
+        initializePet();
+    }
+});
+
+function updateParentStatus(status) {
+    window.parent.postMessage({
+        type: 'updatePetStatus',
+        status: status
+    }, '*');
+}
+
   // Limpiar eventos antiguos del DOM
   const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
