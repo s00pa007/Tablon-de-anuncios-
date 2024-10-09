@@ -29,18 +29,18 @@
             overflow: hidden;
         }
         .game-container {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            height: 100vh;
             padding: 10px;
             position: relative;
         }
         .frame {
             border: 2px solid var(--neon-blue);
-            border-radius: 10px;
-            padding: 5px;
-            margin-bottom: 5px;
-            box-shadow: 0 0 5px var(--neon-blue);
+            border-radius: 20px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 0 10px var(--neon-blue);
         }
         .pet-frame {
             flex: 1;
@@ -49,16 +49,15 @@
             align-items: center;
             position: relative;
             overflow: hidden;
-            min-height: 150px;
         }
         .pet-container {
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: 200px;
+            height: 200px;
             transition: transform 0.5s ease;
         }
         .pet {
-            font-size: 80px;
+            font-size: 120px;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -69,25 +68,25 @@
         }
         .pet-accessory {
             position: absolute;
-            font-size: 40px;
+            font-size: 80px;
             z-index: 1;
             user-select: none;
             cursor: move;
             transition: all 0.5s ease;
         }
-        .accessory-crown { top: -25px; left: 50%; transform: translateX(-50%); }
-        .accessory-glasses { top: 20px; left: 50%; transform: translateX(-50%); font-size: 45px; }
-        .accessory-hat { top: -30px; left: 50%; transform: translateX(-50%); }
+        .accessory-crown { top: -50px; left: 50%; transform: translateX(-50%); }
+        .accessory-glasses { top: 40px; left: 50%; transform: translateX(-50%); font-size: 90px; }
+        .accessory-hat { top: -55px; left: 50%; transform: translateX(-50%); }
         .status-bars {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
         .status-bar {
             width: 30%;
-            height: 15px;
+            height: 20px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 7px;
+            border-radius: 10px;
             overflow: hidden;
             position: relative;
         }
@@ -102,28 +101,30 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 5px;
-            font-size: 14px;
+            margin-bottom: 10px;
         }
         .currency, .xp, .weather {
+            font-size: 18px;
             font-weight: bold;
             color: var(--neon-yellow);
-            text-shadow: 0 0 3px var(--neon-yellow);
+            text-shadow: 0 0 5px var(--neon-yellow);
         }
         .action-buttons {
             display: flex;
             justify-content: space-around;
-            margin-top: 5px;
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            padding: 10px;
         }
         .action-btn {
-            font-size: 24px;
+            font-size: 30px;
             background: none;
             border: none;
             color: white;
-            text-shadow: 0 0 3px var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
             transition: transform 0.2s ease;
-            padding: 5px;
-            touch-action: manipulation;
         }
         .action-btn:active {
             transform: scale(0.9);
@@ -141,19 +142,19 @@
         }
         .modal-content {
             background: var(--background-color);
-            margin: 5% auto;
-            padding: 15px;
+            margin: 10% auto;
+            padding: 20px;
             border: 2px solid var(--neon-blue);
             width: 90%;
-            max-height: 90%;
+            max-height: 80%;
             overflow-y: auto;
-            border-radius: 10px;
-            box-shadow: 0 0 10px var(--neon-blue);
+            border-radius: 20px;
+            box-shadow: 0 0 15px var(--neon-blue);
         }
         .close, .close-chest {
             color: var(--neon-pink);
             float: right;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             cursor: pointer;
         }
@@ -165,15 +166,15 @@
         .shop-items, .food-items {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 20px;
         }
         .shop-item, .food-item {
-            font-size: 20px;
+            font-size: 24px;
             text-align: center;
-            padding: 5px;
+            padding: 10px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
             transition: transform 0.2s ease;
         }
@@ -183,17 +184,17 @@
         .mini-game-board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 20px;
         }
         .mini-game-card {
             aspect-ratio: 1;
             background-color: var(--neon-blue);
-            border-radius: 5px;
+            border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
             transition: transform 0.3s ease;
         }
@@ -205,23 +206,23 @@
         }
         .notification {
             position: fixed;
-            top: 40px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: 2;
         }
         .debug-button {
             position: fixed;
-            top: 5px;
-            left: 5px;
-            font-size: 16px;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
             background: none;
             border: none;
             color: rgba(255, 255, 255, 0.5);
@@ -229,9 +230,9 @@
         }
         .chest {
             position: absolute;
-            right: 5px;
-            bottom: 5px;
-            font-size: 30px;
+            right: 10px;
+            bottom: 10px;
+            font-size: 40px;
             cursor: pointer;
             z-index: 10;
         }
@@ -247,8 +248,8 @@
         }
         .chest-content {
             background-color: var(--background-color);
-            margin: 10% auto;
-            padding: 15px;
+            margin: 15% auto;
+            padding: 20px;
             border: 1px solid var(--neon-blue);
             width: 80%;
             max-width: 300px;
@@ -256,8 +257,8 @@
         }
         .chest-item {
             display: inline-block;
-            font-size: 24px;
-            margin: 3px;
+            font-size: 30px;
+            margin: 5px;
             cursor: pointer;
         }
         .event-bar {
@@ -265,13 +266,13 @@
             justify-content: flex-start;
             align-items: center;
             overflow-x: auto;
-            padding: 3px;
-            height: 30px;
-            margin-bottom: 5px;
+            padding: 5px;
+            height: 40px;
+            margin-bottom: 10px;
         }
         .event-icon {
-            font-size: 16px;
-            margin-right: 5px;
+            font-size: 20px;
+            margin-right: 10px;
             animation: fadeOut 2s forwards;
         }
         @keyframes fadeOut {
@@ -281,15 +282,15 @@
         }
         .light-switch {
             position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 20px;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
             cursor: pointer;
             z-index: 10;
         }
         .poop {
             position: absolute;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
             z-index: 5;
         }
@@ -334,7 +335,7 @@
             <div class="status-bar"><div id="fun-fill" class="status-fill"></div></div>
             <div class="status-bar"><div id="hygiene-fill" class="status-fill"></div></div>
         </div>
-        <div class="frame action-buttons">
+        <div class="action-buttons">
             <button class="action-btn" id="feed-btn">🍽️</button>
             <button class="action-btn" id="play-btn">🎮</button>
             <button class="action-btn" id="clean-btn">🧼</button>
@@ -391,8 +392,8 @@
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
     // Referencia del documento
     const petDocRef = db.collection('Pet').doc('Mascota');
@@ -1213,80 +1214,13 @@ if (diff > 0) {
         // Reanudar otros intervalos aquí si es necesario
     }
 
-    // Inicialización
-    function init() {
-        loadGame();
-        updateStatus();
-        resizePet();
-        setInterval(decreaseStats, 10000);
-        setInterval(saveGame, 30000);
-        setInterval(changeWeather, 60000);
-        setInterval(movePet, 3000);
-        setInterval(changeExpression, 5000);
-        poopInterval = setInterval(generatePoop, 30000);
-        background.style.background = backgrounds[currentBackground];
-        handleConnectionStatus();
-    }
-
-    init();
-
-    // Optimización de eventos táctiles para dispositivos móviles
-    function optimizeTouchEvents() {
-        const buttons = document.querySelectorAll('.action-btn');
-        buttons.forEach(button => {
-            button.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                this.click();
-            }, { passive: false });
-        });
-    }
-
-    optimizeTouchEvents();
-
-    // Ajuste de posición para dispositivos móviles
-    function adjustForMobile() {
-        if (window.innerWidth <= 768) {
-            const petFrame = document.querySelector('.pet-frame');
-            const actionButtons = document.querySelector('.action-buttons');
-            petFrame.style.minHeight = '120px';
-            actionButtons.style.position = 'fixed';
-            actionButtons.style.bottom = '10px';
-            actionButtons.style.left = '0';
-            actionButtons.style.width = '100%';
-            actionButtons.style.padding = '5px';
-            actionButtons.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        } else {
-            const petFrame = document.querySelector('.pet-frame');
-            const actionButtons = document.querySelector('.action-buttons');
-            petFrame.style.minHeight = '150px';
-            actionButtons.style.position = 'static';
-            actionButtons.style.backgroundColor = 'transparent';
-        }
-    }
-
-    window.addEventListener('resize', adjustForMobile);
-    adjustForMobile();
-
-    // Función para manejar el cambio de orientación en dispositivos móviles
-    function handleOrientationChange() {
-        if (window.orientation === 90 || window.orientation === -90) {
-            // Paisaje
-            document.body.style.fontSize = '14px';
-        } else {
-            // Retrato
-            document.body.style.fontSize = '16px';
-        }
-        adjustForMobile();
-        resizePet();
-    }
-
-    window.addEventListener('orientationchange', handleOrientationChange);
-
     // Optimización del rendimiento
     function optimizePerformance() {
         // Usar requestAnimationFrame para animaciones suaves
         function animate() {
-            movePet();
+            if (isGameActive) {
+                movePet();
+            }
             requestAnimationFrame(animate);
         }
         requestAnimationFrame(animate);
@@ -1305,8 +1239,6 @@ if (diff > 0) {
         // Reemplazar llamadas directas a updateFirestore con la versión throttled
         window.updateFirestore = throttledFirebaseUpdate;
     }
-
-    optimizePerformance();
 
     // Gestión de memoria
     function manageMemory() {
@@ -1333,7 +1265,23 @@ if (diff > 0) {
         observer.observe(document.getElementById('eventBar'), { childList: true });
     }
 
-    manageMemory();
-</script>
+    // Inicialización
+    function init() {
+        loadGame();
+        updateStatus();
+        resizePet();
+        setInterval(decreaseStats, 10000);
+        setInterval(saveGame, 30000);
+        setInterval(changeWeather, 60000);
+        setInterval(changeExpression, 5000);
+        poopInterval = setInterval(generatePoop, 30000);
+        background.style.background = backgrounds[currentBackground];
+        handleConnectionStatus();
+        optimizePerformance();
+        manageMemory();
+    }
+
+    init();
+    </script>
 </body>
 </html>
