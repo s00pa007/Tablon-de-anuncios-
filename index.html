@@ -44,9 +44,6 @@
         }
 
         header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
             background-color: var(--header-bg);
             padding: 10px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -75,56 +72,71 @@
             height: 60px;
         }
 
-.pet-status-container {
-        display: flex;
-        align-items: center;
-        background-color: rgba(255, 255, 255, 0.1);
-        padding: 5px;
-        border-radius: 10px;
-        margin-top: 5px;
-        height: 40px;
-    }
+        .pet-status-container {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 10px;
+            margin-top: 5px;
+            height: 80px;
+            border: 2px solid var(--button-bg);
+        }
 
-    .pet-emoji {
-        font-size: 24px;
-        margin-right: 10px;
-        padding: 3px;
-        background-color: var(--button-bg);
-        border-radius: 50%;
-        text-decoration: none;
-    }
+        .pet-emoji {
+            font-size: 24px;
+            margin-right: 10px;
+            padding: 3px;
+            background-color: var(--button-bg);
+            border-radius: 50%;
+            text-decoration: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .pet-levels {
-        display: flex;
-        gap: 5px;
-    }
+        .pet-levels {
+            display: flex;
+            gap: 10px;
+            height: 100%;
+            align-items: flex-end;
+        }
 
-    .level-bar {
-        width: 15px;
-        height: 30px;
-        background-color: #e0e0e0;
-        border-radius: 7px;
-        overflow: hidden;
-    }
+        .level-bar {
+            width: 20px;
+            height: 60px;
+            background-color: #e0e0e0;
+            border-radius: 0;
+            overflow: hidden;
+            position: relative;
+        }
 
-    .level-fill {
-        width: 100%;
-        height: 0%;
-        transition: height 0.3s ease;
-    }
+        .level-fill {
+            width: 100%;
+            height: 0%;
+            position: absolute;
+            bottom: 0;
+            transition: height 0.3s ease;
+        }
 
-    .level-icons {
-        display: flex;
-        gap: 10px;
-        margin-left: 5px;
-        font-size: 12px;
-    }
+        #hunger-fill { background-color: #ff6347; }
+        #fun-fill { background-color: #4caf50; }
+        #hygiene-fill { background-color: #3498db; }
 
-    #theme-toggle {
-        font-size: 20px;
-        margin-left: 10px;
-    }
+        .level-icons {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 60px;
+            font-size: 12px;
+        }
 
+        #theme-toggle {
+            font-size: 20px;
+            margin-left: 10px;
+        }
 
         .main-container {
             display: flex;
@@ -314,25 +326,14 @@
             width: 100%;
             border-top: 1px solid #ccc;
             padding-top: 10px;
-            position: sticky;
-            top: 140px;
             background-color: var(--background-color);
             z-index: 999;
         }
 
-        #load-more {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-top: 20px;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-family: 'Comfortaa', cursive;
-            font-weight: bold;
+        #loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
         }
 
         #pet-popup {
@@ -362,24 +363,24 @@
     </style>
 </head>
 <body>
-<header>
-    <img src="cabecera.jpg" alt="Tablón de anuncios anónimos" id="header-image">
-    <div id="slogan"></div>
-    <div class="pet-status-container">
-        <a href="#" id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">😊</a>
-        <div class="pet-levels">
-            <div class="level-bar" id="hunger-bar"><div class="level-fill"></div></div>
-            <div class="level-bar" id="fun-bar"><div class="level-fill"></div></div>
-            <div class="level-bar" id="hygiene-bar"><div class="level-fill"></div></div>
+    <header>
+        <img src="cabecera.jpg" alt="Tablón de anuncios anónimos" id="header-image">
+        <div id="slogan"></div>
+        <div class="pet-status-container">
+            <a href="#" id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">😊</a>
+            <div class="pet-levels">
+                <div class="level-bar"><div id="hunger-fill" class="level-fill"></div></div>
+                <div class="level-bar"><div id="fun-fill" class="level-fill"></div></div>
+                <div class="level-bar"><div id="hygiene-fill" class="level-fill"></div></div>
+            </div>
+            <div class="level-icons">
+                <span>🍔</span>
+                <span>🎮</span>
+                <span>🚿</span>
+            </div>
+            <button id="theme-toggle">🌓</button>
         </div>
-        <div class="level-icons">
-            <span>🍔</span>
-            <span>🎮</span>
-            <span>🚿</span>
-        </div>
-        <button id="theme-toggle">🌓</button>
-    </div>
-</header>
+    </header>
 
     <div class="main-container">
         <div class="left-column">
@@ -394,8 +395,7 @@
             </form>
             
             <div id="bulletin-board"></div>
-            
-            <button id="load-more">Cargar más mensajes</button>
+            <div id="loading">Cargando más mensajes...</div>
             
             <div class="statistics">
                 <div id="days-operating">Días en funcionamiento: 1</div>
@@ -422,6 +422,7 @@
         };
 
         firebase.initializeApp(firebaseConfig);
+        console.log("Firebase inicializado en index.");
         const db = firebase.firestore();
 
         const bulletinBoard = document.getElementById('bulletin-board');
@@ -435,7 +436,7 @@
         const petEmoji = document.getElementById('pet-emoji');
         const petPopup = document.getElementById('pet-popup');
         const closePopup = document.getElementById('close-popup');
-        const loadMoreButton = document.getElementById('load-more');
+        const loadingElement = document.getElementById('loading');
 
 const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', ' 🦀', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐈‍⬛', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
         
@@ -467,8 +468,13 @@ const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '�
         
         let lastVisibleMessage = null;
         const messagesPerPage = 10;
+        let isLoading = false;
         
         function loadMessages(startAfter = null) {
+            if (isLoading) return;
+            isLoading = true;
+            loadingElement.style.display = 'block';
+            
             let query = db.collection("messages").orderBy("timestamp", "desc").limit(messagesPerPage);
             
             if (startAfter) {
@@ -477,7 +483,8 @@ const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '�
             
             query.get().then((snapshot) => {
                 if (snapshot.empty) {
-                    loadMoreButton.style.display = 'none';
+                    loadingElement.style.display = 'none';
+                    isLoading = false;
                     return;
                 }
                 
@@ -489,6 +496,12 @@ const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '�
                 
                 lastVisibleMessage = snapshot.docs[snapshot.docs.length - 1];
                 updateMessagesPublished(snapshot.size);
+                loadingElement.style.display = 'none';
+                isLoading = false;
+            }).catch((error) => {
+                console.error("Error loading messages: ", error);
+                loadingElement.style.display = 'none';
+                isLoading = false;
             });
         }
         
@@ -757,7 +770,7 @@ const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '�
                 emoji.className = 'floating-emoji';
                 emoji.textContent = getRandomAnimalEmoji();
                 emoji.style.left = `${Math.random() * 100}vw`;
-                emoji.style.top = `${Math.random() * 100}vh`;
+emoji.style.top = `${Math.random() * 100}vh`;
                 emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
                 emoji.style.animationDelay = `${Math.random() * 2}s`;
                 emojiContainer.appendChild(emoji);
@@ -766,7 +779,7 @@ const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '�
             document.body.appendChild(emojiContainer);
         }
 
-function cargarTeletipo() {
+        function cargarTeletipo() {
             fetch('teletipo.html')
                 .then(response => {
                     if (!response.ok) {
@@ -812,15 +825,19 @@ function cargarTeletipo() {
         }
 
         function updatePetLevels() {
+            console.log("Intentando actualizar niveles de mascota");
             db.collection("pet").doc("status").onSnapshot((doc) => {
+                console.log("Documento de mascota encontrado en index:", doc.data());
                 if (doc.exists) {
                     const status = doc.data();
-                    document.querySelector('#hunger-bar .level-fill').style.height = `${status.hunger}%`;
-                    document.querySelector('#fun-bar .level-fill').style.height = `${status.fun}%`;
-                    document.querySelector('#hygiene-bar .level-fill').style.height = `${status.hygiene}%`;
+                    console.log("Datos de mascota recibidos:", status);
+                    document.querySelector('#hunger-fill').style.height = `${status.hunger || 0}%`;
+                    document.querySelector('#fun-fill').style.height = `${status.fun || 0}%`;
+                    document.querySelector('#hygiene-fill').style.height = `${status.hygiene || 0}%`;
                     
-                    // Actualizar el emoji de la mascota basado en el estado general
                     updatePetEmoji(status);
+                } else {
+                    console.log("No se encontró el documento de estado de la mascota");
                 }
             }, (error) => {
                 console.error("Error getting pet status:", error);
@@ -828,6 +845,7 @@ function cargarTeletipo() {
         }
 
         function updatePetEmoji(status) {
+            console.log("Actualizando emoji de mascota con status:", status);
             const averageStatus = (status.hunger + status.fun + status.hygiene) / 3;
             let emoji;
             if (averageStatus > 80) {
@@ -845,7 +863,7 @@ function cargarTeletipo() {
         petEmoji.addEventListener('click', (e) => {
             e.preventDefault();
             petPopup.style.display = 'block';
-            document.getElementById('pet-iframe').src = 'https://s00pa007.github.io/Tablon-de-anuncios-/pet.html';
+            document.getElementById('pet-iframe').src = 'pet.html';
         });
 
         closePopup.addEventListener('click', () => {
@@ -853,17 +871,34 @@ function cargarTeletipo() {
             document.getElementById('pet-iframe').src = 'about:blank';
         });
 
-        loadMoreButton.addEventListener('click', () => {
-            loadMessages(lastVisibleMessage);
+        // Mantener el tamaño del pop-up al 80%
+        function adjustPetPopupSize() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            petPopup.style.width = `${windowWidth * 0.8}px`;
+            petPopup.style.height = `${windowHeight * 0.8}px`;
+            petPopup.style.left = `${windowWidth * 0.1}px`;
+            petPopup.style.top = `${windowHeight * 0.1}px`;
+        }
+
+        window.addEventListener('resize', adjustPetPopupSize);
+
+        // Scroll infinito
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoading) {
+                loadMessages(lastVisibleMessage);
+            }
         });
 
         function initApp() {
+            console.log("Iniciando aplicación...");
             loadMessages();
             changeSlogan();
             createEmojiBackground();
             updateMessagesDeleted();
             cargarTeletipo();
             updatePetLevels();
+            adjustPetPopupSize();
             
             const startDate = new Date('2023-06-08');
             const today = new Date();
@@ -871,9 +906,18 @@ function cargarTeletipo() {
             daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
             
             setInterval(changeSlogan, 10000);
+            setInterval(updatePetLevels, 5000); // Actualiza los niveles de la mascota cada 5 segundos
         }
 
         window.addEventListener('load', initApp);
+
+        // Comunicación con el iframe de la mascota
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'updatePetStatus') {
+                console.log("Recibida actualización de estado de la mascota:", event.data.status);
+                updatePetEmoji(event.data.status);
+            }
+        });
     </script>
 </body>
 </html>
