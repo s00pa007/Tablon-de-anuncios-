@@ -811,36 +811,39 @@ function cargarTeletipo() {
                 });
         }
 
-        function updatePetLevels() {
-            db.collection("pet").doc("status").onSnapshot((doc) => {
-                if (doc.exists) {
-                    const status = doc.data();
-                    document.querySelector('#hunger-bar .level-fill').style.height = `${status.hunger}%`;
-                    document.querySelector('#fun-bar .level-fill').style.height = `${status.fun}%`;
-                    document.querySelector('#hygiene-bar .level-fill').style.height = `${status.hygiene}%`;
-                    
-                    // Actualizar el emoji de la mascota basado en el estado general
-                    updatePetEmoji(status);
-                }
-            }, (error) => {
-                console.error("Error getting pet status:", error);
-            });
+function updatePetLevels() {
+    console.log("Intentando actualizar niveles de mascota");
+    db.collection("Pet").doc("status").onSnapshot((doc) => {
+        if (doc.exists) {
+            const status = doc.data();
+            console.log("Datos de mascota recibidos:", status);
+            document.querySelector('#hunger-bar .level-fill').style.height = `${status.hunger || 0}%`;
+            document.querySelector('#fun-bar .level-fill').style.height = `${status.fun || 0}%`;
+            document.querySelector('#hygiene-bar .level-fill').style.height = `${status.hygiene || 0}%`;
+            
+            updatePetEmoji(status);
+        } else {
+            console.log("No se encontró el documento de estado de la mascota");
         }
+    }, (error) => {
+        console.error("Error getting pet status:", error);
+    });
+}
 
-        function updatePetEmoji(status) {
-            const averageStatus = (status.hunger + status.fun + status.hygiene) / 3;
-            let emoji;
-            if (averageStatus > 80) {
-                emoji = '😊'; // Feliz
-            } else if (averageStatus > 50) {
-                emoji = '😐'; // Neutral
-            } else if (averageStatus > 30) {
-                emoji = '😕'; // Preocupado
-            } else {
-                emoji = '😢'; // Triste
-            }
-            document.getElementById('pet-emoji').textContent = emoji;
-        }
+function updatePetEmoji(status) {
+    const averageStatus = (status.hunger + status.fun + status.hygiene) / 3;
+    let emoji;
+    if (averageStatus > 80) {
+        emoji = '😊'; // Feliz
+    } else if (averageStatus > 50) {
+        emoji = '😐'; // Neutral
+    } else if (averageStatus > 30) {
+        emoji = '😕'; // Preocupado
+    } else {
+        emoji = '😢'; // Triste
+    }
+    document.getElementById('pet-emoji').textContent = emoji;
+}
 
         petEmoji.addEventListener('click', (e) => {
             e.preventDefault();

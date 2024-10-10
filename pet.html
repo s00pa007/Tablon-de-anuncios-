@@ -676,25 +676,27 @@ body {
  // Por ejemplo:
  // updatePetStatus(newHunger, newFun, newHygiene);
   
-  function decreaseStats() {
-  if (!isGameActive) return;
+function decreaseStats() {
+    if (!isGameActive) return;
   
-  if (!isLightOn) {
-  hunger -= 1;
-  fun -= 1;
-  hygiene -= 1;
-  } else {
-  hunger -= 3;
-  fun -= 3;
-  hygiene -= 3;
-  }
-  if (Math.random() < 0.05 && !isSick) {
-  isSick = true;
-  addEventToBar("🤢 Tu mascota se ha enfermado");
-  }
-  updateStatus();
-  updateFirestore();
-  }
+    if (!isLightOn) {
+        hunger = Math.max(0, hunger - 1);
+        fun = Math.max(0, fun - 1);
+        hygiene = Math.max(0, hygiene - 1);
+    } else {
+        hunger = Math.max(0, hunger - 3);
+        fun = Math.max(0, fun - 3);
+        hygiene = Math.max(0, hygiene - 3);
+    }
+    if (Math.random() < 0.05 && !isSick) {
+        isSick = true;
+        addEventToBar("🤢 Tu mascota se ha enfermado");
+    }
+    updateStatus();
+    updateFirestorePetLevels(); // Añadir esta línea
+}
+
+// Añadir llamadas similares en otras funciones que modifiquen los niveles
   
   function addEventToBar(message) {
   const eventIcon = document.createElement('div');
@@ -754,7 +756,18 @@ body {
   updateStatus();
   updateFirestore();
   }
-  
+ 
+ function updateFirestorePetLevels() {
+ db.collection("Pet").doc("status").update({
+ hunger: hunger,
+ fun: fun,
+ hygiene: hygiene
+ }).then(() => {
+ console.log("Niveles de mascota actualizados en Firestore");
+ }).catch((error) => {
+ console.error("Error al actualizar niveles de mascota en Firestore:", error);
+ });
+ }
   function levelUp() {
   level++;
   xp = 0;
