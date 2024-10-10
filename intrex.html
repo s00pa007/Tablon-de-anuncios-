@@ -808,9 +808,9 @@
         });
         }
         
-        function updatePetLevels() {
+        function updatepetLevels() {
         console.log("Intentando actualizar niveles de mascota");
-        db.collection("Pet").doc("status").onSnapshot((doc) => {
+        db.collection("pet").doc("status").onSnapshot((doc) => {
         if (doc.exists) {
         const status = doc.data();
         console.log("Datos de mascota recibidos:", status);
@@ -818,7 +818,7 @@
         document.querySelector('#fun-bar .level-fill').style.height = `${status.fun || 0}%`;
         document.querySelector('#hygiene-bar .level-fill').style.height = `${status.hygiene || 0}%`;
         
-        updatePetEmoji(status);
+        updatepetEmoji(status);
         } else {
         console.log("No se encontró el documento de estado de la mascota");
         }
@@ -827,7 +827,7 @@
         });
         }
         
-        function updatePetEmoji(status) {
+        function updatepetEmoji(status) {
         console.log("Actualizando emoji de mascota con status:", status);
         const averageStatus = (status.hunger + status.fun + status.hygiene) / 3;
         let emoji;
@@ -865,7 +865,7 @@
         createEmojiBackground();
         updateMessagesDeleted();
         cargarTeletipo();
-        updatePetLevels();
+        updatepetLevels();
         
         const startDate = new Date('2023-06-08');
         const today = new Date();
@@ -873,16 +873,16 @@
         daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
         
         setInterval(changeSlogan, 10000);
-        setInterval(updatePetLevels, 5000); // Actualiza los niveles de la mascota cada 5 segundos
+        setInterval(updatepetLevels, 5000); // Actualiza los niveles de la mascota cada 5 segundos
         }
         
         window.addEventListener('load', initApp);
         
         // Comunicación con el iframe de la mascota
         window.addEventListener('message', (event) => {
-        if (event.data.type === 'updatePetStatus') {
+        if (event.data.type === 'updatepetStatus') {
         console.log("Recibida actualización de estado de la mascota:", event.data.status);
-        updatePetEmoji(event.data.status);
+        updatepetEmoji(event.data.status);
         }
         });
         </script>

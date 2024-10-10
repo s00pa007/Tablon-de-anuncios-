@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐾 NeonPet Deluxe 🐾</title>
+    <title>🐾 Neonpet Deluxe 🐾</title>
     <style>
         :root {
             --primary-gradient: linear-gradient(45deg, #ff00ff, #00ffff);
@@ -419,7 +419,7 @@
         const db = firebase.firestore();
         
         // Referencia del documento
-        const petDocRef = db.collection('Pet').doc('status');
+        const petDocRef = db.collection('pet').doc('status');
         
         // Variables globales
         let hunger = 100;
@@ -468,7 +468,7 @@
         
         const petEmojis = ['😊', '😄', '😍', '🤔', '😴', '😋', '😎', '🤓', '🥳', '😝', '🤪', '😇', '🥰', '😌', '😏', '😳', '🙄', '😬', '😅', '😂', '🤣', '😭', '😱', '🤯', '🥵', '🥶', '😨', '😰', '😥', '😓', '🤗', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵'];
         const weatherEmojis = ['☀️', '🌧️', '❄️', '🌤️', '🌈'];
-        let currentPetEmojiIndex = 0;
+        let currentpetEmojiIndex = 0;
         let currentWeatherIndex = 0;
         
         const shopItems = [
@@ -610,10 +610,10 @@
             } else if (hunger < 30 || fun < 30 || hygiene < 30) {
                 pet.textContent = '😢';
             } else {
-                pet.textContent = petEmojis[currentPetEmojiIndex];
+                pet.textContent = petEmojis[currentpetEmojiIndex];
             }
             
-            updatePetAppearance();
+            updatepetAppearance();
         }
         
         function updateUI() {
@@ -623,7 +623,7 @@
             lightSwitch.textContent = isLightOn ? '💡' : '🌙';
         }
         
-        function updatePetLevels() {
+        function updatepetLevels() {
             console.log("Intentando actualizar niveles de mascota");
             petDocRef.onSnapshot((doc) => {
                 if (doc.exists) {
@@ -633,7 +633,7 @@
                     funFill.style.width = `${status.fun}%`;
                     hygieneFill.style.width = `${status.hygiene}%`;
                     
-                    updatePetEmoji(status);
+                    updatepetEmoji(status);
                 } else {
                     console.log("No se encontró el documento de estado de la mascota");
                 }
@@ -642,13 +642,13 @@
             });
         }
         
-        function updatePetStatus(newHunger, newFun, newHygiene) {
+        function updatepetStatus(newHunger, newFun, newHygiene) {
             petDocRef.update({
                 hunger: newHunger,
                 fun: newFun,
                 hygiene: newHygiene
             }).then(() => {
-                console.log("Pet status updated successfully");
+                console.log("pet status updated successfully");
             }).catch((error) => {
                 console.error("Error updating pet status:", error);
             });
@@ -671,7 +671,7 @@
                 addEventToBar("🤢 Tu mascota se ha enfermado");
             }
             updateStatus();
-            updatePetStatus(hunger, fun, hygiene);
+            updatepetStatus(hunger, fun, hygiene);
         }
         
         function addEventToBar(message) {
@@ -777,7 +777,7 @@
         });
         
         pet.addEventListener('click', () => {
-            currentPetEmojiIndex = (currentPetEmojiIndex + 1) % petEmojis.length;
+            currentpetEmojiIndex = (currentpetEmojiIndex + 1) % petEmojis.length;
             fun = Math.min(100, fun + 1);
             tapCount++;
             if (tapCount >= 20) {
@@ -815,7 +815,7 @@
                 const itemElement = document.createElement('div');
                 itemElement.classList.add('food-item');
                 itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
-                itemElement.onclick = () => feedPet(item);
+                itemElement.onclick = () => feedpet(item);
                 if (level < item.requiredLevel) {
                     itemElement.style.opacity = '0.5';
                     itemElement.style.cursor = 'not-allowed';
@@ -864,7 +864,7 @@
             shopModal.style.display = 'none';
         }
         
-        function feedPet(food) {
+        function feedpet(food) {
             if (currency >= food.price && level >= food.requiredLevel) {
                 currency -= food.price;
                 hunger = Math.min(100, hunger + food.hunger);
@@ -1096,7 +1096,7 @@
         }
         
         // Función para actualizar la apariencia basada en el nivel
-        function updatePetAppearance() {
+        function updatepetAppearance() {
             if (level >= 10) {
                 pet.style.filter = 'drop-shadow(0 0 10px gold)';
             } else if (level >= 5) {
@@ -1107,7 +1107,7 @@
         }
         
         // Movimiento aleatorio de la mascota
-        function movePet() {
+        function movepet() {
             if (!isGameActive) return;
             
             const maxMove = 10; // Máximo movimiento en píxeles
@@ -1121,13 +1121,13 @@
             if (!isGameActive) return;
             
             if (!isSick && hunger > 0 && fun > 0 && hygiene > 0) {
-                currentPetEmojiIndex = Math.floor(Math.random() * petEmojis.length);
-                pet.textContent = petEmojis[currentPetEmojiIndex];
+                currentpetEmojiIndex = Math.floor(Math.random() * petEmojis.length);
+                pet.textContent = petEmojis[currentpetEmojiIndex];
             }
         }
         
         // Ajuste automático del tamaño de la mascota y accesorios
-        function resizePet() {
+        function resizepet() {
             const containerSize = Math.min(petContainer.offsetWidth, petContainer.offsetHeight);
             pet.style.fontSize = `${containerSize * 0.6}px`;
             crown.style.fontSize = `${containerSize * 0.3}px`;
@@ -1135,7 +1135,7 @@
             hat.style.fontSize = `${containerSize * 0.3}px`;
         }
         
-        window.addEventListener('resize', resizePet);
+        window.addEventListener('resize', resizepet);
         
         // Función de reset
 // Función de reset
@@ -1153,7 +1153,7 @@
             crown.textContent = '';
             glasses.textContent = '';
             hat.textContent = '';
-            localStorage.removeItem('neonPetDeluxeState');
+            localStorage.removeItem('neonpetDeluxeState');
             updateStatus();
             addEventToBar("🔄✅ Juego reiniciado");
             updateFirestore();
@@ -1172,12 +1172,12 @@
                     hat: hat.textContent
                 }
             };
-            localStorage.setItem('neonPetDeluxeState', JSON.stringify(gameState));
+            localStorage.setItem('neonpetDeluxeState', JSON.stringify(gameState));
             updateFirestore();
         }
         
         function loadGame() {
-            const savedState = localStorage.getItem('neonPetDeluxeState');
+            const savedState = localStorage.getItem('neonpetDeluxeState');
             if (savedState) {
                 const gameState = JSON.parse(savedState);
                 hunger = gameState.hunger;
@@ -1282,7 +1282,7 @@
             // Usar requestAnimationFrame para animaciones suaves
             function animate() {
                 if (isGameActive) {
-                    movePet();
+                    movepet();
                 }
                 requestAnimationFrame(animate);
             }
@@ -1331,7 +1331,7 @@
         function init() {
             loadGame();
             updateStatus();
-            resizePet();
+            resizepet();
             setInterval(decreaseStats, 10000);
             setInterval(saveGame, 30000);
             setInterval(changeWeather, 60000);
@@ -1347,14 +1347,14 @@
 
         // Comunicación con la ventana padre
         window.addEventListener('message', (event) => {
-            if (event.data === 'initializePet') {
+            if (event.data === 'initializepet') {
                 init();
             }
         });
 
         function updateParentStatus(status) {
             window.parent.postMessage({
-                type: 'updatePetStatus',
+                type: 'updatepetStatus',
                 status: status
             }, '*');
         }
