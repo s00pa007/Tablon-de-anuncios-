@@ -526,8 +526,8 @@
         
         // Listener optimizado para cambios en Firebase
         let lastState = {};
-        petDocRef.onSnapshot((doc) => {
-            if (doc.exists) {
+        console.log("Suscribiéndose a los cambios de pet.status"); petDocRef.onSnapshot((doc) => {
+            console.log("Documento encontrado:", doc.data()); if (doc.exists) {
                 isUpdatingFromFirebase = true;
                 const data = doc.data();
                 let hasChanged = false;
@@ -625,8 +625,8 @@
         
         function updatepetLevels() {
             console.log("Intentando actualizar niveles de mascota");
-            petDocRef.onSnapshot((doc) => {
-                if (doc.exists) {
+            console.log("Suscribiéndose a los cambios de pet.status"); petDocRef.onSnapshot((doc) => {
+                console.log("Documento encontrado:", doc.data()); if (doc.exists) {
                     const status = doc.data();
                     console.log("Datos de mascota recibidos:", status);
                     hungerFill.style.width = `${status.hunger}%`;

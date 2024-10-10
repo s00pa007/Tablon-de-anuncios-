@@ -635,7 +635,7 @@
         db.collection("messages").doc(id).update({
         [field]: firebase.firestore.FieldValue.increment(1)
         }).then(() => {
-        db.collection("messages").doc(id).get().then((doc) => {
+        console.log("Obteniendo mensaje desde Firebase:", id); db.collection("messages").doc(id).get().then((doc) => {
         if (doc.exists) {
         const message = doc.data();
         const messageElement = document.querySelector(`[data-id="${id}"]`);
