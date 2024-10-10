@@ -50,7 +50,7 @@
             margin-bottom: 10px;
             flex-wrap: wrap;
         }
-        .currency, .xp, .weather {
+        .currency, .xp, .level, .weather {
             font-size: 1.2em;
             font-weight: bold;
             color: var(--neon-yellow);
@@ -249,18 +249,22 @@
         }
         .mini-game-board {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 10px;
-            margin-top: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 5px;
+            width: 240px;
+            height: 240px;
+            margin: 0 auto;
         }
         .mini-game-card {
-            aspect-ratio: 1 / 1;
+            width: 100%;
+            height: 100%;
             background-color: var(--neon-blue);
             border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.5em;
+            font-size: 1.2em;
             cursor: pointer;
             transition: transform 0.3s ease;
         }
@@ -288,7 +292,7 @@
         }
         .poop {
             position: absolute;
-            font-size: 1.5em;
+            font-size: 4.5em;
             cursor: pointer;
             z-index: 5;
         }
@@ -303,7 +307,7 @@
             transition: opacity 1s ease;
         }
         @media (max-width: 600px) {
-            .currency, .xp, .weather {
+            .currency, .xp, .level, .weather {
                 font-size: 1em;
             }
             .action-btn {
@@ -335,13 +339,13 @@
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
     <div class="game-container">
         <div class="frame info-bar">
             <div class="currency" id="currency">💰 2000</div>
             <div class="xp" id="xp">⭐ 0</div>
+            <div class="level" id="level">🏆 1</div>
             <div class="weather" id="weather">☀️</div>
         </div>
         <div class="frame status-bars">
@@ -397,14 +401,14 @@
     <div id="chestModal" class="chest-modal">
         <div class="chest-content">
             <span class="close-chest" id="closeChest">❌</span>
-<h2>🧳 Cofre</h2>
+            <h2>🧳 Cofre</h2>
             <div id="chestItems"></div>
-        </div>
-    </div>
-    
-    <script>
-        // Configuración de Firebase
-        const firebaseConfig = {
+            </div>
+            </div>
+            
+            <script>
+            // Configuración de Firebase
+            const firebaseConfig = {
             apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
             authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
             projectId: "tablon-de-anuncios-d5dea",
@@ -412,181 +416,183 @@
             messagingSenderId: "67910184237",
             appId: "1:67910184237:web:e43d424657a948ae5d77a4",
             measurementId: "G-YL5W1VNM9Z"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig); console.log("Firebase inicializado en pet.");
-        const db = firebase.firestore();
-        
-        // Referencia del documento
-        const petDocRef = db.collection('pet').doc('status');
-        
-        // Variables globales
-        let hunger = 100;
-        let fun = 100;
-        let hygiene = 100;
-        let currency = 2000;
-        let xp = 0;
-        let level = 1;
-        let isSick = false;
-        let tapCount = 0;
-        let chestItems = [];
-        let shampooCount = 0;
-        let isLightOn = true;
-        let currentBackground = 0;
-        let poopInterval;
-        let isUpdatingFromFirebase = false;
-        let isGameActive = true;
-        
-        const pet = document.getElementById('pet');
-        const petContainer = document.querySelector('.pet-container');
-        const crown = document.getElementById('crown');
-        const glasses = document.getElementById('glasses');
-        const hat = document.getElementById('hat');
-        const hungerFill = document.getElementById('hunger-fill');
-        const funFill = document.getElementById('fun-fill');
-        const hygieneFill = document.getElementById('hygiene-fill');
-        const currencyElement = document.getElementById('currency');
-        const xpElement = document.getElementById('xp');
-        const weatherElement = document.getElementById('weather');
-        const eventBar = document.getElementById('eventBar');
-        const chest = document.getElementById('chest');
-        const lightSwitch = document.getElementById('lightSwitch');
-        const background = document.getElementById('background');
-        
-        const feedBtn = document.getElementById('feed-btn');
-        const playBtn = document.getElementById('play-btn');
-        const cleanBtn = document.getElementById('clean-btn');
-        const shopBtn = document.getElementById('shop-btn');
-        
-        const shopModal = document.getElementById('shopModal');
-        const foodModal = document.getElementById('foodModal');
-        const miniGameModal = document.getElementById('miniGameModal');
-        const chestModal = document.getElementById('chestModal');
-        const chestItemsContainer = document.getElementById('chestItems');
-        const closeChest = document.getElementById('closeChest');
-        
-        const petEmojis = ['😊', '😄', '😍', '🤔', '😴', '😋', '😎', '🤓', '🥳', '😝', '🤪', '😇', '🥰', '😌', '😏', '😳', '🙄', '😬', '😅', '😂', '🤣', '😭', '😱', '🤯', '🥵', '🥶', '😨', '😰', '😥', '😓', '🤗', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵'];
-        const weatherEmojis = ['☀️', '🌧️', '❄️', '🌤️', '🌈'];
-        let currentpetEmojiIndex = 0;
-        let currentWeatherIndex = 0;
-        
-        const shopItems = [
+            };
+            
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            
+            // Referencia del documento
+            const petDocRef = db.collection('pet').doc('status');
+            
+            // Variables globales
+            let hunger = 100;
+            let fun = 100;
+            let hygiene = 100;
+            let currency = 2000;
+            let xp = 0;
+            let level = 1;
+            let isSick = false;
+            let tapCount = 0;
+            let chestItems = [];
+            let shampooCount = 0;
+            let isLightOn = true;
+            let currentBackground = 0;
+            let poopInterval;
+            let hygieneInterval;
+            let isUpdatingFromFirebase = false;
+            let isGameActive = true;
+            
+            const pet = document.getElementById('pet');
+            const petContainer = document.querySelector('.pet-container');
+            const crown = document.getElementById('crown');
+            const glasses = document.getElementById('glasses');
+            const hat = document.getElementById('hat');
+            const hungerFill = document.getElementById('hunger-fill');
+            const funFill = document.getElementById('fun-fill');
+            const hygieneFill = document.getElementById('hygiene-fill');
+            const currencyElement = document.getElementById('currency');
+            const xpElement = document.getElementById('xp');
+            const levelElement = document.getElementById('level');
+            const weatherElement = document.getElementById('weather');
+            const eventBar = document.getElementById('eventBar');
+            const chest = document.getElementById('chest');
+            const lightSwitch = document.getElementById('lightSwitch');
+            const background = document.getElementById('background');
+            
+            const feedBtn = document.getElementById('feed-btn');
+            const playBtn = document.getElementById('play-btn');
+            const cleanBtn = document.getElementById('clean-btn');
+            const shopBtn = document.getElementById('shop-btn');
+            
+            const shopModal = document.getElementById('shopModal');
+            const foodModal = document.getElementById('foodModal');
+            const miniGameModal = document.getElementById('miniGameModal');
+            const chestModal = document.getElementById('chestModal');
+            const chestItemsContainer = document.getElementById('chestItems');
+            const closeChest = document.getElementById('closeChest');
+            
+            const petEmojis = ['😊', '😄', '😍', '🤔', '😴', '😋', '😎', '🤓', '🥳', '😝', '🤪', '😇', '🥰', '😌', '😏', '😳', '🙄', '😬', '😅', '😂', '🤣', '😭', '😱', '🤯', '🥵', '🥶', '😨', '😰', '😥', '😓', '🤗', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵'];
+            const weatherEmojis = ['☀️', '🌧️', '❄️', '🌤️', '🌈'];
+            let currentpetEmojiIndex = 0;
+            let currentWeatherIndex = 0;
+            
+            const shopItems = [
             { emoji: '👑', price: 500, type: 'crown', requiredLevel: 5 },
             { emoji: '👓', price: 300, type: 'glasses', requiredLevel: 3 },
             { emoji: '🧢', price: 200, type: 'hat', requiredLevel: 2 },
             { emoji: '🎩', price: 1000, type: 'topHat', requiredLevel: 10 },
             { emoji: '🧴', price: 50, type: 'shampoo', requiredLevel: 1 },
             { emoji: '💊', price: 100, type: 'medicine', requiredLevel: 1 }
-        ];
-        
-        const foodItems = [
+            ];
+            
+            const foodItems = [
             { emoji: '🍎', hunger: 10, fun: 2, price: 50, requiredLevel: 1 },
             { emoji: '🍔', hunger: 25, fun: 10, price: 100, requiredLevel: 2 },
             { emoji: '🍕', hunger: 20, fun: 15, price: 150, requiredLevel: 3 },
             { emoji: '🍦', hunger: 5, fun: 20, price: 80, requiredLevel: 1 },
             { emoji: '🥗', hunger: 15, fun: 5, price: 120, requiredLevel: 2 },
             { emoji: '🍱', hunger: 30, fun: 25, price: 200, requiredLevel: 4 }
-        ];
-        
-        const backgrounds = [
+            ];
+            
+            const backgrounds = [
             'linear-gradient(to bottom, #87CEEB, #E0F6FF)', // Día
             'linear-gradient(to bottom, #FF7F50, #FFB6C1)', // Amanecer/Atardecer
             'linear-gradient(to bottom, #191970, #000000)'  // Noche
-        ];
-
-        // Función para actualizar Firestore
-        function updateFirestore() {
+            ];
+            
+            // Función para actualizar Firestore
+            function updateFirestore() {
             if (isUpdatingFromFirebase) return;
             
-            console.log("Actualizando estado de la mascota con: hambre =", hunger, "diversión =", fun, "higiene =", hygiene); petDocRef.update({
-                hunger: hunger,
-                fun: fun,
-                hygiene: hygiene,
-                currency: currency,
-                level: level,
-                xp: xp,
-                isSick: isSick,
-                shampooCount: shampooCount,
-                currentBackground: currentBackground,
-                isLightOn: isLightOn,
-                chestItems: chestItems,
-                accessories: {
-                    crown: crown.textContent,
-                    glasses: glasses.textContent,
-                    hat: hat.textContent
-                }
-            }).then(() => {
-                console.log("Datos actualizados correctamente en Firebase");
-            }).catch((error) => {
-                console.error("Error al actualizar los datos en Firebase:", error);
-                handleFirebaseError(error);
-            });
-        }
-        
-        // Listener optimizado para cambios en Firebase
-        let lastState = {};
-        console.log("Suscribiéndose a los cambios de pet.status"); console.log("Suscribiéndose a cambios de pet.status en Firebase..."); petDocRef.onSnapshot((doc) => {
-            console.log("Documento encontrado:", doc.data()); console.log("Documento de estado encontrado en pet:", doc.data()); if (doc.exists) {
-                isUpdatingFromFirebase = true;
-                const data = doc.data();
-                let hasChanged = false;
-                
-                for (let key in data) {
-                    if (JSON.stringify(data[key]) !== JSON.stringify(lastState[key])) {
-                        hasChanged = true;
-                        break;
-                    }
-                }
-                
-                if (hasChanged) {
-                    hunger = data.hunger;
-                    fun = data.fun;
-                    hygiene = data.hygiene;
-                    currency = data.currency;
-                    level = data.level;
-                    xp = data.xp;
-                    isSick = data.isSick;
-                    shampooCount = data.shampooCount;
-                    currentBackground = data.currentBackground;
-                    isLightOn = data.isLightOn;
-                    chestItems = data.chestItems || [];
-                    crown.textContent = data.accessories.crown;
-                    glasses.textContent = data.accessories.glasses;
-                    hat.textContent = data.accessories.hat;
-                    
-                    updateUI();
-                    lastState = {...data};
-                }
-                isUpdatingFromFirebase = false;
+            petDocRef.update({
+            hunger: hunger,
+            fun: fun,
+            hygiene: hygiene,
+            currency: currency,
+            level: level,
+            xp: xp,
+            isSick: isSick,
+            shampooCount: shampooCount,
+            currentBackground: currentBackground,
+            isLightOn: isLightOn,
+            chestItems: chestItems,
+            accessories: {
+            crown: crown.textContent,
+            glasses: glasses.textContent,
+            hat: hat.textContent
             }
-        }, (error) => {
+            }).then(() => {
+            console.log("Datos actualizados correctamente en Firebase");
+            }).catch((error) => {
+            console.error("Error al actualizar los datos en Firebase:", error);
+            handleFirebaseError(error);
+            });
+            }
+            
+            // Listener optimizado para cambios en Firebase
+            let lastState = {};
+            petDocRef.onSnapshot((doc) => {
+            if (doc.exists) {
+            isUpdatingFromFirebase = true;
+            const data = doc.data();
+            let hasChanged = false;
+            
+            for (let key in data) {
+            if (JSON.stringify(data[key]) !== JSON.stringify(lastState[key])) {
+            hasChanged = true;
+            break;
+            }
+            }
+            
+            if (hasChanged) {
+            hunger = data.hunger;
+            fun = data.fun;
+            hygiene = data.hygiene;
+            currency = data.currency;
+            level = data.level;
+            xp = data.xp;
+            isSick = data.isSick;
+            shampooCount = data.shampooCount;
+            currentBackground = data.currentBackground;
+            isLightOn = data.isLightOn;
+            chestItems = data.chestItems || [];
+            crown.textContent = data.accessories.crown;
+            glasses.textContent = data.accessories.glasses;
+            hat.textContent = data.accessories.hat;
+            
+            updateUI();
+            lastState = {...data};
+            }
+            isUpdatingFromFirebase = false;
+            }
+            }, (error) => {
             console.error("Error al escuchar cambios en Firebase:", error);
             handleFirebaseError(error);
-        });
-        
-        // Función para manejar desconexiones y reconexiones
-        function handleConnectionStatus() {
+            });
+            
+            // Función para manejar desconexiones y reconexiones
+            function handleConnectionStatus() {
             const connectedRef = firebase.database().ref('.info/connected');
             connectedRef.on('value', (snap) => {
-                if (snap.val() === true) {
-                    console.log('Conectado a Firebase');
-                    loadGame();
-                } else {
-                    console.log('Desconectado de Firebase');
-                    addEventToBar("📡 Conexión perdida. Intentando reconectar...");
-                }
+            if (snap.val() === true) {
+            console.log('Conectado a Firebase');
+            loadGame();
+            } else {
+            console.log('Desconectado de Firebase');
+            addEventToBar("📡 Conexión perdida. Intentando reconectar...");
+            }
             });
-        }
-        
-        // Función para manejar errores de Firebase
-        function handleFirebaseError(error) {
+            }
+            
+            // Función para manejar errores de Firebase
+            function handleFirebaseError(error) {
             console.error("Error de Firebase:", error);
             addEventToBar("🚨 Error de conexión. Por favor, recarga la página.");
-        }
-        
-        // Funciones principales
-        function updateStatus() {
+            }
+            
+            // Funciones principales
+            function updateStatus() {
             hunger = Math.max(0, Math.min(100, hunger));
             fun = Math.max(0, Math.min(100, fun));
             hygiene = Math.max(0, Math.min(100, hygiene));
@@ -597,84 +603,54 @@
             
             currencyElement.textContent = `💰 ${currency}`;
             xpElement.textContent = `⭐ ${xp}`;
+            levelElement.textContent = `🏆 ${level}`;
             
             if (hunger <= 0 || fun <= 0 || hygiene <= 0) {
-                pet.textContent = '💀';
-                addEventToBar("¡Tu mascota necesita atención urgente!");
-                if (hunger <= 0) hunger = 10;
-                if (fun <= 0) fun = 10;
-                if (hygiene <= 0) hygiene = 10;
-                updateFirestore();
+            pet.textContent = '💀';
+            addEventToBar("¡Tu mascota necesita atención urgente!");
+            if (hunger <= 0) hunger = 10;
+            if (fun <= 0) fun = 10;
+            if (hygiene <= 0) hygiene = 10;
+            updateFirestore();
             } else if (isSick) {
-                pet.textContent = '🤢';
+            pet.textContent = '🤢';
             } else if (hunger < 30 || fun < 30 || hygiene < 30) {
-                pet.textContent = '😢';
+            pet.textContent = '😢';
             } else {
-                pet.textContent = petEmojis[currentpetEmojiIndex];
+            pet.textContent = petEmojis[currentpetEmojiIndex];
             }
             
             updatepetAppearance();
-        }
-        
-        function updateUI() {
+            }
+            
+            function updateUI() {
             updateStatus();
             updateChestItems();
             background.style.background = backgrounds[currentBackground];
             lightSwitch.textContent = isLightOn ? '💡' : '🌙';
-        }
-        
-        function updatepetLevels() {
-            console.log("Intentando actualizar niveles de mascota");
-            console.log("Suscribiéndose a los cambios de pet.status"); console.log("Suscribiéndose a cambios de pet.status en Firebase..."); petDocRef.onSnapshot((doc) => {
-                console.log("Documento encontrado:", doc.data()); console.log("Documento de estado encontrado en pet:", doc.data()); if (doc.exists) {
-                    const status = doc.data();
-                    console.log("Datos de mascota recibidos:", status);
-                    hungerFill.style.width = `${status.hunger}%`;
-                    funFill.style.width = `${status.fun}%`;
-                    hygieneFill.style.width = `${status.hygiene}%`;
-                    
-                    updatepetEmoji(status);
-                } else {
-                    console.log("No se encontró el documento de estado de la mascota");
-                }
-            }, (error) => {
-                console.error("Error getting pet status:", error);
-            });
-        }
-        
-        function updatepetStatus(newHunger, newFun, newHygiene) {
-            console.log("Actualizando estado de la mascota con: hambre =", hunger, "diversión =", fun, "higiene =", hygiene); petDocRef.update({
-                hunger: newHunger,
-                fun: newFun,
-                hygiene: newHygiene
-            }).then(() => {
-                console.log("pet status updated successfully");
-            }).catch((error) => {
-                console.error("Error updating pet status:", error);
-            });
-        }
-        
-        function decreaseStats() {
+            }
+            
+            function decreaseStats() {
             if (!isGameActive) return;
             
             if (!isLightOn) {
-                hunger = Math.max(0, hunger - 1);
-                fun = Math.max(0, fun - 1);
-                hygiene = Math.max(0, hygiene - 1);
+            hunger = Math.max(0, hunger - 1);
+            fun = Math.max(0, fun - 1);
+            hygiene = Math.max(0, hygiene - 1);
             } else {
-                hunger = Math.max(0, hunger - 3);
-                fun = Math.max(0, fun - 3);
-                hygiene = Math.max(0, hygiene - 3);
+            hunger = Math.max(0, hunger - 2);
+            fun = Math.max(0, fun - 2);
+            hygiene = Math.max(0, hygiene - 2);
             }
             if (Math.random() < 0.05 && !isSick) {
-                isSick = true;
-                addEventToBar("🤢 Tu mascota se ha enfermado");
+            isSick = true;
+            addEventToBar("🤢 Tu mascota se ha enfermado");
             }
             updateStatus();
-            updatepetStatus(hunger, fun, hygiene);
-        }
-        
-        function addEventToBar(message) {
+            updateFirestore();
+            }
+            
+            function addEventToBar(message) {
             const eventIcon = document.createElement('div');
             eventIcon.classList.add('event-icon');
             eventIcon.textContent = message;
@@ -682,683 +658,661 @@
             
             // Eliminar el evento después de cierto tiempo
             setTimeout(() => {
-                eventIcon.remove();
+            eventIcon.remove();
             }, 10000);
-        }
-        
-        function changeWeather() {
+            }
+            
+            function changeWeather() {
             if (!isGameActive) return;
             
             currentWeatherIndex = (currentWeatherIndex + 1) % weatherEmojis.length;
             weatherElement.textContent = weatherEmojis[currentWeatherIndex];
             applyWeatherEffects();
-        }
-        
-        function applyWeatherEffects() {
+            }
+            
+            function applyWeatherEffects() {
             switch(weatherEmojis[currentWeatherIndex]) {
-                case '☀️':
-                    fun = Math.min(100, fun + 5);
-                    hygiene = Math.max(0, hygiene - 5);
-                    addEventToBar("☀️ Día soleado");
-                    break;
-                case '🌧️':
-                    hygiene = Math.min(100, hygiene + 10);
-                    fun = Math.max(0, fun - 5);
-                    addEventToBar("🌧️ Día lluvioso");
-                    break;
-                case '❄️':
-                    hunger = Math.max(0, hunger - 10);
-                    addEventToBar("❄️ Día frío");
-                    break;
-                case '🌤️':
-                    currency += 50;
-                    addEventToBar("🌤️💰 Día despejado, ¡ganaste monedas!");
-                    break;
-                case '🌈':
-                    fun = Math.min(100, fun + 15);
-                    currency += 100;
-                    addEventToBar("🌈💰 ¡Arcoíris! Ganaste diversión y monedas");
-                    break;
+            case '☀️':
+            fun = Math.min(100, fun + 5);
+            hygiene = Math.max(0, hygiene - 5);
+            addEventToBar("☀️ Día soleado");
+            break;
+            case '🌧️':
+            hygiene = Math.min(100, hygiene + 10);
+            fun = Math.max(0, fun - 5);
+            addEventToBar("🌧️ Día lluvioso");
+            break;
+            case '❄️':
+            hunger = Math.max(0, hunger - 10);
+            addEventToBar("❄️ Día frío");
+            break;
+            case '🌤️':
+            currency += 50;
+            addEventToBar("🌤️💰 Día despejado, ¡ganaste monedas!");
+            break;
+            case '🌈':
+            fun = Math.min(100, fun + 15);
+            currency += 100;
+            addEventToBar("🌈💰 ¡Arcoíris! Ganaste diversión y monedas");
+            break;
             }
             updateStatus();
             updateFirestore();
-        }
-        
-        function gainXP(amount) {
+            }
+            
+            function gainXP(amount) {
             xp += amount;
             if (xp >= level * 100) {
-                levelUp();
+            levelUp();
             }
             updateStatus();
             updateFirestore();
-        }
-        
-        function levelUp() {
+            }
+            
+            function levelUp() {
             level++;
             xp = 0;
             addEventToBar(`🎉 ¡Subiste al nivel ${level}!`);
             currency += level * 50;
             updateStatus();
             updateFirestore();
-        }
-        
-// Eventos de botones
-        feedBtn.addEventListener('click', () => {
+            }
+            
+            // Eventos de botones
+            feedBtn.addEventListener('click', () => {
             foodModal.style.display = 'block';
             updateFoodMenu();
-        });
-        
-        playBtn.addEventListener('click', () => {
+            });
+            
+            playBtn.addEventListener('click', () => {
             miniGameModal.style.display = 'block';
-            if (Math.random() < 0.5) {
-                startMemoryGame();
-            } else {
-                startCatchEmojiGame();
-            }
-        });
-        
-        cleanBtn.addEventListener('click', () => {
+            startCatchEmojiGame();
+            });
+            
+            cleanBtn.addEventListener('click', () => {
             if (shampooCount > 0) {
-                hygiene = Math.min(100, hygiene + 20);
-                shampooCount--;
-                currency += 10;
-                addEventToBar("🧼✨ Mascota limpia");
-                gainXP(5);
-                updateStatus();
-                updateFirestore();
+            hygiene = Math.min(100, hygiene + 20);
+            shampooCount--;
+            currency += 10;
+            addEventToBar("🧼✨ Mascota limpia");
+            gainXP(5);
+            
+            // Eliminar todas las cacas
+            document.querySelectorAll('.poop').forEach(poop => poop.remove());
+            
+            updateStatus();
+            updateFirestore();
             } else {
-                addEventToBar("❌ No tienes shampoo");
+            addEventToBar("❌ No tienes shampoo");
             }
-        });
-        
-        shopBtn.addEventListener('click', () => {
+            });
+            
+            shopBtn.addEventListener('click', () => {
             shopModal.style.display = 'block';
             updateShop();
-        });
-        
-        pet.addEventListener('click', () => {
-            currentpetEmojiIndex = (currentpetEmojiIndex + 1) % petEmojis.length;
-            fun = Math.min(100, fun + 1);
-            tapCount++;
-            if (tapCount >= 20) {
-                fun = Math.min(100, fun + 10);
-                currency += 50;
-                addEventToBar("🎉💰 ¡Bonus por caricias!");
-                gainXP(10);
-                tapCount = 0;
-            }
-            updateStatus();
-            updateFirestore();
-        });
-        
-        // Funciones de modales
-        function updateShop() {
-            const shopItemsContainer = document.getElementById('shop-items');
-            shopItemsContainer.innerHTML = '';
-            shopItems.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.classList.add('shop-item');
-                itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
-                itemElement.onclick = () => buyItem(item);
-                if (level < item.requiredLevel) {
-                    itemElement.style.opacity = '0.5';
-                    itemElement.style.cursor = 'not-allowed';
-                }
-                shopItemsContainer.appendChild(itemElement);
-            });
-        }
-        
-        function updateFoodMenu() {
-            const foodItemsContainer = document.getElementById('food-items');
-            foodItemsContainer.innerHTML = '';
-            foodItems.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.classList.add('food-item');
-                itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
-                itemElement.onclick = () => feedpet(item);
-                if (level < item.requiredLevel) {
-                    itemElement.style.opacity = '0.5';
-                    itemElement.style.cursor = 'not-allowed';
-                }
-                foodItemsContainer.appendChild(itemElement);
-            });
-        }
-        
-        function buyItem(item) {
-            if (currency >= item.price && level >= item.requiredLevel) {
-                currency -= item.price;
-                switch(item.type) {
-                    case 'crown':
-                    case 'glasses':
-                    case 'hat':
-                    case 'topHat':
-                        const accessoryElement = document.getElementById(item.type);
-                        if (accessoryElement.textContent !== '') {
-                            chestItems.push(accessoryElement.textContent);
-                        }
-                        accessoryElement.textContent = item.emoji;
-                        break;
-                    case 'shampoo':
-                        shampooCount++;
-                        chestItems.push(item.emoji);
-                        break;
-                    case 'medicine':
-                        if (isSick) {
-                            isSick = false;
-                            addEventToBar("💊✅ Tu mascota se ha curado");
-                        } else {
-                            addEventToBar("💊❌ Tu mascota no está enferma");
-                            return;
-                        }
-                        break;
-                }
-                updateStatus();
-                addEventToBar(`${item.emoji}✅ Compra exitosa`);
-                gainXP(10);
-                updateFirestore();
-            } else if (level < item.requiredLevel) {
-                addEventToBar(`❌ Necesitas nivel ${item.requiredLevel}`);
-            } else {
-                addEventToBar("💰❌ No tienes suficientes monedas");
-            }
-            shopModal.style.display = 'none';
-        }
-        
-        function feedpet(food) {
-            if (currency >= food.price && level >= food.requiredLevel) {
-                currency -= food.price;
-                hunger = Math.min(100, hunger + food.hunger);
-                fun = Math.min(100, fun + Math.floor(food.fun / 2));
-                addEventToBar(`${food.emoji}✅ Mascota alimentada`);
-                gainXP(5);
-                if (hunger > 100) {
-                    isSick = true;
-                    addEventToBar("🤢 Tu mascota comió demasiado");
-                }
-                updateStatus();
-                updateFirestore();
-            } else if (level < food.requiredLevel) {
-                addEventToBar(`❌ Necesitas nivel ${food.requiredLevel}`);
-            } else {
-                addEventToBar("💰❌ No tienes suficientes monedas");
-            }
-            foodModal.style.display = 'none';
-        }
-        
-        // Minijuegos
-        function startMemoryGame() {
-            const miniGameBoard = document.getElementById('mini-game-board');
-            miniGameBoard.innerHTML = '';
-            const emojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊'];
-            const gameEmojis = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
-            let flippedCards = [];
-            let matchedPairs = 0;
-            
-            gameEmojis.forEach((emoji, index) => {
-                const card = document.createElement('div');
-                card.classList.add('mini-game-card');
-                card.dataset.emoji = emoji;
-                card.onclick = () => flipCard(card);
-                miniGameBoard.appendChild(card);
             });
             
-            function flipCard(card) {
-                if (flippedCards.length < 2 && !flippedCards.includes(card) && !card.classList.contains('matched')) {
-                    card.textContent = card.dataset.emoji;
-                    flippedCards.push(card);
-                    
-                    if (flippedCards.length === 2) {
-                        setTimeout(checkMatch, 500);
-                    }
-                }
-            }
-            
-            function checkMatch() {
-                const [card1, card2] = flippedCards;
-                if (card1.dataset.emoji === card2.dataset.emoji) {
-                    card1.classList.add('matched');
-                    card2.classList.add('matched');
-                    matchedPairs++;
-                    if (matchedPairs === emojis.length) {
-                        endMiniGame(true);
-                    }
-                } else {
-                    setTimeout(() => {
-                        card1.textContent = '';
-                        card2.textContent = '';
-                    }, 500);
-                }
-                flippedCards = [];
-            }
-        }
-        
-        function startCatchEmojiGame() {
-            const miniGameBoard = document.getElementById('mini-game-board');
-            miniGameBoard.innerHTML = '';
-            miniGameBoard.style.display = 'grid';
-            miniGameBoard.style.gridTemplateColumns = 'repeat(4, 1fr)';
-            miniGameBoard.style.gridTemplateRows = 'repeat(3, 1fr)';
-            
-            const targetEmoji = '🎯';
-            let score = 0;
-            let timeLeft = 30;
-            
-            const scoreDisplay = document.createElement('div');
-            scoreDisplay.textContent = `Puntuación: ${score}`;
-            miniGameBoard.appendChild(scoreDisplay);
-            
-            const timeDisplay = document.createElement('div');
-            timeDisplay.textContent = `Tiempo: ${timeLeft}s`;
-            miniGameBoard.appendChild(timeDisplay);
-            
-            for (let i = 0; i < 10; i++) {
-                const cell = document.createElement('div');
-                cell.classList.add('mini-game-card');
-                miniGameBoard.appendChild(cell);
-            }
-            
-            function moveTarget() {
-                const cells = miniGameBoard.querySelectorAll('.mini-game-card');
-                cells.forEach(cell => {
-                    cell.textContent = '';
-                    cell.onclick = null;
-                });
-                const randomCell = cells[Math.floor(Math.random() * cells.length)];
-                randomCell.textContent = targetEmoji;
-                randomCell.onclick = () => {
-                    score++;
-                    scoreDisplay.textContent = `Puntuación: ${score}`;
-                    moveTarget();
-                };
-            }
-            
-            moveTarget();
-            
-            const timer = setInterval(() => {
-                timeLeft--;
-                timeDisplay.textContent = `Tiempo: ${timeLeft}s`;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    endMiniGame(score >= 15);
-                }
-            }, 1000);
-        }
-        
-        function endMiniGame(won) {
-            if (won) {
-                fun = Math.min(100, fun + 30);
-                currency += 50;
-                gainXP(20);
-                addEventToBar("🎮✨💰 ¡Ganaste el minijuego!");
-            } else {
-                fun = Math.min(100, fun + 10);
-                gainXP(5);
-                addEventToBar("🎮 Mejor suerte la próxima vez");
-            }
-            updateStatus();
-            miniGameModal.style.display = 'none';
-            updateFirestore();
-        }
-        
-        // Sistema de cofre
-        chest.addEventListener('click', () => {
-            chestModal.style.display = 'block';
-            updateChestItems();
-        });
-        
-        closeChest.addEventListener('click', () => {
-            chestModal.style.display = 'none';
-        });
-        
-        function updateChestItems() {
-            chestItemsContainer.innerHTML = '';
-            chestItems.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.classList.add('chest-item');
-                itemElement.textContent = item;
-                itemElement.onclick = () => equipItem(item);
-                chestItemsContainer.appendChild(itemElement);
-            });
-        }
-        
-        function equipItem(item) {
-            const accessoryType = getAccessoryType(item);
-            if (accessoryType) {
-                document.getElementById(accessoryType).textContent = item;
-                chestItems = chestItems.filter(i => i !== item);
-                updateChestItems();
-                addEventToBar(`${item} equipado!`);
-                updateFirestore();
-            } else if (item === '🧴') {
-                shampooCount++;
-                chestItems = chestItems.filter(i => i !== item);
-                updateChestItems();
-                addEventToBar(`🧴 Shampoo añadido`);
-                updateFirestore();
-            }
-        }
-        
-        function getAccessoryType(emoji) {
-            switch(emoji) {
-                case '👑': return 'crown';
-                case '👓': return 'glasses';
-                case '🧢': return 'hat';
-                case '🎩': return 'topHat';
-                default: return null;
-            }
-        }
-        
-        // Arrastrar y soltar accesorios
-        let draggedItem = null;
-        
-        document.querySelectorAll('.pet-accessory').forEach(accessory => {
-            accessory.addEventListener('dragstart', (e) => {
-                draggedItem = e.target;
-                e.dataTransfer.setData('text/plain', e.target.id);
-                setTimeout(() => {
-                    e.target.style.opacity = '0.5';
-                }, 0);
-            });
-            
-            accessory.addEventListener('dragend', (e) => {
-                e.target.style.opacity = '1';
-            });
-        });
-        
-        chest.addEventListener('dragover', (e) => e.preventDefault());
-        chest.addEventListener('drop', (e) => {
-            e.preventDefault();
-            if (draggedItem) {
-                const accessoryType = draggedItem.id;
-                const accessoryEmoji = draggedItem.textContent;
-                if (accessoryEmoji) {
-                    chestItems.push(accessoryEmoji);
-                    draggedItem.textContent = '';
-                    addEventToBar("🧳✅ Accesorio guardado");
-                    updateChestItems();
-                    updateFirestore();
-                }
-                draggedItem = null;
-            }
-        });
-        
-        // Cerrar modales
-        document.querySelectorAll('.close').forEach(closeBtn => {
-            closeBtn.onclick = function() {
-                this.closest('.modal').style.display = 'none';
-            }
-        });
-        
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-        
-        // Función para actualizar la apariencia basada en el nivel
-        function updatepetAppearance() {
-            if (level >= 10) {
-                pet.style.filter = 'drop-shadow(0 0 10px gold)';
-            } else if (level >= 5) {
-                pet.style.filter = 'drop-shadow(0 0 5px silver)';
-            } else {
-                pet.style.filter = 'none';
-            }
-        }
-        
-        // Movimiento aleatorio de la mascota
-        function movepet() {
-            if (!isGameActive) return;
-            
-            const maxMove = 10; // Máximo movimiento en píxeles
-            const newX = (Math.random() - 0.5) * maxMove;
-            const newY = (Math.random() - 0.5) * maxMove;
-            petContainer.style.transform = `translate(${newX}px, ${newY}px)`;
-        }
-        
-        // Cambio aleatorio de expresión
-        function changeExpression() {
-            if (!isGameActive) return;
-            
-            if (!isSick && hunger > 0 && fun > 0 && hygiene > 0) {
-                currentpetEmojiIndex = Math.floor(Math.random() * petEmojis.length);
-                pet.textContent = petEmojis[currentpetEmojiIndex];
-            }
-        }
-        
-        // Ajuste automático del tamaño de la mascota y accesorios
-        function resizepet() {
-            const containerSize = Math.min(petContainer.offsetWidth, petContainer.offsetHeight);
-            pet.style.fontSize = `${containerSize * 0.6}px`;
-            crown.style.fontSize = `${containerSize * 0.3}px`;
-            glasses.style.fontSize = `${containerSize * 0.35}px`;
-            hat.style.fontSize = `${containerSize * 0.3}px`;
-        }
-        
-        window.addEventListener('resize', resizepet);
-        
-        // Función de reset
-// Función de reset
-        function resetGame() {
-            hunger = 100;
-            fun = 100;
-            hygiene = 100;
-            currency = 2000;
-            level = 1;
-            xp = 0;
-            isSick = false;
-            tapCount = 0;
-            chestItems = [];
-            shampooCount = 0;
-            crown.textContent = '';
-            glasses.textContent = '';
-            hat.textContent = '';
-            localStorage.removeItem('neonpetDeluxeState');
-            updateStatus();
-            addEventToBar("🔄✅ Juego reiniciado");
-            updateFirestore();
-        }
-        
-        // Agregar evento al botón de reset
-        document.getElementById('resetButton').addEventListener('click', resetGame);
-        
-        // Guardado automático
-        function saveGame() {
-            const gameState = {
-                hunger, fun, hygiene, currency, isSick, level, xp, chestItems, shampooCount,
-                accessories: {
-                    crown: crown.textContent,
-                    glasses: glasses.textContent,
-                    hat: hat.textContent
-                }
-            };
-            localStorage.setItem('neonpetDeluxeState', JSON.stringify(gameState));
-            updateFirestore();
-        }
-        
-        function loadGame() {
-            const savedState = localStorage.getItem('neonpetDeluxeState');
-            if (savedState) {
-                const gameState = JSON.parse(savedState);
-                hunger = gameState.hunger;
-                fun = gameState.fun;
-                hygiene = gameState.hygiene;
-                currency = gameState.currency;
-                isSick = gameState.isSick;
-                level = gameState.level;
-                xp = gameState.xp;
-                chestItems = gameState.chestItems || [];
-                shampooCount = gameState.shampooCount || 0;
-                crown.textContent = gameState.accessories.crown;
-                glasses.textContent = gameState.accessories.glasses;
-                hat.textContent = gameState.accessories.hat;
-                updateStatus();
-                updateChestItems();
-                updateFirestore();
-            }
-        }
-        
-        // Interruptor de luz
-        lightSwitch.addEventListener('click', () => {
-            isLightOn = !isLightOn;
-            lightSwitch.textContent = isLightOn ? '💡' : '🌙';
-            if (!isLightOn) {
-                pet.textContent = '😴';
-                addEventToBar("💤 Tu mascota está durmiendo");
-            } else {
-                updateStatus();
-                addEventToBar("🌞 Tu mascota se despertó");
-            }
-            updateFirestore();
-        });
-        
-        // Función para generar cacas
-        function generatePoop() {
-            if (!isGameActive) return;
-            
-            const poop = document.createElement('div');
-            poop.textContent = '💩';
-            poop.classList.add('poop');
-            poop.style.left = `${Math.random() * 80 + 10}%`;
-            poop.style.top = `${Math.random() * 80 + 10}%`;
-            poop.onclick = () => {
-                poop.remove();
-                hygiene = Math.max(0, hygiene - 5);
-                updateStatus();
-                updateFirestore();
-            };
-            document.querySelector('.pet-frame').appendChild(poop);
-        }
-        
-        // Cambio de fondo
-        let startX;
-        document.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-        });
-        
-        document.addEventListener('touchend', (e) => {
-            const endX = e.changedTouches[0].clientX;
-            const diff = startX - endX;
-            if (Math.abs(diff) > 50) { // Umbral de 50px para considerar un swipe
-                if (diff > 0) {
-                    // Swipe izquierdo
-                    currentBackground = (currentBackground + 1) % backgrounds.length;
-                } else {
-                    // Swipe derecho
-                    currentBackground = (currentBackground - 1 + backgrounds.length) % backgrounds.length;
-                }
-                background.style.background = backgrounds[currentBackground];
-                updateFirestore();
-            }
-        });
-        
-        // Control de visibilidad de la página
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        
-        function handleVisibilityChange() {
-            if (document.hidden) {
-                isGameActive = false;
-                pauseIntervals();
-            } else {
-                isGameActive = true;
-                resumeIntervals();
-            }
-        }
-        
-        // Pausar intervalos
-        function pauseIntervals() {
-            clearInterval(poopInterval);
-            // Pausar otros intervalos aquí si es necesario
-        }
-        
-        // Reanudar intervalos
-        function resumeIntervals() {
-            poopInterval = setInterval(generatePoop, 30000);
-            // Reanudar otros intervalos aquí si es necesario
-        }
-        
-        // Optimización del rendimiento
-        function optimizePerformance() {
-            // Usar requestAnimationFrame para animaciones suaves
-            function animate() {
-                if (isGameActive) {
-                    movepet();
-                }
-                requestAnimationFrame(animate);
-            }
-            requestAnimationFrame(animate);
-            
-            // Limitar la frecuencia de actualización de Firebase
-            let firebaseUpdateTimeout;
-            function throttledFirebaseUpdate() {
-                if (!firebaseUpdateTimeout) {
-                    firebaseUpdateTimeout = setTimeout(() => {
-                        updateFirestore();
-                        firebaseUpdateTimeout = null;
-                    }, 5000); // Actualizar Firebase como máximo cada 5 segundos
-                }
-            }
-            
-            // Reemplazar llamadas directas a updateFirestore con la versión throttled
-            window.updateFirestore = throttledFirebaseUpdate;
-        }
-        
-        // Gestión de memoria
-        function manageMemory() {
-            // Limpiar poops viejos
-            setInterval(() => {
-                const poops = document.querySelectorAll('.poop');
-                if (poops.length > 5) {
-                    poops[0].remove();
-                }
-            }, 60000);
-            
-            // Limpiar eventos antiguos del DOM
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'childList') {
-                        while (eventBar.childNodes.length > 10) {
-                            eventBar.removeChild(eventBar.firstChild);
-                        }
-                    }
-                });
-            });
-            
-            observer.observe(eventBar, { childList: true });
-        }
-        
-        // Inicialización
-        function init() {
-            loadGame();
-            updateStatus();
-            resizepet();
-            setInterval(decreaseStats, 10000);
-            setInterval(saveGame, 30000);
-            setInterval(changeWeather, 60000);
-            setInterval(changeExpression, 5000);
-            poopInterval = setInterval(generatePoop, 30000);
-            background.style.background = backgrounds[currentBackground];
-            handleConnectionStatus();
-            optimizePerformance();
-            manageMemory();
-        }
-        
-        init();
-
-        // Comunicación con la ventana padre
-        window.addEventListener('message', (event) => {
-            if (event.data === 'initializepet') {
-                init();
-            }
-        });
-
-        function updateParentStatus(status) {
-            window.parent.postMessage({
-                type: 'updatepetStatus',
-                status: status
-            }, '*');
-        }
-
+          pet.addEventListener('click', () => {
+          currentpetEmojiIndex = (currentpetEmojiIndex + 1) % petEmojis.length;
+          fun = Math.min(100, fun + 1);
+          tapCount++;
+          if (tapCount >= 20) {
+          fun = Math.min(100, fun + 10);
+          currency += 50;
+          addEventToBar("🎉💰 ¡Bonus por caricias!");
+          gainXP(10);
+          tapCount = 0;
+          }
+          updateStatus();
+          updateFirestore();
+          });
+          
+          // Funciones de modales
+          function updateShop() {
+          const shopItemsContainer = document.getElementById('shop-items');
+          shopItemsContainer.innerHTML = '';
+          shopItems.forEach(item => {
+          const itemElement = document.createElement('div');
+          itemElement.classList.add('shop-item');
+          itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
+          itemElement.onclick = () => buyItem(item);
+          if (level < item.requiredLevel) {
+          itemElement.style.opacity = '0.5';
+          itemElement.style.cursor = 'not-allowed';
+          }
+          shopItemsContainer.appendChild(itemElement);
+          });
+          }
+          
+          function updateFoodMenu() {
+          const foodItemsContainer = document.getElementById('food-items');
+          foodItemsContainer.innerHTML = '';
+          foodItems.forEach(item => {
+          const itemElement = document.createElement('div');
+          itemElement.classList.add('food-item');
+          itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
+          itemElement.onclick = () => feedpet(item);
+          if (level < item.requiredLevel) {
+          itemElement.style.opacity = '0.5';
+          itemElement.style.cursor = 'not-allowed';
+          }
+          foodItemsContainer.appendChild(itemElement);
+          });
+          }
+          
+          function buyItem(item) {
+          if (currency >= item.price && level >= item.requiredLevel) {
+          currency -= item.price;
+          switch(item.type) {
+          case 'crown':
+          case 'glasses':
+          case 'hat':
+          case 'topHat':
+          const accessoryElement = document.getElementById(item.type);
+          if (accessoryElement.textContent !== '') {
+          chestItems.push(accessoryElement.textContent);
+          }
+          accessoryElement.textContent = item.emoji;
+          break;
+          case 'shampoo':
+          shampooCount++;
+          chestItems.push(item.emoji);
+          break;
+          case 'medicine':
+          if (isSick) {
+          isSick = false;
+          addEventToBar("💊✅ Tu mascota se ha curado");
+          } else {
+          addEventToBar("💊❌ Tu mascota no está enferma");
+          return;
+          }
+          break;
+          }
+          updateStatus();
+          addEventToBar(`${item.emoji}✅ Compra exitosa`);
+          gainXP(10);
+          updateFirestore();
+          } else if (level < item.requiredLevel) {
+          addEventToBar(`❌ Necesitas nivel ${item.requiredLevel}`);
+          } else {
+          addEventToBar("💰❌ No tienes suficientes monedas");
+          }
+          shopModal.style.display = 'none';
+          }
+          
+          function feedpet(food) {
+          if (currency >= food.price && level >= food.requiredLevel) {
+          currency -= food.price;
+          hunger = Math.min(100, hunger + food.hunger);
+          fun = Math.min(100, fun + Math.floor(food.fun / 2));
+          addEventToBar(`${food.emoji}✅ Mascota alimentada`);
+          gainXP(5);
+          if (hunger > 100) {
+          isSick = true;
+          addEventToBar("🤢 Tu mascota comió demasiado");
+          }
+          updateStatus();
+          updateFirestore();
+          } else if (level < food.requiredLevel) {
+          addEventToBar(`❌ Necesitas nivel ${food.requiredLevel}`);
+          } else {
+          addEventToBar("💰❌ No tienes suficientes monedas");
+          }
+          foodModal.style.display = 'none';
+          }
+          
+          // Minijuegos
+          function startCatchEmojiGame() {
+          const miniGameBoard = document.getElementById('mini-game-board');
+          miniGameBoard.innerHTML = '';
+          miniGameBoard.style.display = 'grid';
+          miniGameBoard.style.gridTemplateColumns = 'repeat(4, 1fr)';
+          miniGameBoard.style.gridTemplateRows = 'repeat(4, 1fr)';
+          miniGameBoard.style.gap = '5px';
+          miniGameBoard.style.width = '240px';
+          miniGameBoard.style.height = '240px';
+          miniGameBoard.style.margin = '0 auto';
+          
+          const targetEmoji = '🎯';
+          let score = 0;
+          let timeLeft = 30;
+          
+          const scoreDisplay = document.createElement('div');
+          scoreDisplay.textContent = `Puntuación: ${score}`;
+          miniGameBoard.appendChild(scoreDisplay);
+          
+          const timeDisplay = document.createElement('div');
+          timeDisplay.textContent = `Tiempo: ${timeLeft}s`;
+          miniGameBoard.appendChild(timeDisplay);
+          
+          for (let i = 0; i < 16; i++) {
+          const cell = document.createElement('div');
+          cell.classList.add('mini-game-card');
+          cell.style.width = '100%';
+          cell.style.height = '100%';
+          miniGameBoard.appendChild(cell);
+          }
+          
+          function moveTarget() {
+          const cells = miniGameBoard.querySelectorAll('.mini-game-card');
+          cells.forEach(cell => {
+          cell.textContent = '';
+          cell.onclick = null;
+          });
+          const randomCell = cells[Math.floor(Math.random() * cells.length)];
+          randomCell.textContent = targetEmoji;
+          randomCell.onclick = () => {
+          score++;
+          scoreDisplay.textContent = `Puntuación: ${score}`;
+          moveTarget();
+          };
+          }
+          
+          moveTarget();
+          
+          const timer = setInterval(() => {
+          timeLeft--;
+          timeDisplay.textContent = `Tiempo: ${timeLeft}s`;
+          if (timeLeft <= 0) {
+          clearInterval(timer);
+          endMiniGame(score >= 15);
+          }
+          }, 1000);
+          }
+          
+          function endMiniGame(won) {
+          if (won) {
+          fun = Math.min(100, fun + 30);
+          currency += 50;
+          gainXP(20);
+          addEventToBar("🎮✨💰 ¡Ganaste el minijuego!");
+          } else {
+          fun = Math.min(100, fun + 10);
+          gainXP(5);
+          addEventToBar("🎮 Mejor suerte la próxima vez");
+          }
+          updateStatus();
+          miniGameModal.style.display = 'none';
+          updateFirestore();
+          }
+          
+          // Sistema de cofre
+          chest.addEventListener('click', () => {
+          chestModal.style.display = 'block';
+          updateChestItems();
+          });
+          
+          closeChest.addEventListener('click', () => {
+          chestModal.style.display = 'none';
+          });
+          
+          function updateChestItems() {
+          chestItemsContainer.innerHTML = '';
+          chestItems.forEach(item => {
+          const itemElement = document.createElement('div');
+          itemElement.classList.add('chest-item');
+          itemElement.textContent = item;
+          itemElement.onclick = () => equipItem(item);
+          chestItemsContainer.appendChild(itemElement);
+          });
+          }
+          
+          function equipItem(item) {
+          const accessoryType = getAccessoryType(item);
+          if (accessoryType) {
+          document.getElementById(accessoryType).textContent = item;
+          chestItems = chestItems.filter(i => i !== item);
+          updateChestItems();
+          addEventToBar(`${item} equipado!`);
+          updateFirestore();
+          } else if (item === '🧴') {
+          shampooCount++;
+          chestItems = chestItems.filter(i => i !== item);
+          updateChestItems();
+          addEventToBar(`🧴 Shampoo añadido`);
+          updateFirestore();
+          }
+          }
+          
+          function getAccessoryType(emoji) {
+          switch(emoji) {
+          case '👑': return 'crown';
+          case '👓': return 'glasses';
+          case '🧢': return 'hat';
+          case '🎩': return 'topHat';
+          default: return null;
+          }
+          }
+          
+          // Arrastrar y soltar accesorios
+          let draggedItem = null;
+          
+          document.querySelectorAll('.pet-accessory').forEach(accessory => {
+          accessory.addEventListener('dragstart', (e) => {
+          draggedItem = e.target;
+          e.dataTransfer.setData('text/plain', e.target.id);
+          setTimeout(() => {
+          e.target.style.opacity = '0.5';
+          }, 0);
+          });
+          
+          accessory.addEventListener('dragend', (e) => {
+          e.target.style.opacity = '1';
+          });
+          });
+          
+          chest.addEventListener('dragover', (e) => e.preventDefault());
+          chest.addEventListener('drop', (e) => {
+          e.preventDefault();
+          if (draggedItem) {
+          const accessoryType = draggedItem.id;
+          const accessoryEmoji = draggedItem.textContent;
+          if (accessoryEmoji) {
+          chestItems.push(accessoryEmoji);
+          draggedItem.textContent = '';
+          addEventToBar("🧳✅ Accesorio guardado");
+          updateChestItems();
+          updateFirestore();
+          }
+          draggedItem = null;
+          }
+          });
+          
+          // Cerrar modales
+          document.querySelectorAll('.close').forEach(closeBtn => {
+          closeBtn.onclick = function() {
+          this.closest('.modal').style.display = 'none';
+          }
+          });
+          
+          window.onclick = function(event) {
+          if (event.target.classList.contains('modal')) {
+          event.target.style.display = 'none';
+          }
+          }
+          
+          // Función para actualizar la apariencia basada en el nivel
+          function updatepetAppearance() {
+          if (level >= 10) {
+          pet.style.filter = 'drop-shadow(0 0 10px gold)';
+          } else if (level >= 5) {
+          pet.style.filter = 'drop-shadow(0 0 5px silver)';
+          } else {
+          pet.style.filter = 'none';
+          }
+          }
+          
+          // Movimiento aleatorio de la mascota
+          function movepet() {
+          if (!isGameActive) return;
+          
+          const maxMove = 10; // Máximo movimiento en píxeles
+          const newX = (Math.random() - 0.5) * maxMove;
+          const newY = (Math.random() - 0.5) * maxMove;
+          petContainer.style.transform = `translate(${newX}px, ${newY}px)`;
+          }
+          
+          // Cambio aleatorio de expresión
+          function changeExpression() {
+          if (!isGameActive) return;
+          
+          if (!isSick && hunger > 0 && fun > 0 && hygiene > 0) {
+          currentpetEmojiIndex = Math.floor(Math.random() * petEmojis.length);
+          pet.textContent = petEmojis[currentpetEmojiIndex];
+          }
+          }
+          
+          // Ajuste automático del tamaño de la mascota y accesorios
+          function resizepet() {
+          const containerSize = Math.min(petContainer.offsetWidth, petContainer.offsetHeight);
+          pet.style.fontSize = `${containerSize * 0.6}px`;
+          crown.style.fontSize = `${containerSize * 0.3}px`;
+          glasses.style.fontSize = `${containerSize * 0.35}px`;
+          hat.style.fontSize = `${containerSize * 0.3}px`;
+          }
+          
+          window.addEventListener('resize', resizepet);
+          
+          // Función de reset
+          function resetGame() {
+          hunger = 100;
+          fun = 100;
+          hygiene = 100;
+          currency = 2000;
+          level = 1;
+          xp = 0;
+          isSick = false;
+          tapCount = 0;
+          chestItems = [];
+          shampooCount = 0;
+          crown.textContent = '';
+          glasses.textContent = '';
+          hat.textContent = '';
+          localStorage.removeItem('neonpetDeluxeState');
+          updateStatus();
+          addEventToBar("🔄✅ Juego reiniciado");
+          updateFirestore();
+          }
+          
+          // Agregar evento al botón de reset
+          document.getElementById('resetButton').addEventListener('click', resetGame);
+          
+          // Guardado automático
+          function saveGame() {
+          const gameState = {
+          hunger, fun, hygiene, currency, isSick, level, xp, chestItems, shampooCount,
+          accessories: {
+          crown: crown.textContent,
+          glasses: glasses.textContent,
+          hat: hat.textContent
+          }
+          };
+          localStorage.setItem('neonpetDeluxeState', JSON.stringify(gameState));
+          updateFirestore();
+          }
+          
+          function loadGame() {
+          const savedState = localStorage.getItem('neonpetDeluxeState');
+          if (savedState) {
+          const gameState = JSON.parse(savedState);
+          hunger = gameState.hunger;
+          fun = gameState.fun;
+          hygiene = gameState.hygiene;
+          currency = gameState.currency;
+          isSick = gameState.isSick;
+          level = gameState.level;
+          xp = gameState.xp;
+          chestItems = gameState.chestItems || [];
+          shampooCount = gameState.shampooCount || 0;
+          crown.textContent = gameState.accessories.crown;
+          glasses.textContent = gameState.accessories.glasses;
+          hat.textContent = gameState.accessories.hat;
+          updateStatus();
+          updateChestItems();
+          updateFirestore();
+          }
+          }
+          
+          // Interruptor de luz
+          lightSwitch.addEventListener('click', () => {
+          isLightOn = !isLightOn;
+          lightSwitch.textContent = isLightOn ? '💡' : '🌙';
+          if (!isLightOn) {
+          pet.textContent = '😴';
+          addEventToBar("💤 Tu mascota está durmiendo");
+          } else {
+    updateStatus();
+    addEventToBar("🌞 Tu mascota se despertó");
+    }
+    updateFirestore();
+    });
+    
+    // Función para generar cacas
+    function generatePoop() {
+    if (!isGameActive) return;
+    
+    const poopCount = document.querySelectorAll('.poop').length;
+    if (poopCount >= 10) return; // Limitar a 10 cacas máximo
+    
+    const poop = document.createElement('div');
+    poop.textContent = '💩';
+    poop.classList.add('poop');
+    poop.style.left = `${Math.random() * 80 + 10}%`;
+    poop.style.top = `${Math.random() * 80 + 10}%`;
+    poop.onclick = () => {
+    poop.remove();
+    hygiene = Math.max(0, hygiene - 5);
+    updateStatus();
+    updateFirestore();
+    };
+    document.querySelector('.pet-frame').appendChild(poop);
+    
+    // Afectar la salud de la mascota
+    hygiene = Math.max(0, hygiene - 2);
+    updateStatus();
+    }
+    
+    // Función para actualizar el estado basado en las cacas
+    function updateHygieneBasedOnPoops() {
+    const poopCount = document.querySelectorAll('.poop').length;
+    if (poopCount > 0) {
+    hygiene = Math.max(0, hygiene - poopCount);
+    updateStatus();
+    }
+    }
+    
+    // Cambio de fondo
+    let startX;
+    document.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    });
+    
+    document.addEventListener('touchend', (e) => {
+    const endX = e.changedTouches[0].clientX;
+    const diff = startX - endX;
+    if (Math.abs(diff) > 50) { // Umbral de 50px para considerar un swipe
+    if (diff > 0) {
+    // Swipe izquierdo
+    currentBackground = (currentBackground + 1) % backgrounds.length;
+    } else {
+    // Swipe derecho
+    currentBackground = (currentBackground - 1 + backgrounds.length) % backgrounds.length;
+    }
+    background.style.background = backgrounds[currentBackground];
+    updateFirestore();
+    }
+    });
+    
+    // Control de visibilidad de la página
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    function handleVisibilityChange() {
+    if (document.hidden) {
+    isGameActive = false;
+    pauseIntervals();
+    } else {
+    isGameActive = true;
+    resumeIntervals();
+    }
+    }
+    
+    // Pausar intervalos
+    function pauseIntervals() {
+    clearInterval(poopInterval);
+    clearInterval(hygieneInterval);
+    // Pausar otros intervalos aquí si es necesario
+    }
+    
+    // Reanudar intervalos
+    function resumeIntervals() {
+    poopInterval = setInterval(generatePoop, 30000);
+    hygieneInterval = setInterval(updateHygieneBasedOnPoops, 10000);
+    // Reanudar otros intervalos aquí si es necesario
+    }
+    
+    // Optimización del rendimiento
+    function optimizePerformance() {
+    // Usar requestAnimationFrame para animaciones suaves
+    function animate() {
+    if (isGameActive) {
+    movepet();
+    }
+    requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+    
+    // Limitar la frecuencia de actualización de Firebase
+    let firebaseUpdateTimeout;
+    function throttledFirebaseUpdate() {
+    if (!firebaseUpdateTimeout) {
+    firebaseUpdateTimeout = setTimeout(() => {
+    updateFirestore();
+    firebaseUpdateTimeout = null;
+    }, 5000); // Actualizar Firebase como máximo cada 5 segundos
+    }
+    }
+    
+    // Reemplazar llamadas directas a updateFirestore con la versión throttled
+    window.updateFirestore = throttledFirebaseUpdate;
+    }
+    
+    // Gestión de memoria
+    function manageMemory() {
+    // Limpiar poops viejos
+    setInterval(() => {
+    const poops = document.querySelectorAll('.poop');
+    if (poops.length > 10) {
+    poops[0].remove();
+    }
+    }, 60000);
+    
+    // Limpiar eventos antiguos del DOM
+    const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+    if (mutation.type === 'childList') {
+    while (eventBar.childNodes.length > 10) {
+    eventBar.removeChild(eventBar.firstChild);
+    }
+    }
+    });
+    });
+    
+    observer.observe(eventBar, { childList: true });
+    }
+    
+    // Inicialización
+    function init() {
+    loadGame();
+    updateStatus();
+    resizepet();
+    setInterval(decreaseStats, 1000); // Actualizado para disminuir cada segundo
+    setInterval(saveGame, 30000);
+    setInterval(changeWeather, 60000);
+    setInterval(changeExpression, 5000);
+    poopInterval = setInterval(generatePoop, 30000);
+    hygieneInterval = setInterval(updateHygieneBasedOnPoops, 10000);
+    background.style.background = backgrounds[currentBackground];
+    handleConnectionStatus();
+    optimizePerformance();
+    manageMemory();
+    }
+    
+    init();
+    
+    // Comunicación con la ventana padre
+    window.addEventListener('message', (event) => {
+    if (event.data === 'initializepet') {
+    init();
+    }
+    });
+    
+    function updateParentStatus(status) {
+    window.parent.postMessage({
+    type: 'updatepetStatus',
+    status: status
+    }, '*');
+    }
+    
     </script>
-</body>
-</html>
+    </body>
+    </html>
