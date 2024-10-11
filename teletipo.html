@@ -80,9 +80,9 @@
             }
 
             function generarFrases(cantidad) {
-                const sujetosBarajados = shuffle([...sujetos]);
-                const accionesBarajadas = shuffle([...acciones]);
-                const lugaresBarajados = shuffle([...lugares]);
+                const sujetosBarajados = shuffle([...sujetos]).sort(() => Math.random() - 0.5);
+                const accionesBarajadas = shuffle([...acciones]).sort(() => Math.random() - 0.5);
+                const lugaresBarajados = shuffle([...lugares]).sort(() => Math.random() - 0.5);
                 
                 let frases = [];
                 for (let i = 0; i < cantidad; i++) {
