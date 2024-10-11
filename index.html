@@ -455,341 +455,350 @@ const firebaseConfig = {
         const closePopup = document.getElementById('close-popup');
         const loadingElement = document.getElementById('loading');
 
-        const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
-        
-        const slogans = [
-        "Ahora más anónimo",
-        "Lo nunca visto",
-        "Publica sin miedo",
-        "Cuidado, no se pueden borrar",
-        "Tu voz, tu espacio",
-        "Comparte libremente",
-        "Ideas sin límites",
-        "El muro digital",
-        "Exprésate sin barreras",
-        "Tu mensaje importa",
-        "Anunciado en TV",
-        "Donde hasta Moncho opina",
-        "¡Cuéntalo, que nadie se entera!",
-        "El rincón de las ocurrencias familiares",
-        "Secretos de familia: ahora públicos",
-        "Anónimo... pero sabemos que es cosa de Samuel",
-        "Donde mamá pide caviar",
-        "¡Aquí se venden gatos pesados!",
-        "El tablón de los valientes",
-        "El diario secreto de la familia (versión pública)",
-        "La página de la gente que no se peina",
-        "Escribe lo que quieras, que no hay consecuencias",
-        "Al final seguro que papi se enfada"
-        ];
-        
-        let lastVisibleMessage = null;
-        const messagesPerPage = 10;
-        let isLoading = false;
-        
-        function loadMessages(startAfter = null) {
-        if (isLoading) return;
-        isLoading = true;
-        loadingElement.style.display = 'block';
-        
-        let query = db.collection("messages").orderBy("timestamp", "desc").limit(messagesPerPage);
-        
-        if (startAfter) {
-        query = query.startAfter(startAfter);
-        }
-        
-        query.get().then((snapshot) => {
-        if (snapshot.empty) {
-        loadingElement.style.display = 'none';
-        isLoading = false;
-        return;
-        }
-        
-        snapshot.forEach((doc) => {
-        const message = { ...doc.data(), id: doc.id };
-        const messageElement = createMessageElement(message);
-        bulletinBoard.appendChild(messageElement);
-        });
-        
-        lastVisibleMessage = snapshot.docs[snapshot.docs.length - 1];
-        updateMessagesPublished();
-        loadingElement.style.display = 'none';
-        isLoading = false;
-        }).catch((error) => {
-        console.error("Error loading messages: ", error);
-        loadingElement.style.display = 'none';
-        isLoading = false;
-        });
-        }
-        
-        function createMessageElement(message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message';
-        messageDiv.id = `message-${message.id}`;
-        messageDiv.dataset.id = message.id;
-        
-        const bgColor = message.bgColor || getRandomContrastColor();
-        messageDiv.style.backgroundColor = bgColor;
-        
-        const textColor = getContrastingTextColor(bgColor);
-        messageDiv.style.color = textColor;
-        
-        if (message.replyTo) {
-        const quotedMessage = createQuotedMessage(message.replyTo);
-        messageDiv.appendChild(quotedMessage);
-        }
-        
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
-        
-        const emoji = document.createElement('div');
-        emoji.className = 'message-emoji';
-        emoji.textContent = message.emoji;
-        
-        const textDiv = document.createElement('div');
-        textDiv.className = 'message-text';
-        textDiv.textContent = message.text;
-        
-        contentDiv.appendChild(emoji);
-        contentDiv.appendChild(textDiv);
-        
-        const timestamp = document.createElement('div');
-        timestamp.className = 'message-timestamp';
-        if (message.timestamp) {
-        timestamp.textContent = new Date(message.timestamp.toDate()).toLocaleString();
-        } else {
-        timestamp.textContent = 'Fecha desconocida';
-        }
-        
-        const actions = document.createElement('div');
-        actions.className = 'message-actions';
-        
-        const likeBtn = document.createElement('button');
-        likeBtn.className = 'like-btn';
-        likeBtn.textContent = `👍 ${message.likes || 0}`;
-        likeBtn.onclick = () => updateLikes(message.id, 'likes');
-        
-        const dislikeBtn = document.createElement('button');
-        dislikeBtn.className = 'dislike-btn';
-        dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
-        dislikeBtn.onclick = () => updateLikes(message.id, 'dislikes');
-        
-        const replyBtn = document.createElement('button');
-        replyBtn.className = 'reply-btn';
-        replyBtn.textContent = '↩️';
-        replyBtn.onclick = () => showReplyForm(message.id, message);
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.textContent = '🗑️';
-        deleteBtn.onclick = () => showDeleteConfirmation(message.id);
-        
-        actions.appendChild(likeBtn);
-        actions.appendChild(dislikeBtn);
-        actions.appendChild(replyBtn);
-        actions.appendChild(deleteBtn);
-        
-        messageDiv.appendChild(contentDiv);
-        messageDiv.appendChild(timestamp);
-        messageDiv.appendChild(actions);
-        
-        return messageDiv;
-        }
-        
-        function createQuotedMessage(originalMessage) {
-        const quotedDiv = document.createElement('div');
-        quotedDiv.className = 'quoted-message';
-        quotedDiv.style.backgroundColor = originalMessage.bgColor;
-        quotedDiv.style.color = getContrastingTextColor(originalMessage.bgColor);
-        quotedDiv.textContent = `${originalMessage.emoji} ${originalMessage.text}`;
-        quotedDiv.onclick = () => scrollToMessage(originalMessage.id);
-        return quotedDiv;
-        }
-        
-        function scrollToMessage(messageId) {
-        const targetMessage = document.getElementById(`message-${messageId}`);
-        if (targetMessage) {
-        targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        targetMessage.style.animation = 'highlight 2s';
-        }
-        }
-        
-        function showReplyForm(parentId, parentMessage) {
-        const parentMessageElement = document.querySelector(`[data-id="${parentId}"]`);
-        let replyForm = parentMessageElement.querySelector('.reply-form');
-        
-        if (replyForm) {
-        parentMessageElement.removeChild(replyForm);
-        return;
-        }
-        
-        replyForm = document.createElement('form');
-        replyForm.className = 'reply-form';
-        replyForm.innerHTML = `
-        <textarea placeholder="Escribe tu respuesta..."></textarea>
-        <button type="submit">Responder</button>
-        `;
-        replyForm.onsubmit = (e) => {
-        e.preventDefault();
-        const replyText = e.target.querySelector('textarea').value;
-        if (replyText.trim()) {
-        addReply(parentId, replyText, parentMessage);
-        }
-        parentMessageElement.removeChild(replyForm);
-        };
-        parentMessageElement.appendChild(replyForm);
-        }
-        
-        function addReply(parentId, replyText, parentMessage) {
-        const reply = {
-        text: replyText,
-        emoji: getRandomAnimalEmoji(),
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        replyTo: {
-        id: parentId,
-        text: parentMessage.text,
-        emoji: parentMessage.emoji,
-        bgColor: parentMessage.bgColor
-        },
-        bgColor: getRandomContrastColor(),
-        likes: 0,
-        dislikes: 0
-        };
-        
-        db.collection("messages").add(reply)
-        .then(() => {
-        console.log("Respuesta añadida con éxito");
-        })
-        .catch((error) => {
-        console.error("Error al añadir la respuesta: ", error);
-        alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
-        });
-        }
-        
-        function updateLikes(id, field) {
-        db.collection("messages").doc(id).update({
-        [field]: firebase.firestore.FieldValue.increment(1)
-        }).then(() => {
-        db.collection("messages").doc(id).get().then((doc) => {
-        if (doc.exists) {
-        const message = doc.data();
-        const messageElement = document.querySelector(`[data-id="${id}"]`);
-        const likeBtn = messageElement.querySelector('.like-btn');
-        const dislikeBtn = messageElement.querySelector('.dislike-btn');
-        likeBtn.textContent = `👍 ${message.likes || 0}`;
-        dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
-        }
-        });
-        }).catch((error) => {
-        console.error("Error updating likes: ", error);
-        });
-        }
-        
-        function showDeleteConfirmation(id) {
-        const messageElement = document.querySelector(`[data-id="${id}"]`);
-        const actions = messageElement.querySelector('.message-actions');
-        const deleteConfirmation = document.createElement('div');
-        deleteConfirmation.className = 'delete-confirmation';
-        deleteConfirmation.innerHTML = `
-        <button class="confirm-delete">✅</button>
-        <button class="cancel-delete">❌</button>
-        `;
-        actions.appendChild(deleteConfirmation);
-        
-        const confirmDelete = deleteConfirmation.querySelector('.confirm-delete');
-        const cancelDelete = deleteConfirmation.querySelector('.cancel-delete');
-        
-        confirmDelete.onclick = () => deleteMessage(id);
-        cancelDelete.onclick = () => actions.removeChild(deleteConfirmation);
-        }
-        
-        function deleteMessage(id) {
-        db.collection("messages").doc(id).delete().then(() => {
-        incrementMessagesDeleted();
-        }).catch((error) => {
-        console.error("Error removing message: ", error);
-        });
-        }
-        
-        messageForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const text = messageInput.value.trim();
-        if (text) {
-        const message = {
-        text: text,
-        emoji: getRandomAnimalEmoji(),
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        bgColor: getRandomContrastColor(),
-        likes: 0,
-        dislikes: 0
-        };
-        db.collection("messages").add(message).then(() => {
-        messageInput.value = '';
-        });
-        }
-        });
-        
-        function getRandomAnimalEmoji() {
-        return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
-        }
-        
-        function getRandomContrastColor() {
-        const hue = Math.floor(Math.random() * 360);
-        const saturation = 70 + Math.random() * 30;
-        const lightness = 65 + Math.random() * 25;
-        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-        }
-        
-        function getContrastingTextColor(bgColor) {
-        const hsl = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-        if (hsl) {
-        const l = parseInt(hsl[3]);
-        return l > 50 ? '#000000' : '#FFFFFF';
-        } else {
-        return '#000000';
-        }
-        }
-        
-        function updateMessagesPublished() {
-        db.collection("messages").get().then((snapshot) => {
-        messagesPublished.textContent = `Mensajes publicados: ${snapshot.size}`;
-        });
-        }
-        
-        function updateMessagesDeleted() {
-        db.collection("statistics").doc("counters").get().then((doc) => {
-        if (doc.exists) {
-        const deletedCount = doc.data().messagesDeleted || 0;
-        messagesDeleted.textContent = `Mensajes borrados: ${deletedCount}`;
-        }
-        });
-        }
-        
-        function incrementMessagesDeleted() {
-        db.collection("statistics").doc("counters").update({
-        messagesDeleted: firebase.firestore.FieldValue.increment(1)
-        }).then(() => {
-        updateMessagesDeleted();
-        });
-        }
-        
-        function changeSlogan() {
-        slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
-        }
-        
-        themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        themeToggle.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌓';
-        });
-        
-        function createEmojiBackground() {
-        const emojiContainer = document.createElement('div');
-        emojiContainer.style.position = 'fixed';
-        emojiContainer.style.top = '0';
-        emojiContainer.style.left = '0';
-        emojiContainer.style.width = '100%';
-        emojiContainer.style.height = '100%';
-emojiContainer.style.pointerEvents = 'none';
+     const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
+     
+     const slogans = [
+     "Ahora más anónimo",
+     "Lo nunca visto",
+     "Publica sin miedo",
+     "Cuidado, no se pueden borrar",
+     "Tu voz, tu espacio",
+     "Comparte libremente",
+     "Ideas sin límites",
+     "El muro digital",
+     "Exprésate sin barreras",
+     "Tu mensaje importa",
+     "Anunciado en TV",
+     "Donde hasta Moncho opina",
+     "¡Cuéntalo, que nadie se entera!",
+     "El rincón de las ocurrencias familiares",
+     "Secretos de familia: ahora públicos",
+     "Anónimo... pero sabemos que es cosa de Samuel",
+     "Donde mamá pide caviar",
+     "¡Aquí se venden gatos pesados!",
+     "El tablón de los valientes",
+     "El diario secreto de la familia (versión pública)",
+     "La página de la gente que no se peina",
+     "Escribe lo que quieras, que no hay consecuencias",
+     "Al final seguro que papi se enfada"
+     ];
+     
+     let lastVisibleMessage = null;
+     const messagesPerPage = 10;
+     let isLoading = false;
+     let displayedMessageIds = new Set();
+     
+     function loadMessages(startAfter = null) {
+     if (isLoading) return;
+     isLoading = true;
+     loadingElement.style.display = 'block';
+     
+     let query = db.collection("messages").orderBy("timestamp", "desc").limit(messagesPerPage);
+     
+     if (startAfter) {
+     query = query.startAfter(startAfter);
+     }
+     
+     query.get().then((snapshot) => {
+     if (snapshot.empty) {
+     loadingElement.style.display = 'none';
+     isLoading = false;
+     return;
+     }
+     
+     snapshot.forEach((doc) => {
+     const message = { ...doc.data(), id: doc.id };
+     if (!displayedMessageIds.has(message.id)) {
+     const messageElement = createMessageElement(message);
+     bulletinBoard.appendChild(messageElement);
+     displayedMessageIds.add(message.id);
+     }
+     });
+     
+     lastVisibleMessage = snapshot.docs[snapshot.docs.length - 1];
+     updateMessagesPublished();
+     loadingElement.style.display = 'none';
+     isLoading = false;
+     }).catch((error) => {
+     console.error("Error loading messages: ", error);
+     loadingElement.style.display = 'none';
+     isLoading = false;
+     });
+     }
+     
+     function createMessageElement(message) {
+     const messageDiv = document.createElement('div');
+     messageDiv.className = 'message';
+     messageDiv.id = `message-${message.id}`;
+     messageDiv.dataset.id = message.id;
+     
+     const bgColor = message.bgColor || getRandomContrastColor();
+     messageDiv.style.backgroundColor = bgColor;
+     
+     const textColor = getContrastingTextColor(bgColor);
+     messageDiv.style.color = textColor;
+     
+     if (message.replyTo) {
+     const quotedMessage = createQuotedMessage(message.replyTo);
+     messageDiv.appendChild(quotedMessage);
+     }
+     
+     const contentDiv = document.createElement('div');
+     contentDiv.className = 'message-content';
+     
+     const emoji = document.createElement('div');
+     emoji.className = 'message-emoji';
+     emoji.textContent = message.emoji;
+     
+     const textDiv = document.createElement('div');
+     textDiv.className = 'message-text';
+     textDiv.textContent = message.text;
+     
+     contentDiv.appendChild(emoji);
+     contentDiv.appendChild(textDiv);
+     
+     const timestamp = document.createElement('div');
+     timestamp.className = 'message-timestamp';
+     if (message.timestamp) {
+     timestamp.textContent = new Date(message.timestamp.toDate()).toLocaleString();
+     } else {
+     timestamp.textContent = 'Fecha desconocida';
+     }
+     
+     const actions = document.createElement('div');
+     actions.className = 'message-actions';
+     
+     const likeBtn = document.createElement('button');
+     likeBtn.className = 'like-btn';
+     likeBtn.textContent = `👍 ${message.likes || 0}`;
+     likeBtn.onclick = () => updateLikes(message.id, 'likes');
+     
+     const dislikeBtn = document.createElement('button');
+     dislikeBtn.className = 'dislike-btn';
+     dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
+     dislikeBtn.onclick = () => updateLikes(message.id, 'dislikes');
+     
+     const replyBtn = document.createElement('button');
+     replyBtn.className = 'reply-btn';
+     replyBtn.textContent = '↩️';
+     replyBtn.onclick = () => showReplyForm(message.id, message);
+     
+     const deleteBtn = document.createElement('button');
+     deleteBtn.className = 'delete-btn';
+     deleteBtn.textContent = '🗑️';
+     deleteBtn.onclick = () => showDeleteConfirmation(message.id);
+     
+     actions.appendChild(likeBtn);
+     actions.appendChild(dislikeBtn);
+     actions.appendChild(replyBtn);
+     actions.appendChild(deleteBtn);
+     
+     messageDiv.appendChild(contentDiv);
+     messageDiv.appendChild(timestamp);
+     messageDiv.appendChild(actions);
+     
+     return messageDiv;
+     }
+     
+     function createQuotedMessage(originalMessage) {
+     const quotedDiv = document.createElement('div');
+     quotedDiv.className = 'quoted-message';
+     quotedDiv.style.backgroundColor = originalMessage.bgColor;
+     quotedDiv.style.color = getContrastingTextColor(originalMessage.bgColor);
+     quotedDiv.textContent = `${originalMessage.emoji} ${originalMessage.text}`;
+     quotedDiv.onclick = () => scrollToMessage(originalMessage.id);
+     return quotedDiv;
+     }
+     
+     function scrollToMessage(messageId) {
+     const targetMessage = document.getElementById(`message-${messageId}`);
+     if (targetMessage) {
+     targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+     targetMessage.style.animation = 'highlight 2s';
+     }
+     }
+     
+     function showReplyForm(parentId, parentMessage) {
+     const parentMessageElement = document.querySelector(`[data-id="${parentId}"]`);
+     let replyForm = parentMessageElement.querySelector('.reply-form');
+     
+     if (replyForm) {
+     parentMessageElement.removeChild(replyForm);
+     return;
+     }
+     
+     replyForm = document.createElement('form');
+     replyForm.className = 'reply-form';
+     replyForm.innerHTML = `
+     <textarea placeholder="Escribe tu respuesta..."></textarea>
+     <button type="submit">Responder</button>
+     `;
+     replyForm.onsubmit = (e) => {
+     e.preventDefault();
+     const replyText = e.target.querySelector('textarea').value;
+     if (replyText.trim()) {
+     addReply(parentId, replyText, parentMessage);
+     }
+     parentMessageElement.removeChild(replyForm);
+     };
+     parentMessageElement.appendChild(replyForm);
+     }
+     
+     function addReply(parentId, replyText, parentMessage) {
+     const reply = {
+     text: replyText,
+     emoji: getRandomAnimalEmoji(),
+     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+     replyTo: {
+     id: parentId,
+     text: parentMessage.text,
+     emoji: parentMessage.emoji,
+     bgColor: parentMessage.bgColor
+     },
+     bgColor: getRandomContrastColor(),
+     likes: 0,
+     dislikes: 0
+     };
+     
+     db.collection("messages").add(reply)
+     .then(() => {
+     console.log("Respuesta añadida con éxito");
+     })
+     .catch((error) => {
+     console.error("Error al añadir la respuesta: ", error);
+     alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
+     });
+     }
+     
+     function updateLikes(id, field) {
+     db.collection("messages").doc(id).update({
+     [field]: firebase.firestore.FieldValue.increment(1)
+     }).then(() => {
+     db.collection("messages").doc(id).get().then((doc) => {
+     if (doc.exists) {
+     const message = doc.data();
+     const messageElement = document.querySelector(`[data-id="${id}"]`);
+     const likeBtn = messageElement.querySelector('.like-btn');
+     const dislikeBtn = messageElement.querySelector('.dislike-btn');
+     likeBtn.textContent = `👍 ${message.likes || 0}`;
+     dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
+     }
+     });
+     }).catch((error) => {
+     console.error("Error updating likes: ", error);
+     });
+     }
+     
+     function showDeleteConfirmation(id) {
+     const messageElement = document.querySelector(`[data-id="${id}"]`);
+     const actions = messageElement.querySelector('.message-actions');
+     const deleteConfirmation = document.createElement('div');
+     deleteConfirmation.className = 'delete-confirmation';
+     deleteConfirmation.innerHTML = `
+     <button class="confirm-delete">✅</button>
+     <button class="cancel-delete">❌</button>
+     `;
+     actions.appendChild(deleteConfirmation);
+     
+     const confirmDelete = deleteConfirmation.querySelector('.confirm-delete');
+     const cancelDelete = deleteConfirmation.querySelector('.cancel-delete');
+     
+     confirmDelete.onclick = () => deleteMessage(id);
+     cancelDelete.onclick = () => actions.removeChild(deleteConfirmation);
+     }
+     
+     function deleteMessage(id) {
+     db.collection("messages").doc(id).delete().then(() => {
+     incrementMessagesDeleted();
+     const messageElement = document.querySelector(`[data-id="${id}"]`);
+     if (messageElement) {
+     bulletinBoard.removeChild(messageElement);
+     displayedMessageIds.delete(id);
+     }
+     }).catch((error) => {
+     console.error("Error removing message: ", error);
+     });
+     }
+     
+     messageForm.addEventListener('submit', (e) => {
+     e.preventDefault();
+     const text = messageInput.value.trim();
+     if (text) {
+     const message = {
+     text: text,
+     emoji: getRandomAnimalEmoji(),
+     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+     bgColor: getRandomContrastColor(),
+     likes: 0,
+     dislikes: 0
+     };
+     db.collection("messages").add(message).then(() => {
+     messageInput.value = '';
+     });
+     }
+     });
+     
+     function getRandomAnimalEmoji() {
+     return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
+     }
+     
+     function getRandomContrastColor() {
+     const hue = Math.floor(Math.random() * 360);
+     const saturation = 70 + Math.random() * 30;
+     const lightness = 65 + Math.random() * 25;
+     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+     }
+     
+     function getContrastingTextColor(bgColor) {
+     const hsl = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+     if (hsl) {
+     const l = parseInt(hsl[3]);
+     return l > 50 ? '#000000' : '#FFFFFF';
+     } else {
+     return '#000000';
+     }
+     }
+     
+     function updateMessagesPublished() {
+     db.collection("messages").get().then((snapshot) => {
+     messagesPublished.textContent = `Mensajes publicados: ${snapshot.size}`;
+     });
+     }
+     
+     function updateMessagesDeleted() {
+     db.collection("statistics").doc("counters").get().then((doc) => {
+     if (doc.exists) {
+     const deletedCount = doc.data().messagesDeleted || 0;
+     messagesDeleted.textContent = `Mensajes borrados: ${deletedCount}`;
+     }
+     });
+     }
+     
+     function incrementMessagesDeleted() {
+     db.collection("statistics").doc("counters").update({
+     messagesDeleted: firebase.firestore.FieldValue.increment(1)
+     }).then(() => {
+     updateMessagesDeleted();
+     });
+     }
+     
+     function changeSlogan() {
+     slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
+     }
+     
+     themeToggle.addEventListener('click', () => {
+     document.body.classList.toggle('dark-mode');
+     themeToggle.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌓';
+     });
+     
+function createEmojiBackground() {
+            const emojiContainer = document.createElement('div');
+            emojiContainer.style.position = 'fixed';
+            emojiContainer.style.top = '0';
+            emojiContainer.style.left = '0';
+            emojiContainer.style.width = '100%';
+            emojiContainer.style.height = '100%';
+            emojiContainer.style.pointerEvents = 'none';
             emojiContainer.style.zIndex = '-1';
             
             for (let i = 0; i < 50; i++) {
@@ -938,9 +947,12 @@ emojiContainer.style.pointerEvents = 'none';
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "added") {
                             const newMessage = { ...change.doc.data(), id: change.doc.id };
-                            const messageElement = createMessageElement(newMessage);
-                            bulletinBoard.insertBefore(messageElement, bulletinBoard.firstChild);
-                            updateMessagesPublished();
+                            if (!displayedMessageIds.has(newMessage.id)) {
+                                const messageElement = createMessageElement(newMessage);
+                                bulletinBoard.insertBefore(messageElement, bulletinBoard.firstChild);
+                                displayedMessageIds.add(newMessage.id);
+                                updateMessagesPublished();
+                            }
                         }
                     });
                 });
