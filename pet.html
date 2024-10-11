@@ -303,7 +303,7 @@
         }
         .poop {
             position: absolute;
-            font-size: 1.5em;
+            font-size: 2em; /* Aumentar el tamaño de las cacas */
             cursor: pointer;
             z-index: 1;
         }
@@ -438,13 +438,13 @@
     <script>
         // Configuración de Firebase (reemplaza con tus propias credenciales)
 const firebaseConfig = {
-apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
-authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
-projectId: "tablon-de-anuncios-d5dea",
-storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
-messagingSenderId: "67910184237",
-appId: "1:67910184237:web:e43d424657a948ae5d77a4",
-measurementId: "G-YL5W1VNM9Z"
+    apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
+    authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
+    projectId: "tablon-de-anuncios-d5dea",
+    storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
+    messagingSenderId: "67910184237",
+    appId: "1:67910184237:web:e43d424657a948ae5d77a4",
+    measurementId: "G-YL5W1VNM9Z"
 };
 
         // Inicializar Firebase
@@ -509,7 +509,7 @@ measurementId: "G-YL5W1VNM9Z"
         const closeGame = document.getElementById('closeGame');
 
         const petEmojis = ['😊', '😄', '😍', '🤔', '😋', '😎', '🤓', '🥳', '😝', '🤪', '😇', '🥰', '😌', '😏', '😳', '🙄', '😬', '😅', '😂', '🤣', '😭', '😱', '🤯', '🥵', '🥶', '😨', '😰', '😥', '😓', '🤗', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '🤤', '😪', '😵'];
-        const weatherEmojis = ['☀️', '🌧️', '❄️', '🌤️', '🌈'];
+        const weatherEmojis = ['☀️', '🌧️', '☁️'];
         let currentPetEmojiIndex = 0;
         let currentWeatherIndex = 0;
 
@@ -535,6 +535,19 @@ measurementId: "G-YL5W1VNM9Z"
             'linear-gradient(to bottom, #87CEEB, #E0F6FF)', // Día
             'linear-gradient(to bottom, #FF7F50, #FFB6C1)', // Amanecer/Atardecer
             'linear-gradient(to bottom, #191970, #000000)'  // Noche
+        ];
+
+        const messages = [
+            "¡Tu mascota está feliz!",
+            "Tu mascota quiere jugar.",
+            "¡Qué día tan bonito!",
+            "Tu mascota tiene hambre.",
+            "¡Cuidado con la lluvia!",
+            "Tu mascota te quiere mucho.",
+            "¡Hora de limpiar!",
+            "Tu mascota se siente sola.",
+            "¡Diviértete con tu mascota!",
+            "Tu mascota está soñando contigo."
         ];
 
         // Funciones principales
@@ -587,14 +600,14 @@ measurementId: "G-YL5W1VNM9Z"
             const elapsedMinutes = (currentTime - lastUpdateTime) / 60000; // Convertir a minutos
             lastUpdateTime = currentTime;
 
-            const decreaseAmount = isLightOn ? elapsedMinutes * 5 : elapsedMinutes * 2.5;
+            const decreaseAmount = isLightOn ? elapsedMinutes * 10 : elapsedMinutes * 5;
 
             hunger = Math.max(0, hunger - decreaseAmount);
-            fun = Math.max(0, fun - decreaseAmount * 1.5); // La diversión disminuye más rápido
+            fun = Math.max(0, fun - decreaseAmount * 2); // La diversión disminuye más rápido
             hygiene = Math.max(0, hygiene - decreaseAmount);
 
             // Probabilidad de enfermar
-            if (Math.random() < 0.01 * elapsedMinutes && !isSick) {
+            if (Math.random() < 0.05 * elapsedMinutes && !isSick) {
                 isSick = true;
                 addEventToBar("🤒 Tu mascota se ha enfermado");
             }
@@ -627,7 +640,7 @@ measurementId: "G-YL5W1VNM9Z"
         function changeWeather() {
             if (!isGameActive) return;
 
-            currentWeatherIndex = (currentWeatherIndex + 1) % weatherEmojis.length;
+            currentWeatherIndex = Math.floor(Math.random() * weatherEmojis.length);
             weatherElement.textContent = weatherEmojis[currentWeatherIndex];
             applyWeatherEffects();
         }
@@ -637,35 +650,25 @@ measurementId: "G-YL5W1VNM9Z"
             switch (weatherEmojis[currentWeatherIndex]) {
                 case '☀️':
                     fun = Math.min(100, fun + 5);
-                    hygiene = Math.max(0, hygiene - 5);
-                    addEventToBar("☀️ Día soleado: +5 diversión, -5 higiene");
+                    addEventToBar("☀️ Día soleado: +5 diversión");
                     break;
                 case '🌧️':
-                    hygiene = Math.min(100, hygiene + 10);
+                    isSick = true;
+                    addEventToBar("🌧️ Día lluvioso: Tu mascota se ha enfermado");
+                    break;
+                case '☁️':
                     fun = Math.max(0, fun - 5);
-                    if (Math.random() < 0.1 && !isSick) {
-                        isSick = true;
-                        addEventToBar("🌧️ Tu mascota se mojó y se enfermó");
-                    } else {
-                        addEventToBar("🌧️ Día lluvioso: +10 higiene, -5 diversión");
-                    }
-                    break;
-                case '❄️':
-                    hunger = Math.max(0, hunger - 10);
-                    addEventToBar("❄️ Día frío: -10 saciedad");
-                    break;
-                case '🌤️':
-                    currency += 50;
-                    addEventToBar("🌤️ Día despejado: +50 monedas");
-                    break;
-                case '🌈':
-                    fun = Math.min(100, fun + 15);
-                    currency += 100;
-                    addEventToBar("🌈 ¡Arcoíris!: +15 diversión, +100 monedas");
+                    addEventToBar("☁️ Día nublado: -5 diversión");
                     break;
             }
             updateStatus();
             updateFirestore();
+        }
+
+        // Función para mostrar mensajes aleatorios
+        function showRandomMessage() {
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            addEventToBar(randomMessage);
         }
 
         // Función para ganar experiencia y manejar nivel
@@ -1087,12 +1090,12 @@ measurementId: "G-YL5W1VNM9Z"
             clearInterval(expressionInterval);
             expressionInterval = setInterval(() => {
                 changeExpression();
-            }, Math.random() * 5000 + 5000); // Cambiar expresión cada 5-10 segundos
+            }, Math.random() * 3000 + 3000); // Cambiar expresión cada 3-6 segundos
         }
 
         let expressionInterval = setInterval(() => {
             changeExpression();
-        }, Math.random() * 5000 + 5000);
+        }, Math.random() * 3000 + 3000);
 
         // Ajuste del tamaño de la mascota y accesorios
         function resizePet() {
@@ -1263,10 +1266,11 @@ measurementId: "G-YL5W1VNM9Z"
         }
 
         function resumeIntervals() {
-            intervals.push(setInterval(decreaseStats, 30000)); // Actualizar cada 30 segundos
-            intervals.push(setInterval(changeWeather, 300000)); // Cambiar clima cada 5 minutos
+            intervals.push(setInterval(decreaseStats, 10000)); // Actualizar cada 10 segundos
+            intervals.push(setInterval(changeWeather, 7000)); // Cambiar clima cada 6-7 segundos
             intervals.push(setInterval(generatePoop, 20000)); // Generar caca cada 20 segundos (más frecuente)
             intervals.push(setInterval(movePet, 3000)); // Mover mascota cada 3 segundos
+            intervals.push(setInterval(showRandomMessage, 15000)); // Mostrar mensaje cada 15 segundos
         }
 
         // Optimización del rendimiento y gestión de memoria
