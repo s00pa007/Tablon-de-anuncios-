@@ -538,16 +538,16 @@ const firebaseConfig = {
         ];
 
         const messages = [
-            "¡Tu mascota está feliz!",
-            "Tu mascota quiere jugar.",
+            "¡Cakiwaki está feliz!",
+            "Cakiwaki quiere jugar.",
             "¡Qué día tan bonito!",
-            "Tu mascota tiene hambre.",
+            "Cakiwaki tiene hambre.",
             "¡Cuidado con la lluvia!",
-            "Tu mascota te quiere mucho.",
+            "Cakiwaki te quiere mucho.",
             "¡Hora de limpiar!",
-            "Tu mascota se siente sola.",
-            "¡Diviértete con tu mascota!",
-            "Tu mascota está soñando contigo."
+            "Cakiwaki se siente sola.",
+            "¡Diviértete con Cakiwaki!",
+            "Cakiwaki está soñando contigo."
         ];
 
         // Funciones principales
@@ -571,7 +571,7 @@ const firebaseConfig = {
             // Manejo de estados extremos y apariencia de la mascota
             if (hunger <= 0 || fun <= 0 || hygiene <= 0) {
                 pet.textContent = '💀';
-                addEventToBar("⚠️ Tu mascota está en peligro. Necesita atención inmediata.");
+                addEventToBar("⚠️ Cakiwaki está en peligro. Necesita atención inmediata.");
                 isGameActive = false; // Pausar el juego
             } else if (isSick) {
                 pet.textContent = '🤢';
@@ -609,7 +609,7 @@ const firebaseConfig = {
             // Probabilidad de enfermar
             if (Math.random() < 0.05 * elapsedMinutes && !isSick) {
                 isSick = true;
-                addEventToBar("🤒 Tu mascota se ha enfermado");
+                addEventToBar("🤒 Cakiwaki se ha enfermado");
             }
 
             updateStatus();
@@ -654,7 +654,7 @@ const firebaseConfig = {
                     break;
                 case '🌧️':
                     isSick = true;
-                    addEventToBar("🌧️ Día lluvioso: Tu mascota se ha enfermado");
+                    addEventToBar("🌧️ Día lluvioso: Cakiwaki se ha enfermado");
                     break;
                 case '☁️':
                     fun = Math.max(0, fun - 5);
@@ -717,7 +717,7 @@ const firebaseConfig = {
                     hygiene = Math.min(100, hygiene + 20);
                     shampooCount--;
                     currency += 10;
-                    addEventToBar("🧼 Tu mascota está limpia y feliz");
+                    addEventToBar("🧼 Cakiwaki está limpia y feliz");
                     gainXP(5);
 
                     // Eliminar todas las cacas
@@ -750,7 +750,7 @@ const firebaseConfig = {
                     startChangingExpressions();
                 }, 10000); // Mantener expresión por 10 segundos
                 if (tapCount >= 10) {
-                    addEventToBar("🤗 ¡A tu mascota le encantan las caricias!");
+                    addEventToBar("🤗 ¡A Cakiwaki le encantan las caricias!");
                     gainXP(10);
                     tapCount = 0;
                 }
@@ -814,9 +814,9 @@ const firebaseConfig = {
                     case 'medicine':
                         if (isSick) {
                             isSick = false;
-                            addEventToBar("💊 Tu mascota se ha recuperado");
+                            addEventToBar("💊 Cakiwaki se ha recuperado");
                         } else {
-                            addEventToBar("💊 Tu mascota no está enferma");
+                            addEventToBar("💊 Cakiwaki no está enferma");
                             currency += item.price; // Devolver el dinero
                         }
                         break;
@@ -841,7 +841,7 @@ const firebaseConfig = {
                 gainXP(5);
                 if (hunger > 100) {
                     isSick = true;
-                    addEventToBar("🤢 Tu mascota comió demasiado y se enfermó");
+                    addEventToBar("🤢 Cakiwaki comió demasiado y se enfermó");
                 }
                 updateStatus();
                 updateFirestore();
@@ -1180,11 +1180,11 @@ const firebaseConfig = {
             if (!isLightOn) {
                 isAsleep = true;
                 pet.textContent = '😴';
-                addEventToBar("💤 Tu mascota se ha ido a dormir");
+                addEventToBar("💤 Cakiwaki se ha ido a dormir");
             } else {
                 isAsleep = false;
                 updateStatus();
-                addEventToBar("🌞 Tu mascota se ha despertado");
+                addEventToBar("🌞 Cakiwaki se ha despertado");
             }
             updateFirestore();
         });
