@@ -532,7 +532,7 @@
     let isExpressionLocked = false;
     let isRandomExpressionMode = true;
     let expressionChangeTimeout;
-
+    let ignoreStateBasedExpressions = false;  // Nueva variable para controlar cuándo ignorar los cambios de estado.
     // Elementos del DOM
     const pet = document.getElementById('pet');
     const petContainer = document.querySelector('.pet-container');
@@ -737,53 +737,61 @@ infoBar.insertBefore(levelElement, weatherElement);
       resizePet();
     }
 
-    function updatePetExpression() {
-      const currentTime = Date.now();
-      if (currentTime - lastExpressionChangeTime < 10000) {
+function updatePetExpression() {
+    const currentTime = Date.now();
+
+    // Si la expresión está bloqueada por el tap o ignoramos los cambios de estado, no hacemos nada
+    if (isExpressionLocked || ignoreStateBasedExpressions) return;
+
+    // Solo permitimos cambios de expresión cada 15 segundos como mínimo
+    if (currentTime - lastExpressionChangeTime < 15000) {
         return;
-      }
-
-      if (!isLightOn) {
-        pet.textContent = '😴';
-        pet.style.fontSize = '15vh';
-      } else if (isSick) {
-        pet.textContent = '🤒';
-        pet.style.fontSize = '15vh';
-      } else if (hunger <= 30 || fun <= 30 || hygiene <= 30) {
-        pet.textContent = '😢';
-        pet.style.fontSize = '12vh';
-      } else {
-        if (isRandomExpressionMode) {
-          changePetFace();
-        }
-      }
-
-      const size = 12 + (hunger / 100) * 8; // Tamaño base de 12vh, aumenta hasta 20vh
-      pet.style.fontSize = `${size}vh`;
-
-      updatePetAppearance();
     }
 
-    function changePetFace() {
-      if (!isGameActive || !isLightOn || isSick) return;
+    // Si la luz está apagada o Cakiwaki está enfermo, no hacemos más cambios
+    if (!isLightOn) {
+        pet.textContent = '😴';  // Dormido cuando la luz está apagada
+        return;
+    }
 
-      clearTimeout(expressionChangeTimeout);
+    if (isSick) {
+        pet.textContent = '🤒';  // Expresión de enfermo
+        return;
+    }
 
-      if (isRandomExpressionMode) {
+    // Cambiar expresión solo si las necesidades están bajas o en modo aleatorio
+    if (hunger <= 30 || fun <= 30 || hygiene <= 30) {
+        pet.textContent = '😢';  // Expresión triste por necesidad baja
+    } else if (isRandomExpressionMode) {
+        changePetFace();  // Cambiar expresión aleatoriamente
+    }
+
+    lastExpressionChangeTime = currentTime; // Actualizamos el último cambio de expresión
+}
+    
+
+// Función de cambio de cara en modo aleatorio
+// Función de cambio de cara en modo aleatorio
+function changePetFace() {
+    if (!isExpressionLocked && !isSick) { // Solo cambia de cara si no está bloqueado o enfermo
         currentpetEmojiIndex = Math.floor(Math.random() * petEmojis.length);
         pet.textContent = petEmojis[currentpetEmojiIndex];
 
-        const nextChangeTime = Math.floor(Math.random() * 4000) + 3000; // 3 a 7 segundos
-        expressionChangeTimeout = setTimeout(changePetFace, nextChangeTime);
-      }
+        // Cancelar cualquier temporizador previo antes de configurar uno nuevo
+        clearTimeout(expressionTimeout);
+
+        // Cambiar la cara aleatoriamente después de 6 a 10 segundos
+        const nextChangeTime = Math.floor(Math.random() * 4000) + 6000; // 6000 ms (6 segundos) a 10000 ms (10 segundos)
+        expressionTimeout = setTimeout(changePetFace, nextChangeTime);
     }
+}
 
     function decreaseStats() {
       if (!isGameActive) return;
 
-      const decreaseAmountHunger = 0.5;
-      const decreaseAmountFun = 0.3;
-      const decreaseAmountHygiene = 0.4;
+   const decreaseAmountHunger = 0.6;  // Aumentar de 0.5 a 1.0 para que el hambre baje más rápido
+   const decreaseAmountFun = 0.8;     // Aumentar de 0.3 a 0.8 para que la diversión baje más rápido
+   const decreaseAmountHygiene = 0.7; // Aumentar de 0.4 a 0.7 para que la higiene baje más rápido
 
       hunger = Math.max(0, hunger - decreaseAmountHunger);
       fun = Math.max(0, fun - decreaseAmountFun);
@@ -913,30 +921,33 @@ infoBar.insertBefore(levelElement, weatherElement);
     closeChest.addEventListener('click', () => {
       chestModal.style.display = 'none';
     });
+    function caressBonus() {
+    caressCount++;  // Incrementar el contador de caricias
+    fun = Math.min(100, fun + 10);  // Incrementa la diversión con cada caricia
+    addEventToBar("💖 ¡Cakiwaki recibió una caricia!", "Cakiwaki está más feliz gracias a tus caricias.");
+    gainXP(5);  // Añadir puntos de experiencia
+    updateStatus();  // Actualizar el estado general del juego
+    }
+// Evento de tap para cambiar la expresión inmediatamente y bloquear el modo aleatorio
+// Evento de tap para cambiar la expresión inmediatamente y bloquear el modo aleatorio
+pet.addEventListener('click', () => {
+    // Bloqueamos cualquier otro cambio de expresión
+    clearTimeout(expressionTimeout);  
+    isExpressionLocked = true;  // Bloqueamos expresiones aleatorias
 
-    pet.addEventListener('click', () => {
-      if (!isLightOn) {
-        isLightOn = true;
-        lightSwitch.textContent = '💡';
-        addEventToBar("🌞 Cakiwaki se despertó", "¡Qué bueno que lo despertaste! Ahora podrá jugar y divertirse contigo.");
-      }
+    // Cambiamos la expresión al hacer tap
+    currentpetEmojiIndex = (currentpetEmojiIndex + 1) % petEmojis.length;
+    pet.textContent = petEmojis[currentpetEmojiIndex];
 
-      isRandomExpressionMode = false;
-      clearTimeout(expressionChangeTimeout);
-      clearTimeout(expressionTimeout);
-      currentpetEmojiIndex = (currentpetEmojiIndex + 1) % petEmojis.length;
-      pet.textContent = petEmojis[currentpetEmojiIndex];
+    // Aumentamos el contador de caricias y aplicamos el bonus
+    caressBonus();  // Aplicar bonus por caricia
 
-      if (!isSick) {
-        addEventToBar("😊 Cakiwaki está feliz por tu atención", "Tus caricias hacen que Cakiwaki se sienta querido y especial.");
-      } else {
-        addEventToBar("🤒 Cakiwaki no se siente bien", "Necesita descansar y tal vez algo de medicina para sentirse mejor.");
-      }
-
-      updateStatus();
-      updateFirestore();
-    });
-
+    // Mantenemos la nueva expresión y el tamaño durante 10 segundos
+    expressionTimeout = setTimeout(() => {
+        isExpressionLocked = false;  // Después de 10 segundos, desbloqueamos los cambios de expresión
+        changePetFace();  // Volvemos al modo aleatorio
+    }, 1000);  // 10 segundos de bloqueo después del tap
+});
     function updateShopItems() {
       const shopItemsContainer = document.getElementById('shop-items');
       shopItemsContainer.innerHTML = '';
@@ -1382,12 +1393,10 @@ addEventToBar("🧼 ¡Gran limpieza!", "Has eliminado muchas cacas. Cakiwaki se 
       petContainer.style.transform = 'translate(-50%, -50%)';
     }
 
-    function resizePet() {
-      // El tamaño del pet se maneja en updatePetExpression
-    }
-
-    window.addEventListener('resize', resizePet);
-
+function resizePet() {
+    const size = 5 + (hunger / 100) * 25;  // Tamaño base de 5vh, ajusta hasta 30vh según el hambre
+    pet.style.fontSize = `${size}vh`;
+}
     function resetGame() {
       hunger = 50;
       fun = 100;
@@ -1468,30 +1477,29 @@ petDocRef.onSnapshot((doc) => {
     });
 
     function updateFirestore() {
-      petDocRef.set({
-        hunger: hunger,
-        fun: fun,
-        hygiene: hygiene,
-        currency: currency,
-        level: level,
-        xp: xp,
-        isSick: isSick,
-        caressCount: caressCount,
-        chestItems: chestItems,
-        shampooCount: shampooCount,
-        isLightOn: isLightOn,
-        currentBackground: currentBackground,
-        accessories: {
-          crown: crown.textContent,
-          glasses: glasses.textContent,
-          hat: hat.textContent
-        }
-      }).then(() => {
-        console.log("Datos actualizados correctamente en Firebase");
-      }).catch((error) => {
-        console.error("Error al actualizar los datos en Firebase:", error);
-        addEventToBar("🚨 Error al actualizar datos en Firebase.", "Ha ocurrido un problema al guardar tu progreso. Por favor, inténtalo de nuevo más tarde.");
-      });
+    petDocRef.set({
+    hunger: hunger,
+    fun: fun,
+    hygiene: hygiene,
+    currency: currency,
+    level: level,
+    xp: xp,
+    isSick: isSick,
+    caressCount: caressCount, // Guardar el contador de caricias
+    chestItems: chestItems,
+    shampooCount: shampooCount,
+    isLightOn: isLightOn,
+    currentBackground: currentBackground,
+    accessories: {
+    crown: crown.textContent,
+    glasses: glasses.textContent,
+    hat: hat.textContent
+    }
+    }).then(() => {
+    console.log("Datos actualizados correctamente en Firebase");
+    }).catch((error) => {
+    console.error("Error al actualizar los datos en Firebase:", error);
+    });
     }
 
     function loadGame() {
@@ -1576,22 +1584,35 @@ petDocRef.onSnapshot((doc) => {
       addEventToBar("💀 Cakiwaki ha muerto. Dale de comer para revivirlo.", "No te desanimes, puedes traer a Cakiwaki de vuelta con algo de comida.");
     }
 
+    // Función modificada para que Cakiwaki se enferme con menos frecuencia
     function randomSickness() {
-      if (!isGameActive || isSick) return;
-
-      const sicknessProbability = 0.02 + (document.querySelectorAll('.poop').length * 0.01);
-
-      if (Math.random() < sicknessProbability) {
-        isSick = true;
-        isRandomExpressionMode = false;
-        pet.textContent = '🤒';
-        pet.style.fontSize = '15vh'; // Tamaño fijo cuando está enfermo
-        addEventToBar(getRandomPhrase('sick'), "Cuidar la salud de Cakiwaki es importante. Asegúrate de mantenerlo limpio y bien alimentado.");
-        fun = Math.max(0, fun - 20);
-        updateStatus();
-        updateFirestore();
-      }
+    if (!isGameActive || isSick) return;
+    
+    const sicknessProbability = 0.005 + (document.querySelectorAll('.poop').length * 0.005); 
+    // La probabilidad base es 0.5% y cada caca aumenta solo un 0.5% más
+    
+    if (Math.random() < sicknessProbability) {
+    isSick = true;
+    isRandomExpressionMode = false;
+    pet.textContent = '🤒';
+    pet.style.fontSize = '15vh'; // Tamaño fijo cuando está enfermo
+    addEventToBar(getRandomPhrase('sick'), "Cakiwaki se ha enfermado, cuídalo bien para que mejore.");
+    fun = Math.max(0, fun - 20);
+    updateStatus();
+    updateFirestore();
+    
+    // Establecer un tiempo límite para la enfermedad
+    sickTimeout = setTimeout(() => {
+    isSick = false;
+    pet.textContent = petEmojis[currentpetEmojiIndex]; // Volver a una expresión normal
+    addEventToBar("💊 Cakiwaki se ha recuperado por sí solo", "Cakiwaki ya se siente mejor.");
+    updateStatus();
+    }, 30000); // Cakiwaki se cura automáticamente en 30 segundos
     }
+    }
+    
+    // Llamar a randomSickness cada cierto tiempo (por ejemplo, cada minuto)
+    setInterval(randomSickness, 60000); // Verificar si se enferma cada 60 segundos
 
     function randomEvent() {
       if (!isGameActive) return;
@@ -1668,7 +1689,7 @@ petDocRef.onSnapshot((doc) => {
       loadGame();
       updateStatus();
       resizePet();
-      setInterval(decreaseStats, 10000);
+      setInterval(decreaseStats, 2000);
       setInterval(changeWeather, 15000);
       setInterval(() => {
         if (isLightOn && isGameActive && !isSick) {
