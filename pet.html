@@ -556,33 +556,8 @@
             <div id="chestItems"></div>
         </div>
     </div>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
-    <!-- Tu script principal (se proporcionará en la siguiente respuesta) -->
     <script>
-// Configuración de Firebase
-// Configuración de Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
-  authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
-  projectId: "tablon-de-anuncios-d5dea",
-  storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
-  messagingSenderId: "67910184237",
-  appId: "1:67910184237:web:e43d424657a948ae5d77a4",
-  measurementId: "G-YL5W1VNM9Z"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// Referencia del documento
-const petDocRef = db.collection('pet').doc('status');
-
+                
 // Variables globales
 let petState = {
   hunger: 100,
@@ -593,67 +568,49 @@ let petState = {
   level: 1,
   isSick: false,
   isDead: false,
+  isPaused: false,
   caressCount: 0,
   chestItems: [],
   shampooCount: 0,
-  isLightOn: true,
   accessories: {
     crown: '',
     glasses: '',
     hat: ''
   },
   expression: '😊',
-  currentBackground: 1
+  currentBackground: 1,
+  achievements: {},
+  startTime: null,
+  weatherTimer: 0,
+  weatherInterval: 60, // Intervalo de cambio climático en segundos
+  lastExpressionChangeTime: 0,
+  expressionChangeInterval: 5000, // Cambiar expresión cada 5 segundos
+  caressTimeout: null
 };
 
-// Flags para el cambio de expresión
-let isCyclingExpression = false;
-let expressionInterval = null;
-
-// Variables para el swipe de fondos
-let touchStartX = 0;
-let touchEndX = 0;
-const swipeThreshold = 50;
-const totalBackgrounds = 3;
-
 // Elementos del DOM
-const pet = document.getElementById('pet');
-const petContainer = document.querySelector('.pet-container');
-const crown = document.getElementById('crown');
-const glasses = document.getElementById('glasses');
-const hat = document.getElementById('hat');
-const hungerFill = document.getElementById('hunger-fill');
-const funFill = document.getElementById('fun-fill');
-const hygieneFill = document.getElementById('hygiene-fill');
-const currencyElement = document.getElementById('currency');
-const xpElement = document.getElementById('xp');
-let levelElement = document.getElementById('level');
-const weatherElement = document.getElementById('weather');
-const eventBar = document.getElementById('eventBar');
-const chest = document.getElementById('chest');
-const lightSwitch = document.getElementById('lightSwitch');
-const background = document.getElementById('background');
-const deathOverlay = document.getElementById('deathOverlay');
-const caressBonus = document.getElementById('caressBonus');
+let pet, petContainer, crown, glasses, hat, hungerFill, funFill, hygieneFill, currencyElement, xpElement, levelElement, weatherElement, eventBar, chest, lightSwitch, background, deathOverlay, caressBonus;
 
 // Botones de acción
-const feedBtn = document.getElementById('feed-btn');
-const playBtn = document.getElementById('play-btn');
-const cleanBtn = document.getElementById('clean-btn');
-const shopIcon = document.getElementById('shopIcon');
+let feedBtn, playBtn, cleanBtn, shopIcon;
 
 // Modales
-const shopModal = document.getElementById('shopModal');
-const foodModal = document.getElementById('foodModal');
-const miniGameModal = document.getElementById('miniGameModal');
-const chestModal = document.getElementById('chestModal');
-const chestItemsContainer = document.getElementById('chestItems');
-const closeChest = document.getElementById('closeChest');
+let shopModal, foodModal, miniGameModal, chestModal, chestItemsContainer, closeChest;
 
-// Emojis
-const petEmojis = ['😊', '😄', '😍', '🤔', '😴', '😋', '😎', '🤓', '🥳', '😝', '🤪', '😇', '🥰', '😌', '😏', '😳', '🙄', '😬', '😅', '😂', '🤣', '😭', '😱', '🤯', '🥵', '🥶', '😨', '😰', '😥', '😓', '🤗', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵'];
+// Constantes
+const DECREASE_INTERVAL = 5000; // 5 segundos
+const HUNGER_DECREASE_RATE = 1;
+const FUN_DECREASE_RATE = 0.8;
+const HYGIENE_DECREASE_RATE = 0.7;
+const SICKNESS_PROBABILITY = 0.01;
+const SPECIAL_EVENT_PROBABILITY = 0.01;
+
+// Emojis para diferentes estados
+const lowStateEmojis = ['😟', '😢', '😭', '😞', '😔', '🙁', '😕', '😖'];
+const mediumStateEmojis = ['😐', '🙂', '😌', '😶', '😑', '😏', '😒', '😊'];
+const highStateEmojis = ['😄', '😍', '😁', '😃', '😀', '😊', '🥰', '😎'];
+const caressEmojis = ['😻', '😽', '😘', '🥰', '🤗'];
 const weatherEmojis = ['☀️', '🌧️', '❄️', '🌤️', '🌈'];
-let currentpetEmojiIndex = 0;
 let currentWeatherIndex = 0;
 
 // Items
@@ -664,7 +621,8 @@ const shopItems = [
   { emoji: '🎩', price: 1000, type: 'topHat', requiredLevel: 10 },
   { emoji: '🧴', price: 50, type: 'shampoo', requiredLevel: 1 },
   { emoji: '💊', price: 100, type: 'medicine', requiredLevel: 1 },
-  { emoji: '🥽', price: 800, type: 'goggles', requiredLevel: 8 }
+  { emoji: '🥽', price: 800, type: 'goggles', requiredLevel: 8 },
+  { emoji: '🎓', price: 600, type: 'graduationCap', requiredLevel: 7 }
 ];
 
 const foodItems = [
@@ -681,12 +639,6 @@ const foodItems = [
   { emoji: '🍰', hunger: 18, price: 140, requiredLevel: 4 }
 ];
 
-const backgrounds = [
-  'background1',
-  'background2',
-  'background3'
-];
-
 // Frases variadas para la interfaz
 const phrases = {
   feed: [
@@ -701,1273 +653,947 @@ const phrases = {
     "¡Esto sabe a felicidad! 😊",
     "¡Comida de campeones! 🏆"
   ],
-  play: [
-    "¡Qué divertido! 🎉",
-    "¡Me encanta jugar contigo! 🥳",
-    "¡Eres el mejor compañero de juegos! 🎮",
-    "¡Otra vez, otra vez! 🔄",
-    "¡Esto es genial! 🤩",
-    "¡Cakiwaki está muy feliz! 😄",
-    "¡Diversión al máximo! 🎈",
-    "¡Cakiwaki quiere más juegos! 🕹️",
-    "¡Jugando se aprende! 📚",
-    "¡Risas y diversión sin fin! 😆"
-  ],
   clean: [
-    "¡Qué fresquito! 🧼",
-    "¡Gracias por el baño! 🚿",
-    "¡Me siento como nuevo! ✨",
-    "¡Adiós, suciedad! 👋",
-    "¡Ahora estoy reluciente! 💎",
-    "¡Cakiwaki está limpio y feliz! 🧽",
-    "¡Qué bien huele Cakiwaki! 🌸",
-    "¡Baño refrescante para Cakiwaki! 🛁",
-    "¡Limpio por fuera, feliz por dentro! 😊",
-    "¡Un Cakiwaki limpio es un Cakiwaki feliz! 🌟"
+    "¡Gracias por mantenerme limpio! 🛁",
+    "¡Me siento fresco! 🌸",
+    "¡A brillar! ✨",
+    "¡Ahora huelo genial! 🌺",
+    "¡Listo para jugar! 🏃‍♂️",
+    "¡Cakiwaki está reluciente! 💎",
+    "¡Nada como una buena limpieza! 🧽",
+    "¡Me encanta estar limpio! 😊",
+    "¡Fuera suciedad! 🧼",
+    "¡Gracias por cuidarme! ❤️"
   ],
-  caress: [
-    "¡Me encantan tus caricias! 💖",
-    "¡Qué agradable! 😊",
-    "¡Más, por favor! 🥰",
-    "¡Eres el mejor! 🌟",
-    "¡Me haces tan feliz! 😄",
-    "¡Cakiwaki se siente amado! ❤️",
-    "¡Cariños para Cakiwaki! 🤗",
-    "¡Cakiwaki ronronea de felicidad! 😺",
-    "¡Tus caricias son mágicas! ✨",
-    "¡Cakiwaki se derrite de amor! 💓"
-  ],
-  levelUp: [
-    "¡Subí de nivel! 🎊",
-    "¡Cada vez más fuerte! 💪",
-    "¡Mira lo grande que estoy! 📏",
-    "¡Gracias por cuidarme tan bien! 🏆",
-    "¡Somos un gran equipo! 🤝",
-    "¡Cakiwaki evoluciona! 🌟",
-    "¡Nuevo nivel desbloqueado! 🔓",
-    "¡Cakiwaki se hace más poderoso! 💥",
-    "¡Un paso más hacia la grandeza! 🚀",
-    "¡Cakiwaki alcanza nuevas alturas! 🏔️"
-  ],
-  random: [
-    "¿Jugamos a algo? 🎲",
-    "Tengo ganas de aventuras 🗺️",
-    "¿Me cuentas un chiste? 😆",
-    "¿Qué tal si bailamos? 💃",
-    "Me pregunto qué habrá en el cofre... 🤔",
-    "Cakiwaki tiene una idea loca 💡",
-    "¿Podrías traerle una sopita a Cakiwaki? 🍲",
-    "Cakiwaki quiere explorar el mundo 🌍",
-    "¿Podemos hacer un picnic virtual? 🧺",
-    "Cakiwaki sueña con ser una estrella 🌠",
-    "¿Qué tal si inventamos un nuevo juego? 🎯",
-    "Cakiwaki quiere hacer un desfile de moda 👗",
-    "¿Podemos tener una fiesta de pijamas? 🛏️",
-    "Cakiwaki quiere aprender a cocinar 👨‍🍳",
-    "¿Y si construimos un fuerte de almohadas? 🏰"
+  overfed: [
+    "¡Uf, comí demasiado! 🤢",
+    "¡Me siento pesado! 😣",
+    "Creo que fue mucho... 😓",
+    "¡Ay, mi pancita! 🥴",
+    "Necesito descansar... 😴"
   ],
   sick: [
-    "Cakiwaki no se siente muy bien 🤒",
-    "¿Puedes cuidar de Cakiwaki? 🤧",
-    "Cakiwaki necesita descansar 😴",
-    "Un poco de medicina ayudaría 💊",
-    "Cakiwaki tiene escalofríos 🥶",
-    "Cakiwaki necesita un abrazo reconfortante 🤗",
-    "¿Podrías traerle una sopita a Cakiwaki? 🍲",
-    "Cakiwaki se siente débil 😔",
-    "Un día de reposo hará bien a Cakiwaki 🛌",
-    "Cakiwaki necesita mimos extra hoy 🥺"
+    "No me siento bien... 🤒",
+    "Creo que estoy enfermo... 😷",
+    "Necesito medicina... 🤧",
+    "¡Achoo! 🤧",
+    "¿Puedes ayudarme? 😢"
   ],
   dead: [
-    "💀 Cakiwaki ha muerto. Revívelo con comida."
+    "Cakiwaki ha partido... 💀",
+    "Adiós, amigo... 🥀",
+    "Fue un buen tiempo juntos... 😢",
+    "Cakiwaki ya no está... 🕯️",
+    "Descansa en paz... 🌙"
+  ],
+  levelUp: [
+    "¡Subí de nivel! 🎉",
+    "¡Soy más fuerte ahora! 💪",
+    "¡Nivel nuevo, aventuras nuevas! 🌟",
+    "¡Seguimos creciendo! 🌱",
+    "¡Gracias por ayudarme! 😊"
   ]
 };
 
 // Función para obtener una frase aleatoria
 function getRandomPhrase(category) {
-  if (category === 'dead') {
-    return phrases.dead[0];
-  }
   return phrases[category][Math.floor(Math.random() * phrases[category].length)];
 }
 
-// Funciones principales
-function updateStatus() {
-  petState.hunger = Math.max(0, Math.min(100, petState.hunger));
-  petState.fun = Math.max(0, Math.min(100, petState.fun));
-  petState.hygiene = Math.max(0, Math.min(100, petState.hygiene));
-
-  hungerFill.style.width = `${petState.hunger}%`;
-  funFill.style.width = `${petState.fun}%`;
-  hygieneFill.style.width = `${petState.hygiene}%`;
-
-  currencyElement.textContent = `💰 ${petState.currency}`;
-  xpElement.textContent = `⭐ ${petState.xp}`;
-
-  if (levelElement) {
-    levelElement.textContent = `🔺 Nivel ${petState.level}`;
-  } else {
-    levelElement = document.createElement('div');
-    levelElement.classList.add('level');
-    levelElement.id = 'level';
-    levelElement.style.fontSize = '1.2em';
-    levelElement.style.fontWeight = 'bold';
-    levelElement.style.color = 'var(--neon-yellow)';
-    levelElement.style.textShadow = '0 0 5px var(--neon-yellow)';
-
-    const infoBar = document.querySelector('.info-bar');
-    const weatherElement = document.getElementById('weather');
-    infoBar.insertBefore(levelElement, weatherElement);
-    levelElement.textContent = `🔺 Nivel ${petState.level}`;
-  }
-
-  updatePetExpression();
-  updatePetAppearance();
-  resizePet();
-  applyBlurEffect();
+// Función para obtener una expresión aleatoria
+function getRandomExpression(emojisArray) {
+  return emojisArray[Math.floor(Math.random() * emojisArray.length)];
 }
 
+// Función para desactivar la selección de texto
+function disableTextSelection(element) {
+  if (element) {
+    element.style.userSelect = 'none';
+    element.style.webkitUserSelect = 'none';
+    element.style.msUserSelect = 'none';
+    element.style.touchAction = 'manipulation';
+  }
+}
+
+// Función para inicializar el juego
+function initializeGame() {
+  pet = document.getElementById('pet');
+  petContainer = document.querySelector('.pet-container');
+  crown = document.getElementById('crown');
+  glasses = document.getElementById('glasses');
+  hat = document.getElementById('hat');
+  hungerFill = document.getElementById('hunger-fill');
+  funFill = document.getElementById('fun-fill');
+  hygieneFill = document.getElementById('hygiene-fill');
+  currencyElement = document.getElementById('currency');
+  xpElement = document.getElementById('xp');
+  levelElement = document.getElementById('level');
+  weatherElement = document.getElementById('weather');
+  eventBar = document.getElementById('eventBar');
+  chest = document.getElementById('chest');
+  lightSwitch = document.getElementById('lightSwitch');
+  background = document.getElementById('background');
+  deathOverlay = document.getElementById('deathOverlay');
+  caressBonus = document.getElementById('caressBonus');
+
+  feedBtn = document.getElementById('feed-btn');
+  playBtn = document.getElementById('play-btn');
+  cleanBtn = document.getElementById('clean-btn');
+  shopIcon = document.getElementById('shopIcon');
+
+  shopModal = document.getElementById('shopModal');
+  foodModal = document.getElementById('foodModal');
+  miniGameModal = document.getElementById('miniGameModal');
+  chestModal = document.getElementById('chestModal');
+  chestItemsContainer = document.getElementById('chestItems');
+  closeChest = document.getElementById('closeChest');
+
+  // Agregar eventos a los botones de acción
+  if (feedBtn) feedBtn.addEventListener('click', () => openModal(foodModal, updateFoodMenu));
+  if (playBtn) playBtn.addEventListener('click', () => openModal(miniGameModal, startRandomMiniGame));
+  if (cleanBtn) cleanBtn.addEventListener('click', cleanPet);
+  if (shopIcon) shopIcon.addEventListener('click', () => openModal(shopModal, updateShopItems));
+
+  // Eventos para abrir y cerrar el cofre
+  if (chest) chest.addEventListener('click', () => openModal(chestModal, updateChestItems));
+
+  // Agregar eventos a todos los botones de cierre de modales
+  const closeButtons = document.querySelectorAll('.close, .close-chest');
+  closeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const modal = button.closest('.modal, .chest-modal');
+      if (modal) modal.style.display = 'none';
+    });
+  });
+
+  // Cerrar modales al hacer clic fuera del contenido
+  const modals = document.querySelectorAll('.modal, .chest-modal');
+  modals.forEach(modal => {
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  });
+
+  // Evento para el interruptor de luz (botón de pausa)
+  if (lightSwitch) {
+    lightSwitch.addEventListener('click', togglePause);
+  }
+
+  // Evento para acariciar a la mascota
+  if (pet) {
+    pet.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleCaressBonus();
+    });
+  }
+
+  // Desactivar selección de texto específicamente en el emoji de la mascota y accesorios
+  disableTextSelection(pet);
+  disableTextSelection(crown);
+  disableTextSelection(glasses);
+  disableTextSelection(hat);
+
+  // Cargar el juego y comenzar el ciclo de juego
+  loadGame();
+
+  // Ejecutar el gameLoop cada segundo
+  setInterval(gameLoop, 1000);
+
+  // Iniciar la oscilación del emoji
+  startPetOscillation();
+
+  // Redimensionar la mascota al cargar
+  resizePet();
+  window.addEventListener('resize', resizePet);
+
+  // Actualizar la rejilla del fondo
+  updateGrid();
+}
+
+// Función para cargar el juego desde localStorage
+function loadGame() {
+  const savedState = localStorage.getItem('petState');
+  if (savedState) {
+    Object.assign(petState, JSON.parse(savedState));
+    updateAccessoryDisplay('crown', petState.accessories.crown);
+    updateAccessoryDisplay('glasses', petState.accessories.glasses);
+    updateAccessoryDisplay('hat', petState.accessories.hat);
+    updateStatus();
+    updateExpression();
+  }
+}
+
+// Función para guardar el estado del juego en localStorage
+function saveGame() {
+  localStorage.setItem('petState', JSON.stringify(petState));
+}
+
+// Función principal para el ciclo del juego
+function gameLoop() {
+  if (petState.isPaused || petState.isDead) {
+    updateExpression();
+    return;
+  }
+
+  // Disminuir gradualmente los niveles
+  decreaseStats();
+
+  // Cambiar el clima si es el momento adecuado
+  changeWeather();
+
+  // Redimensionar los accesorios si es necesario
+  resizeAccessories();
+
+  // Actualizar la expresión de la mascota
+  updateExpression();
+
+  // Actualizar el estado visual del juego
+  updateStatus();
+
+  // Guardar el estado del juego
+  saveGame();
+}
+
+// Función para disminuir gradualmente los niveles de la mascota
+function decreaseStats() {
+  if (petState.isDead || petState.isPaused) return;
+
+  // Disminuir los niveles, asegurando que no caigan por debajo de 0
+  petState.hunger = Math.max(0, petState.hunger - (petState.hunger >= 90 ? HUNGER_DECREASE_RATE * 0.5 : HUNGER_DECREASE_RATE));
+  petState.fun = Math.max(0, petState.fun - FUN_DECREASE_RATE);
+  petState.hygiene = Math.max(0, petState.hygiene - HYGIENE_DECREASE_RATE);
+
+  // Si el hambre llega a 0, la mascota muere
+  if (petState.hunger <= 0) {
+    petDeath();
+  }
+
+  // Si el hambre llega a 100, la mascota se empacha
+  if (petState.hunger >= 100) {
+    petState.isSick = true;
+    changeExpression('🤢');
+    addEventToBar(getRandomPhrase('overfed'), "Cakiwaki está empachado. Espera a que su hambre baje.");
+  }
+
+  // Si el hambre baja de 90 y estaba empachado, la mascota se recupera
+  if (petState.hunger < 90 && petState.isSick && petState.expression === '🤢') {
+    petState.isSick = false;
+    updateExpression();
+    addEventToBar("😊 Cakiwaki se siente mejor", "El empacho ha pasado.");
+  }
+
+  // Posibilidad de que la mascota se enferme aleatoriamente
+  randomSickness();
+
+  // Actualizar el estado visual del juego
+  updateStatus();
+}
+
+// Función para manejar la enfermedad aleatoria
+function randomSickness() {
+  if (!petState.isSick && Math.random() < SICKNESS_PROBABILITY) {
+    petState.isSick = true;
+    changeExpression('🤒');
+    addEventToBar(getRandomPhrase('sick'), "Cakiwaki necesita medicina para recuperarse.");
+  }
+}
+
+// Función para manejar la muerte de la mascota
+function petDeath() {
+  petState.isDead = true;
+  changeExpression('💀');
+  addEventToBar(getRandomPhrase('dead'), "Alimenta a Cakiwaki para revivirlo.");
+  deathOverlay.style.display = 'block';
+  saveGame();
+}
+
+// Función para cambiar la expresión de la mascota
 function changeExpression(newExpression) {
   if (pet) {
     pet.textContent = newExpression;
     petState.expression = newExpression;
-    updateFirestore();
-  } else {
-    console.error("Elemento 'pet' no encontrado");
+    saveGame();
   }
 }
 
-function updatePetExpression() {
+// Función para actualizar la expresión de la mascota
+function updateExpression() {
   if (petState.isDead) {
-    changeExpression(Math.random() < 0.5 ? '💀' : '👹');
-    return;
-  }
-
-  if (isCyclingExpression) {
-    return;
-  }
-
-  if (!petState.isLightOn) {
+    changeExpression('💀');
+  } else if (petState.isPaused) {
     changeExpression('😴');
   } else if (petState.isSick) {
-    changeExpression('🤒');
-  } else if (petState.hunger <= 30 || petState.fun <=30 || petState.hygiene <= 30) {
-  changeExpression('😢');
+    changeExpression(petState.hunger >= 100 ? '🤢' : '🤒');
+  } else if (petState.caressing) {
+    changeExpression(getRandomExpression(caressEmojis));
   } else {
-  changePetFace();
+    const now = Date.now();
+    if (now - petState.lastExpressionChangeTime > petState.expressionChangeInterval) {
+      if (petState.hunger <= 20 || petState.fun <= 20 || petState.hygiene <= 20) {
+        changeExpression(getRandomExpression(lowStateEmojis));
+      } else if (petState.hunger >= 80 && petState.fun >= 80 && petState.hygiene >= 80) {
+        changeExpression(getRandomExpression(highStateEmojis));
+      } else {
+        changeExpression(getRandomExpression(mediumStateEmojis));
+      }
+      petState.lastExpressionChangeTime = now;
+    }
   }
-  }
-  
-  function changePetFace() {
-  if (!petState.isSick && petState.isLightOn) {
-  currentpetEmojiIndex = Math.floor(Math.random() * petEmojis.length);
-  changeExpression(petEmojis[currentpetEmojiIndex]);
-  }
-  }
-  
-  function decreaseStats() {
+}
+
+// Función para manejar el bonus por caricias
+function handleCaressBonus() {
   if (petState.isDead) return;
-  
-  const decreaseAmountHunger = 1;
-  const decreaseAmountFun = 0.8;
-  const decreaseAmountHygiene = 0.7;
-  
-  petState.hunger = Math.max(0, petState.hunger - decreaseAmountHunger);
-  petState.fun = Math.max(0, petState.fun - decreaseAmountFun);
-  petState.hygiene = Math.max(0, petState.hygiene - decreaseAmountHygiene);
-  
-  if (petState.hunger <= 0) {
-  addEventToBar(getRandomPhrase('dead'), "💀 Cakiwaki ha muerto de hambre.");
-  petDeath();
+
+  petState.caressCount = (petState.caressCount || 0) + 1;
+  petState.caressing = true;
+  changeExpression(getRandomExpression(caressEmojis));
+
+  if (petState.caressCount % 5 === 0) {
+    const funBonus = 10;
+    petState.fun = Math.min(100, petState.fun + funBonus);
+    addEventToBar(`💖 ¡Bonus por caricias! +${funBonus}% diversión`, "Cakiwaki aprecia tus caricias.");
+    showCaressBonusNotification();
   }
-  
-  randomSickness();
+
+  clearTimeout(petState.caressTimeout);
+  petState.caressTimeout = setTimeout(() => {
+    petState.caressing = false;
+    updateExpression();
+  }, 1000);
+
   updateStatus();
+  saveGame();
+}
+
+// Función para mostrar la notificación de bonus por caricias
+function showCaressBonusNotification() {
+  caressBonus.style.display = 'block';
+  setTimeout(() => {
+    caressBonus.style.display = 'none';
+  }, 3000);
+}
+
+// Función para limpiar a la mascota
+function cleanPet() {
+  if (petState.shampooCount > 0) {
+    petState.hygiene = Math.min(100, petState.hygiene + 40);
+    petState.shampooCount--;
+    petState.currency += 10;
+    addEventToBar(getRandomPhrase('clean'), "Mantener a Cakiwaki limpio lo hace más feliz y saludable. ¡Buen trabajo!");
+
+    const poops = document.querySelectorAll('.poop');
+    poops.forEach(poop => poop.remove());
+
+    gainXP(5);
+    updateStatus();
+    saveGame();
+  } else {
+    addEventToBar("❌ No tienes shampoo", "Puedes comprar más shampoo en la tienda. ¡Mantener la higiene es importante!");
   }
-  
-  function addEventToBar(message, additionalInfo = "") {
+}
+
+// Función para mostrar eventos en el event bar
+function addEventToBar(message, additionalInfo = "") {
   const eventIcon = document.createElement('div');
   eventIcon.classList.add('event-icon');
   eventIcon.innerHTML = `${message}<br><small>${additionalInfo}</small>`;
   eventIcon.style.fontSize = '0.8em';
   eventBar.insertBefore(eventIcon, eventBar.firstChild);
-  
+
   while (eventBar.childNodes.length > 5) {
-  eventBar.removeChild(eventBar.lastChild);
+    eventBar.removeChild(eventBar.lastChild);
   }
+}
+
+// Función para actualizar el estado visual del juego
+function updateStatus() {
+  if (hungerFill) hungerFill.style.width = `${petState.hunger}%`;
+  if (funFill) funFill.style.width = `${petState.fun}%`;
+  if (hygieneFill) hygieneFill.style.width = `${petState.hygiene}%`;
+  if (currencyElement) currencyElement.textContent = `💰 ${petState.currency}`;
+  if (xpElement) xpElement.textContent = `⭐ ${petState.xp} / ${petState.level * 100}`;
+  if (levelElement) levelElement.textContent = `🔺 Nivel ${petState.level}`;
+
+  applyVisualEffects();
+}
+
+// Función para aplicar efectos visuales basados en el estado de la mascota
+function applyVisualEffects() {
+  if (petState.isDead) {
+    pet.style.filter = 'grayscale(100%)';
+  } else if (petState.isSick) {
+    pet.style.filter = 'hue-rotate(180deg)';
+  } else {
+    pet.style.filter = 'none';
   }
-  
-  function changeWeather() {
-  if (petState.isDead) return;
-  
-  currentWeatherIndex = (currentWeatherIndex + 1) % weatherEmojis.length;
-  weatherElement.textContent = weatherEmojis[currentWeatherIndex];
-  applyWeatherEffects();
+
+  // Efecto de brillo basado en la diversión
+  const brightness = 100 + (petState.fun / 2);
+  pet.style.filter += ` brightness(${brightness}%)`;
+
+  // Cambiar el tamaño de la mascota según sus niveles
+  resizePet();
+}
+
+// Función para redimensionar la mascota y los accesorios
+function resizePet() {
+  const petFrame = document.querySelector('.pet-frame');
+  const frameSize = Math.min(petFrame.offsetWidth, petFrame.offsetHeight);
+
+  // Calcular el tamaño de la mascota basado en los niveles
+  const averageLevel = (petState.hunger + petState.fun + petState.hygiene) / 3;
+  const petSizeFactor = 0.4 + (averageLevel / 250); // Factor entre 0.4 y 0.8
+  const petSize = frameSize * petSizeFactor; // La mascota ocupa entre el 40% y 80% del frame
+
+  pet.style.fontSize = `${petSize}px`;
+  resizeAccessories();
+}
+
+// Función para redimensionar los accesorios
+function resizeAccessories() {
+  const petSize = pet.getBoundingClientRect();
+  const scaleFactor = petSize.width / 100; // Escalar proporcionalmente al tamaño del emoji
+
+  if (crown) crown.style.transform = `translate(-50%, -50%) scale(${scaleFactor})`;
+  if (glasses) glasses.style.transform = `translate(-50%, -50%) scale(${scaleFactor})`;
+  if (hat) hat.style.transform = `translate(-50%, -50%) scale(${scaleFactor})`;
+}
+
+// Función para cambiar el clima con intervalos más largos
+function changeWeather() {
+  if (petState.isDead || petState.isPaused) return;
+
+  petState.weatherTimer++;
+  if (petState.weatherTimer >= petState.weatherInterval) {
+    currentWeatherIndex = (currentWeatherIndex + 1) % weatherEmojis.length;
+    weatherElement.textContent = weatherEmojis[currentWeatherIndex];
+    applyWeatherEffects();
+    petState.weatherTimer = 0;
   }
-  
-  function applyWeatherEffects() {
-  switch(weatherEmojis[currentWeatherIndex]) {
-  case '☀️':
-  petState.fun = Math.min(100, petState.fun + 5);
-  petState.hygiene = Math.max(0, petState.hygiene - 5);
-  addEventToBar("☀️ Día soleado, ¡Cakiwaki quiere jugar afuera!", "El sol anima a Cakiwaki, pero ten cuidado con el sudor.");
-  break;
-  case '🌧️':
-  petState.hygiene = Math.min(100, petState.hygiene + 10);
-  petState.fun = Math.max(0, petState.fun - 5);
-  if (Math.random() < 0.2 && !petState.isSick) {
-  petState.isSick = true;
-  addEventToBar(getRandomPhrase('sick'), "La lluvia puede enfermar a Cakiwaki. Considera darle medicina.");
-  petState.fun = Math.max(0, petState.fun - 20);
+}
+
+// Función para aplicar efectos del clima
+function applyWeatherEffects() {
+  const currentWeather = weatherEmojis[currentWeatherIndex];
+  switch (currentWeather) {
+    case '☀️':
+      background.className = 'background background1';
+      break;
+    case '🌧️':
+      background.className = 'background background2';
+      break;
+    case '❄️':
+      background.className = 'background background3';
+      break;
+    case '🌤️':
+      background.className = 'background background1';
+      break;
+    case '🌈':
+      background.className = 'background background2';
+      break;
+    default:
+      background.className = 'background background1';
+      break;
   }
-  addEventToBar("🌧️ Día lluvioso, ¡Cakiwaki se da un baño natural!", "La lluvia limpia a Cakiwaki, pero puede aburrirlo un poco.");
-  break;
-  case '❄️':
-  petState.hunger = Math.min(100, petState.hunger + 10);
-  if (Math.random() < 0.3 && !petState.isSick) {
-  petState.isSick = true;
-  addEventToBar(getRandomPhrase('sick'), "El frío puede enfermar a Cakiwaki. Mantenlo caliente y dale medicina si es necesario.");
+}
+
+// Función para limpiar a la mascota
+function cleanPet() {
+  if (petState.shampooCount > 0) {
+    petState.hygiene = Math.min(100, petState.hygiene + 40);
+    petState.shampooCount--;
+    petState.currency += 10;
+    addEventToBar(getRandomPhrase('clean'), "Mantener a Cakiwaki limpio lo hace más feliz y saludable. ¡Buen trabajo!");
+
+    const poops = document.querySelectorAll('.poop');
+    poops.forEach(poop => poop.remove());
+
+    gainXP(5);
+    updateStatus();
+    saveGame();
+  } else {
+    addEventToBar("❌ No tienes shampoo", "Puedes comprar más shampoo en la tienda. ¡Mantener la higiene es importante!");
   }
-  addEventToBar("❄️ Día frío, Cakiwaki necesita más energía", "El frío aumenta el apetito de Cakiwaki. Asegúrate de alimentarlo bien.");
-  break;
-  case '🌤️':
-  petState.currency += 50;
-  addEventToBar("🌤️💰 Día despejado, ¡Cakiwaki encontró monedas brillando al sol!", "¡Qué suerte! Usa estas monedas sabiamente para cuidar mejor a Cakiwaki.");
-  break;
-  case '🌈':
-  petState.fun = Math.min(100, petState.fun + 15);
-  petState.currency += 100;
-  addEventToBar("🌈💰 ¡Arcoíris! Cakiwaki está feliz y encontró un tesoro", "Los arcoíris traen alegría y fortuna. ¡Aprovecha este momento especial!");
-  break;
+}
+
+// Función para mostrar eventos en el event bar
+function addEventToBar(message, additionalInfo = "") {
+  const eventIcon = document.createElement('div');
+  eventIcon.classList.add('event-icon');
+  eventIcon.innerHTML = `${message}<br><small>${additionalInfo}</small>`;
+  eventIcon.style.fontSize = '0.8em';
+  eventBar.insertBefore(eventIcon, eventBar.firstChild);
+
+  while (eventBar.childNodes.length > 5) {
+    eventBar.removeChild(eventBar.lastChild);
   }
-  updateStatus();
+}
+
+// Función para manejar la pausa cuando se presiona el botón de bombillo
+function togglePause() {
+  petState.isPaused = !petState.isPaused;
+  if (petState.isPaused) {
+    addEventToBar("💤 Cakiwaki está durmiendo", "Los niveles se detienen.");
+    changeExpression('😴');
+  } else {
+    addEventToBar("⏯️ Cakiwaki ha despertado", "Las necesidades se reanudan.");
+    updateExpression();
   }
-  
-  function gainXP(amount) {
+  saveGame();
+}
+
+// Función para abrir un modal y actualizar su contenido
+function openModal(modal, updateFunction) {
+  modal.style.display = 'block';
+  updateFunction();
+}
+
+// Función para actualizar los items de la tienda
+function updateShopItems() {
+  const shopItemsContainer = document.getElementById('shop-items');
+  if (shopItemsContainer) {
+    shopItemsContainer.innerHTML = '';
+    shopItems.forEach(item => {
+      const itemElement = createShopItem(item);
+      shopItemsContainer.appendChild(itemElement);
+    });
+  }
+}
+
+// Función para crear un item de la tienda
+function createShopItem(item) {
+  const itemElement = document.createElement('div');
+  itemElement.classList.add('shop-item');
+  itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
+
+  if (['crown', 'glasses', 'hat', 'goggles', 'topHat', 'graduationCap'].includes(item.type)) {
+    itemElement.onclick = () => toggleAccessoryButtons(item, itemElement);
+  } else {
+    itemElement.onclick = () => buyConsumableItem(item);
+  }
+
+  if (petState.level < item.requiredLevel || petState.currency < item.price) {
+    itemElement.style.opacity = '0.5';
+    itemElement.style.cursor = 'not-allowed';
+  }
+
+  return itemElement;
+}
+
+// Función para actualizar el menú de comida
+function updateFoodMenu() {
+  const foodItemsContainer = document.getElementById('food-items');
+  foodItemsContainer.innerHTML = '';
+  foodItems.forEach(item => {
+    const itemElement = document.createElement('div');
+    itemElement.classList.add('food-item');
+    itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
+    itemElement.onclick = () => feedPet(item);
+
+    if (petState.level < item.requiredLevel || petState.currency < item.price) {
+      itemElement.style.opacity = '0.5';
+      itemElement.style.cursor = 'not-allowed';
+    }
+
+    foodItemsContainer.appendChild(itemElement);
+  });
+}
+
+// Función para alternar los botones de accesorios
+function toggleAccessoryButtons(item, itemElement) {
+  if (itemElement.querySelector('.accessory-buttons')) return;
+
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.classList.add('accessory-buttons');
+
+  const tickButton = document.createElement('button');
+  tickButton.textContent = '✔️';
+  tickButton.classList.add('tick-button');
+  tickButton.style.marginRight = '5px';
+  tickButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    equipAccessory(item, itemElement);
+  });
+
+  const crossButton = document.createElement('button');
+  crossButton.textContent = '❌';
+  crossButton.classList.add('cross-button');
+  crossButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    unequipAccessory(item, itemElement);
+  });
+
+  buttonsContainer.appendChild(tickButton);
+  buttonsContainer.appendChild(crossButton);
+  itemElement.appendChild(buttonsContainer);
+}
+
+// Función para equipar un accesorio
+function equipAccessory(item, itemElement) {
+  if (petState.currency < item.price || petState.level < item.requiredLevel) {
+    addEventToBar("❌ No tienes suficientes recursos para equipar este accesorio.", "Asegúrate de tener el nivel y monedas necesarios.");
+    removeAccessoryButtons(itemElement);
+    return;
+  }
+
+  petState.currency -= item.price;
+  petState.accessories[getAccessoryType(item.type)] = item.emoji;
+  updateAccessoryDisplay(getAccessoryType(item.type), item.emoji);
+  addEventToBar(`🛍️ Compraste y equipaste: ${item.emoji}`, "¡Cakiwaki luce genial con su nuevo accesorio!");
+  gainXP(10);
+  saveGame();
+  removeAccessoryButtons(itemElement);
+  shopModal.style.display = 'none';
+}
+
+// Función para desequipar un accesorio
+function unequipAccessory(item, itemElement) {
+  if (petState.accessories[getAccessoryType(item.type)] === item.emoji) {
+    petState.accessories[getAccessoryType(item.type)] = '';
+    updateAccessoryDisplay(getAccessoryType(item.type), '');
+    addEventToBar(`❌ Has quitado: ${item.emoji}`, "El accesorio ha sido removido de Cakiwaki.");
+    gainXP(5);
+    saveGame();
+  }
+  removeAccessoryButtons(itemElement);
+}
+
+// Función para actualizar la visualización de accesorios
+function updateAccessoryDisplay(type, emoji) {
+  const accessoryElement = document.getElementById(type);
+  if (accessoryElement) {
+    accessoryElement.textContent = emoji;
+  }
+}
+
+// Función para comprar un item consumible
+function buyConsumableItem(item) {
+  if (petState.currency >= item.price && petState.level >= item.requiredLevel) {
+    petState.currency -= item.price;
+    switch(item.type) {
+      case 'shampoo':
+        petState.shampooCount++;
+        addEventToBar(`🧴 Has comprado shampoo`, "Mantener limpio a Cakiwaki será más fácil ahora.");
+        break;
+      case 'medicine':
+        handleMedicinePurchase();
+        break;
+    }
+    gainXP(10);
+    saveGame();
+    shopModal.style.display = 'none';
+  } else if (petState.level < item.requiredLevel) {
+    addEventToBar(`❌ Necesitas nivel ${item.requiredLevel} para comprar esto.`, "Sigue cuidando a Cakiwaki para subir de nivel y desbloquear nuevos artículos.");
+  } else {
+    addEventToBar("❌ No tienes suficientes monedas.", "Juega minijuegos o completa logros para ganar más monedas.");
+  }
+}
+
+// Función para manejar la compra de medicina
+function handleMedicinePurchase() {
+  if (petState.isSick && petState.expression !== '🤢') {
+    petState.isSick = false;
+    updateExpression();
+    addEventToBar("💊 Cakiwaki se ha curado", "¡Bien hecho! Cakiwaki se siente mucho mejor gracias a ti.");
+  } else {
+    addEventToBar("💊 Guardaste la medicina para más tarde", "Es bueno estar preparado. Podrás usar la medicina cuando Cakiwaki se enferme.");
+    petState.chestItems.push('💊');
+  }
+  gainXP(5);
+  saveGame();
+}
+
+// Función para obtener el tipo de accesorio
+function getAccessoryType(type) {
+  switch (type) {
+    case 'crown':
+    case 'topHat':
+    case 'graduationCap':
+      return 'crown';
+    case 'glasses':
+    case 'goggles':
+      return 'glasses';
+    case 'hat':
+      return 'hat';
+    default:
+      return type;
+  }
+}
+
+// Función para remover los botones de accesorios
+function removeAccessoryButtons(itemElement) {
+  const buttonsContainer = itemElement.querySelector('.accessory-buttons');
+  if (buttonsContainer) {
+    buttonsContainer.remove();
+  }
+}
+
+// Función para alimentar a la mascota
+function feedPet(food) {
+  if (petState.isDead) {
+    revivePet();
+    return;
+  }
+
+  if (petState.currency >= food.price && petState.level >= food.requiredLevel) {
+    petState.currency -= food.price;
+    petState.hunger = Math.min(100, petState.hunger + food.hunger);
+    addEventToBar(getRandomPhrase('feed'), `${food.emoji} ¡Delicioso! Cakiwaki ha disfrutado su comida.`);
+    gainXP(5);
+    saveGame();
+    foodModal.style.display = 'none'; // Cerrar el menú de comida
+  } else if (petState.level < food.requiredLevel) {
+    addEventToBar(`❌ Necesitas nivel ${food.requiredLevel} para comprar esto.`, "Sigue cuidando a Cakiwaki para subir de nivel y desbloquear nuevas comidas.");
+  } else {
+    addEventToBar("❌ No tienes suficientes monedas.", "Juega minijuegos o completa logros para ganar más monedas.");
+  }
+}
+
+// Función para revivir a la mascota
+function revivePet() {
+  petState.isDead = false;
+  petState.hunger = 50;
+  petState.fun = 50;
+  petState.hygiene = 50;
+  changeExpression('😊');
+  addEventToBar("🎉 ¡Cakiwaki ha revivido!", "Gracias por no abandonar a tu amigo. Cuídalo bien esta vez.");
+  deathOverlay.style.display = 'none';
+  saveGame();
+}
+
+// Función para iniciar un minijuego aleatorio
+function startRandomMiniGame() {
+  memoryGame();
+}
+
+// Implementación del minijuego 'Busca a tu pareja' (Memory Game)
+function memoryGame() {
+  const miniGameBoard = document.getElementById('mini-game-board');
+  miniGameBoard.innerHTML = '';
+  miniGameModal.style.display = 'block';
+
+  const emojis = ['🍎', '🍌', '🍒', '🍇', '🍉', '🍓', '🥝', '🍍'];
+  const gameEmojis = [...emojis, ...emojis]; // Duplicar para hacer pares
+  gameEmojis.sort(() => 0.5 - Math.random()); // Mezclar los emojis
+
+  let firstCard = null;
+  let secondCard = null;
+  let lockBoard = false;
+  let matchesFound = 0;
+
+  gameEmojis.forEach((emoji, index) => {
+    const card = document.createElement('div');
+    card.classList.add('mini-game-cell');
+    card.dataset.emoji = emoji;
+    card.dataset.index = index;
+    card.textContent = '❓';
+
+    card.addEventListener('click', () => {
+      if (lockBoard || card === firstCard || card.classList.contains('matched')) return;
+
+      card.textContent = emoji;
+
+      if (!firstCard) {
+        firstCard = card;
+      } else {
+        secondCard = card;
+        lockBoard = true;
+
+        if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+          firstCard.classList.add('matched');
+          secondCard.classList.add('matched');
+          matchesFound++;
+          resetCards();
+
+          if (matchesFound === emojis.length) {
+            addEventToBar("🎉 ¡Ganaste el minijuego!", "+20% diversión y +50 monedas");
+            petState.fun = Math.min(100, petState.fun + 20);
+            petState.currency += 50;
+            gainXP(20);
+            miniGameModal.style.display = 'none';
+            saveGame();
+          }
+        } else {
+          setTimeout(() => {
+            firstCard.textContent = '❓';
+            secondCard.textContent = '❓';
+            resetCards();
+          }, 1000);
+        }
+      }
+    });
+
+    miniGameBoard.appendChild(card);
+  });
+
+  function resetCards() {
+    [firstCard, secondCard] = [null, null];
+    lockBoard = false;
+  }
+}
+
+// Función para ganar XP y subir de nivel
+function gainXP(amount) {
   petState.xp += amount;
   if (petState.xp >= petState.level * 100) {
-  levelUp();
+    levelUp();
   } else {
-  addEventToBar(`⭐ +${amount} XP`, "¡Sigue así! Cada punto de experiencia te acerca al siguiente nivel.");
+    addEventToBar(`⭐ +${amount} XP`, "¡Sigue así! Cada punto de experiencia te acerca al siguiente nivel.");
   }
   updateStatus();
-  }
-  
-  function levelUp() {
+}
+
+// Función para subir de nivel
+function levelUp() {
   petState.level++;
   petState.xp = 0;
   addEventToBar(getRandomPhrase('levelUp'), "¡Increíble progreso! Cada nivel desbloquea nuevas posibilidades para Cakiwaki.");
   petState.currency += petState.level * 50;
   updateStatus();
-  }
-  
-  // Event listeners para botones
-  feedBtn.addEventListener('click', () => {
-  foodModal.style.display = 'block';
-  updateFoodMenu();
-  });
-  
-  playBtn.addEventListener('click', () => {
-  miniGameModal.style.display = 'block';
-  startRandomMiniGame();
-  });
-  
-  cleanBtn.addEventListener('click', () => {
-  cleanPet();
-  });
-  
-  shopIcon.addEventListener('click', () => {
-  shopModal.style.display = 'block';
-  updateShopItems();
-  });
-  
-  lightSwitch.addEventListener('click', () => {
-  petState.isLightOn = !petState.isLightOn;
-  lightSwitch.textContent = petState.isLightOn ? '💡' : '🌙';
-  addEventToBar(petState.isLightOn ? "💡 Luz encendida" : "🌙 Luz apagada", petState.isLightOn ? "Cakiwaki puede jugar y divertirse ahora." : "Cakiwaki descansará mejor en la oscuridad.");
-  
-  applyBlurEffect();
-  updateStatus();
-  });
-  
-  chest.addEventListener('click', () => {
-  chestModal.style.display = 'block';
-  updateChestItems();
-  });
-  
-  closeChest.addEventListener('click', () => {
-  chestModal.style.display = 'none';
-  });
-  
-  // Función para bonificación por caricias
+}
 
-  
-  function showCaressBonusNotification() {
-  caressBonus.style.display = 'block';
-  setTimeout(() => {
-  caressBonus.style.display = 'none';
-  }, 3000);
+// Función para iniciar la oscilación de la mascota
+function startPetOscillation() {
+  let angle = 0;
+  const baseAmplitude = 10;
+  let amplitude = baseAmplitude;
+
+  function oscillate() {
+    if (!petState.isPaused && !petState.isDead) {
+      if (petState.hunger > 80 && petState.fun > 80 && petState.hygiene > 80) {
+        amplitude = 20;
+        angle += 0.2;
+      } else {
+        amplitude = baseAmplitude;
+        angle += 0.1;
+      }
+
+      const offsetX = amplitude * Math.sin(angle);
+      pet.style.transform = `translate(-50%, -50%) translateX(${offsetX}px)`;
+    }
+    requestAnimationFrame(oscillate);
   }
-  
-  // Event listener para tap en la mascota
-  pet.addEventListener('click', () => {
-  if (petState.isDead || !petState.isLightOn) return;
-  
-  toggleCyclingExpressions();
-  caressBonus();
-  });
-  
-  function updateShopItems() {
-  const shopItemsContainer = document.getElementById('shop-items');
-  shopItemsContainer.innerHTML = '';
-  shopItems.forEach(item => {
-  const itemElement = document.createElement('div');
-  itemElement.classList.add('shop-item');
-  itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
-  itemElement.onclick = () => buyItem(item);
-  if (petState.level < item.requiredLevel || petState.currency < item.price) {
-  itemElement.style.opacity = '0.5';
-  itemElement.style.cursor = 'not-allowed';
+  oscillate();
+}
+
+// Función para manejar eventos especiales
+function handleSpecialEvents() {
+  if (Math.random() < SPECIAL_EVENT_PROBABILITY && !petState.isDead && !petState.isPaused) {
+    const events = [
+      { name: "Lluvia de monedas", action: () => {
+        const coinsGained = Math.floor(Math.random() * 50) + 10;
+        petState.currency += coinsGained;
+        addEventToBar(`🌧️💰 ¡Lluvia de monedas! +${coinsGained} monedas`, "¡Una sorpresa agradable para Cakiwaki!");
+      }},
+      { name: "Arcoíris de felicidad", action: () => {
+        petState.fun = 100;
+        addEventToBar("🌈 ¡Arcoíris de felicidad!", "Cakiwaki está extremadamente feliz ahora.");
+      }},
+      { name: "Ducha refrescante", action: () => {
+        petState.hygiene = 100;
+        addEventToBar("🚿 ¡Ducha refrescante!", "Cakiwaki está completamente limpio.");
+      }},
+      { name: "Fiesta sorpresa", action: () => {
+        gainXP(50);
+        addEventToBar("🎉 ¡Fiesta sorpresa!", "Cakiwaki ganó 50 XP por esta celebración inesperada.");
+      }}
+    ];
+
+    const randomEvent = events[Math.floor(Math.random() * events.length)];
+    randomEvent.action();
+    updateStatus();
+    saveGame();
   }
-  shopItemsContainer.appendChild(itemElement);
-  });
-  }
-  
-  function updateFoodMenu() {
-  const foodItemsContainer = document.getElementById('food-items');
-  foodItemsContainer.innerHTML = '';
-  foodItems.forEach(item => {
-  const itemElement = document.createElement('div');
-  itemElement.classList.add('food-item');
-  itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
-  itemElement.onclick = () => feedPet(item);
-  if (petState.level < item.requiredLevel || petState.currency < item.price) {
-  itemElement.style.opacity = '0.5';
-  itemElement.style.cursor = 'not-allowed';
-  }
-  foodItemsContainer.appendChild(itemElement);
-  });
-  }
-  
-  function buyItem(item) {
-  if (petState.currency >= item.price && petState.level >= item.requiredLevel) {
-  petState.currency -= item.price;
-  switch(item.type) {
-  case 'crown':
-  crown.textContent = item.emoji;
-  petState.accessories.crown = item.emoji;
-  addEventToBar(`👑 ¡Cakiwaki ahora lleva una corona!`, "La realeza le sienta bien a Cakiwaki.");
-  break;
-  case 'glasses':
-  case 'goggles':
-  glasses.textContent = item.emoji;
-  petState.accessories.glasses = item.emoji;
-  addEventToBar(`👓 ¡Cakiwaki tiene nuevas gafas!`, "Ahora Cakiwaki puede ver el mundo de una nueva manera.");
-  break;
-  case 'hat':
-  case 'topHat':
-  hat.textContent = item.emoji;
-  petState.accessories.hat = item.emoji;
-  addEventToBar(`🎩 ¡Cakiwaki tiene un nuevo sombrero!`, "¡Qué elegante se ve Cakiwaki con su nuevo sombrero!");
-  break;
-  case 'shampoo':
-  petState.shampooCount++;
-  addEventToBar(`🧴 Has comprado shampoo`, "Mantener limpio a Cakiwaki será más fácil ahora.");
-  break;
-  case 'medicine':
-  if (petState.isSick) {
-  petState.isSick = false;
-  addEventToBar("💊 Cakiwaki se ha curado", "¡Bien hecho! Cakiwaki se siente mucho mejor gracias a ti.");
-  } else {
-  addEventToBar("💊 Guardaste la medicina para más tarde", "Es bueno estar preparado. Podrás usar la medicina cuando Cakiwaki se enferme.");
-  petState.chestItems.push(item.emoji);
-  }
-  break;
-  }
-  addEventToBar(`🛍️ Compraste: ${item.emoji}`, "¡Buena compra! Estos artículos harán la vida de Cakiwaki más interesante.");
-  gainXP(10);
-  updateFirestore();
-  shopModal.style.display = 'none';
-  } else if (petState.level < item.requiredLevel) {
-  addEventToBar(`❌ Necesitas nivel ${item.requiredLevel} para comprar esto.`, "Sigue cuidando a Cakiwaki para subir de nivel y desbloquear nuevos artículos.");
-  } else {
-  addEventToBar("❌ No tienes suficientes monedas.", "Juega minijuegos o completa logros para ganar más monedas.");
-  }
-  }
-  
-  function feedPet(food) {
-  if (petState.currency >= food.price && petState.level >= food.requiredLevel) {
-  petState.currency -= food.price;
-  if (petState.isDead) {
-  petState.isDead = false;
-  petState.hunger = 50;
-  petState.fun = 50;
-  petState.hygiene = 50;
-  petState.level = 1;
-  petState.xp = 0;
-  addEventToBar("🎉 Cakiwaki ha revivido!", "¡Increíble! Has traído a Cakiwaki de vuelta. Cuídalo bien esta vez.");
-  deathOverlay.classList.remove('active');
-  applyBlurEffect();
-  } else {
-  petState.hunger = Math.min(100, petState.hunger + food.hunger);
-  }
-  addEventToBar(getRandomPhrase('feed'), "Alimentar a Cakiwaki regularmente lo mantendrá feliz y saludable.");
-  gainXP(5);
-  if (petState.hunger > 100) {
-  petState.isSick = true;
-  addEventToBar("🤢 Cakiwaki comió demasiado", "¡Uh oh! Parece que Cakiwaki se excedió. Un poco de descanso lo ayudará a sentirse mejor.");
-  }
-  updateFirestore();
-  foodModal.style.display = 'none';
-  } else if (petState.level < food.requiredLevel) {
-  addEventToBar(`❌ Necesitas nivel ${food.requiredLevel}`, "Sigue jugando y cuidando a Cakiwaki para desbloquear más opciones de comida.");
-  } else {
-  addEventToBar("💰❌ No tienes suficientes monedas", "¡No te desanimes! Juega minijuegos o completa logros para ganar más monedas.");
-  }
-  }
-  
-  function cleanPet() {
-  if (petState.shampooCount > 0) {
-  petState.hygiene = Math.min(100, petState.hygiene + 40);
-  petState.shampooCount--;
-  petState.currency += 10;
-  addEventToBar(getRandomPhrase('clean'), "Mantener a Cakiwaki limpio lo hace más feliz y saludable. ¡Buen trabajo!");
-  
-  const poops = document.querySelectorAll('.poop');
-  poops.forEach(poop => poop.remove());
-  if (poops.length > 3) {
-  addEventToBar("🧼 ¡Gran limpieza!", "Has eliminado muchas cacas. Cakiwaki se siente mucho mejor ahora.");
-  }
-  
-  gainXP(5);
-  updateFirestore();
-  } else {
-  addEventToBar("❌ No tienes shampoo", "Puedes comprar más shampoo en la tienda. ¡Mantener la higiene es importante!");
-  }
-  }
-  
-  function startRandomMiniGame() {
-  const games = [startCatchEmojiGame, startFollowEmojiGame, startMemoryGame];
-  const randomGame = games[Math.floor(Math.random() * games.length)];
-  randomGame();
-  }
-  
-  function startCatchEmojiGame() {
-  const miniGameBoard = document.getElementById('mini-game-board');
-  miniGameBoard.innerHTML = '';
-  miniGameBoard.style.gridTemplateColumns = 'repeat(4, 1fr)';
-  miniGameBoard.style.gridTemplateRows = 'repeat(4, 1fr)';
-  
-  const targetEmoji = '🎯';
-  let score = 0;
-  let timeLeft = 30;
-  
-  const scoreDisplay = document.createElement('div');
-  scoreDisplay.textContent = `Puntuación: ${score}`;
-  miniGameBoard.appendChild(scoreDisplay);
-  
-  const timeDisplay = document.createElement('div');
-  timeDisplay.textContent = `Tiempo: ${timeLeft}s`;
-  miniGameBoard.appendChild(timeDisplay);
-  
+}
+
+// Función para actualizar la rejilla del fondo
+function updateGrid() {
+  const gridContainer = document.getElementById('gridContainer');
+  gridContainer.innerHTML = '';
   for (let i = 0; i < 16; i++) {
-  const cell = document.createElement('div');
-  cell.classList.add('mini-game-cell');
-  miniGameBoard.appendChild(cell);
+    const cell = document.createElement('div');
+    cell.classList.add('grid-cell');
+    gridContainer.appendChild(cell);
   }
-  
-  function placeTarget() {
-  const cells = miniGameBoard.querySelectorAll('.mini-game-cell');
-  cells.forEach(cell => {
-  cell.textContent = '';
-  cell.onclick = null;
-  });
-  const randomCell = cells[Math.floor(Math.random() * cells.length)];
-  randomCell.textContent = targetEmoji;
-  randomCell.onclick = () => {
-  score++;
-  gainXP(2);
-  addEventToBar("🎯 ¡Has alcanzado el objetivo!", "¡Bien hecho! Sigue así para conseguir una gran puntuación.");
-  scoreDisplay.textContent = `Puntuación: ${score}`;
-  placeTarget();
-  };
-  }
-  
-  placeTarget();
-  
-  const timerInterval = setInterval(() => {
-  timeLeft--;
-  timeDisplay.textContent = `Tiempo: ${timeLeft}s`;
-  if (timeLeft <= 0) {
-  clearInterval(timerInterval);
-  endCatchEmojiGame();
-  }
-  }, 1000);
-  
-  function endCatchEmojiGame() {
-  addEventToBar(`🏁 Fin del juego: Puntuación = ${score}`, "¡Gran partida! Jugar minijuegos ayuda a Cakiwaki a divertirse y ganar recompensas.");
-  petState.fun = Math.min(100, petState.fun + score * 2);
-  petState.currency += score * 10;
-  gainXP(score);
-  updateFirestore();
-  miniGameModal.style.display = 'none';
-  }
-  }
-  
-  function startFollowEmojiGame() {
-  const miniGameBoard = document.getElementById('mini-game-board');
-  miniGameBoard.innerHTML = '';
-  miniGameBoard.style.gridTemplateColumns = 'repeat(4, 1fr)';
-  miniGameBoard.style.gridTemplateRows = 'repeat(4, 1fr)';
-  
-  const targetEmoji = '🎯';
-  let score = 0;
-  let timeLeft = 15;
-  let currentTargetCell = null;
-  
-  const scoreDisplay = document.createElement('div');
-  scoreDisplay.textContent = `Puntuación: ${score}`;
-  miniGameBoard.appendChild(scoreDisplay);
-  
-  const timeDisplay = document.createElement('div');
-  timeDisplay.textContent = `Tiempo: ${timeLeft}s`;
-  miniGameBoard.appendChild(timeDisplay);
-  
-  for (let i = 0; i < 16; i++) {
-  const cell = document.createElement('div');
-  cell.classList.add('mini-game-cell');
-  miniGameBoard.appendChild(cell);
-  }
-  
-  function placeTarget() {
-  const cells = miniGameBoard.querySelectorAll('.mini-game-cell');
-  cells.forEach(cell => cell.textContent = '');
-  const randomIndex = Math.floor(Math.random() * cells.length);
-  currentTargetCell = cells[randomIndex];
-  currentTargetCell.textContent = targetEmoji;
-  currentTargetCell.onclick = () => {
-  score++;
-  gainXP(2);
-  addEventToBar("🎯 ¡Has alcanzado el objetivo!", "¡Excelentes reflejos! Sigue así para mejorar tu puntuación.");
-  scoreDisplay.textContent = `Puntuación: ${score}`;
-  placeTarget();
-  };
-  }
-  
-  placeTarget();
-  
-  const timerInterval = setInterval(() => {
-  timeLeft--;
-  timeDisplay.textContent = `Tiempo: ${timeLeft}s`;
-  if (timeLeft <= 0) {
-  clearInterval(timerInterval);
-  endFollowEmojiGame();
-  } else {
-  placeTarget();
-  }
-  }, 1000);
-  
-  function endFollowEmojiGame() {
-  addEventToBar(`🏁 Fin del juego: Puntuación = ${score}`, "¡Buen juego! Tus reflejos rápidos han impresionado a Cakiwaki.");
-  petState.fun = Math.min(100, petState.fun + score * 2);
-  petState.currency += score * 10;
-  gainXP(score);
-  updateFirestore();
-  miniGameModal.style.display = 'none';
-  }
-  }
-  
-  function startMemoryGame() {
-  const miniGameBoard = document.getElementById('mini-game-board');
-  miniGameBoard.innerHTML = '';
-  miniGameBoard.style.gridTemplateColumns = 'repeat(4, 1fr)';
-  miniGameBoard.style.gridTemplateRows = 'repeat(4, 1fr)';
-  
-  const emojis = ['🍎', '🍌', '🍒', '🍓', '🍊', '🍋', '🍉', '🍇'];
-  const gameEmojis = [...emojis, ...emojis];
-  gameEmojis.sort(() => Math.random() - 0.5);
-  
-  let flippedCards = [];
-  let matchedPairs = 0;
-  let canFlip = true;
-  
-  for (let i = 0; i < 16; i++) {
-  const cell = document.createElement('div');
-  cell.classList.add('mini-game-cell');
-  cell.textContent = '❓';
-  cell.addEventListener('click', () => {
-  if (canFlip && cell.textContent === '❓' && flippedCards.length < 2) {
-  cell.textContent = gameEmojis[i];
-  flippedCards.push(cell);
-  
-  if (flippedCards.length === 2) {
-  canFlip = false;
-  setTimeout(checkMatch, 1000);
-  }
-  }
-  });
-  miniGameBoard.appendChild(cell);
-  }
-  
-  function checkMatch() {
-  const [card1, card2] = flippedCards;
-  if (card1.textContent === card2.textContent) {
-  matchedPairs++;
-  gainXP(5);
-  addEventToBar("🎉 ¡Encontraste un par!", "¡Buena memoria! Sigue así para completar el juego.");
-  if (matchedPairs === 8) {
-  endMemoryGame();
-  }
-  } else {
-  card1.textContent = '❓';
-  card2.textContent = '❓';
-  }
-  flippedCards = [];
-  canFlip = true;
-  }
-  
-  function endMemoryGame() {
-  addEventToBar("🏆 ¡Has completado el juego de memoria!", "¡Increíble trabajo! Tu memoria ha impresionado a Cakiwaki.");
-  petState.fun = Math.min(100, petState.fun + 30);
-  petState.currency += 100;
-  gainXP(50);
-  updateFirestore();
-  miniGameModal.style.display = 'none';
-  }
-  }
-  
-  function updateChestItems() {
-  chestItemsContainer.innerHTML = '';
-  petState.chestItems.forEach(item => {
-  const itemElement = document.createElement('div');
-  itemElement.classList.add('chest-item');
-  itemElement.textContent = item;
-  itemElement.onclick = () => equipItem(item);
-  chestItemsContainer.appendChild(itemElement);
-  });
-  }
-  
-  function equipItem(item) {
-  const accessoryType = getAccessoryType(item);
-  if (accessoryType) {
-  switch(accessoryType) {
-  case 'crown':
-  crown.textContent = item;
-  petState.accessories.crown = item;
-  break;
-  case 'glasses':
-  glasses.textContent = item;
-  petState.accessories.glasses = item;
-  break;
-  case 'hat':
-  hat.textContent = item;
-  petState.accessories.hat = item;
-  break;
-  }
-  addEventToBar(`${item} equipado!`, "¡Cakiwaki luce genial con su nuevo accesorio!");
-  gainXP(5);
-  } else if (item === '🧴') {
-  petState.shampooCount++;
-  addEventToBar(`🧴 Shampoo añadido`, "Ahora puedes dar un baño refrescante a Cakiwaki.");
-  gainXP(2);
-  } else if (item === '💊') {
-  if (petState.isSick) {
-  petState.isSick = false;
-  addEventToBar("💊 Cakiwaki se ha curado", "¡Bien hecho! Has ayudado a Cakiwaki a recuperarse.");
-  } else {
-  addEventToBar("💊 No es necesario usar la medicina ahora", "Guarda la medicina para cuando Cakiwaki realmente la necesite.");
-  }
-  gainXP(5);
-  }
-  petState.chestItems = petState.chestItems.filter(i => i !== item);
-  updateChestItems();
-  updateFirestore();
-  }
-  
-  function getAccessoryType(emoji) {
-  switch(emoji) {
-  case '👑': return 'crown';
-  case '👓': case '🥽': return 'glasses';
-  case '🧢': case '🎩': return 'hat';
-  default: return null;
-  }
-  }
-  
-  function updateFirestore() {
-  petDocRef.set(petState, { merge: true })
-  .then(() => {
-  console.log("Datos actualizados correctamente en Firebase");
-  })
-  .catch((error) => {
-  console.error("Error al actualizar los datos en Firebase:", error);
-  });
-  }
-  
-  function initializeNewGame() {
-  petState = {
-  hunger: 100,
-  fun: 100,
-  hygiene: 100,
-  currency: 2000,
-  xp: 0,
-  level: 1,
-  isSick: false,
-  isDead: false,
-  caressCount: 0,
-  chestItems: [],
-  shampooCount: 0,
-  isLightOn: true,
-  accessories: {
-  crown: '',
-  glasses: '',
-  hat: ''
-  },
-  expression: '😊',
-  currentBackground: 1
-  };
-  
-  petDocRef.set(petState, { merge: true })
-  .then(() => {
-  console.log("Nuevo juego inicializado en Firebase");
-  addEventToBar("🆕 Nuevo juego iniciado", "¡Bienvenido a tu nueva aventura con Cakiwaki!");
-  updateUI();
-  })
-  .catch((error) => {
-  console.error("Error al inicializar el juego en Firebase:", error);
-  addEventToBar("🚨 Error al iniciar el juego.", "Ha ocurrido un problema al iniciar tu partida. Por favor, inténtalo de nuevo más tarde.");
-  });
-  }
-  
-  function loadGame() {
-  petDocRef.onSnapshot((doc) => {
-  if (doc.exists) {
-  const data = doc.data();
-  petState = data;
-  updateUI();
-  if (petState.isDead) {
-  addEventToBar(getRandomPhrase('dead'), "💀 Cakiwaki ha muerto. Revívelo con comida.");
-  deathOverlay.classList.add('active');
-  } else {
-  addEventToBar("🎮 Juego cargado", "¡Bienvenido de nuevo! Cakiwaki está feliz de verte.");
-  deathOverlay.classList.remove('active');
-  }
-  } else {
-  initializeNewGame();
-  }
-  }, (error) => {
-  console.error("Error al cargar el juego desde Firebase:", error);
-  addEventToBar("🚨 Error al cargar el juego.", "Ha ocurrido un problema al cargar tu progreso. Por favor, inténtalo de nuevo más tarde.");
-  });
-  }
-  
-  function updateUI() {
-  updateStatus();
-  updateChestItems();
-  setInitialBackground();
-  lightSwitch.textContent = petState.isLightOn ? '💡' : '🌙';
-  crown.textContent = petState.accessories.crown;
-  glasses.textContent = petState.accessories.glasses;
-  hat.textContent = petState.accessories.hat;
-  changeExpression(petState.expression);
-  handleGlobalDeath();
-  }
-  
-  function petDeath() {
-  petState.isDead = true;
-  changeExpression(Math.random() < 0.5 ? '💀' : '👹');
-  pet.style.fontSize = '15vh';
-  addEventToBar(getRandomPhrase('dead'), "💀 Cakiwaki ha muerto. Revívelo con comida.");
-  updateFirestore();
-  handleGlobalDeath();
-  }
-  
-  function handleGlobalDeath() {
-  if (petState.isDead) {
-  document.body.style.opacity = '0.5';
-  addEventToBar("☠️ Cakiwaki ha muerto para todos.", "Todos los jugadores han perdido a su mascota. Alimenta a Cakiwaki para revivirlo.");
-  deathOverlay.classList.add('active');
-  } else {
-  document.body.style.opacity = '1';
-  deathOverlay.classList.remove('active');
-  }
-  }
-  
-  function randomEvent() {
-  if (petState.isDead) return;
-  
-  const events = [
-  { probability: 0.05, action: () => { addEventToBar("🌟 ¡Cakiwaki encontró una moneda brillante!", "¡Qué suerte! Cada moneda ayuda a cuidar mejor a Cakiwaki."); petState.currency += 10; gainXP(5); } },
-  { probability: 0.03, action: () => { addEventToBar(getRandomPhrase('random'), "Cakiwaki tiene ideas interesantes. ¿Por qué no juegas con él?"); } },
-  { probability: 0.04, action: () => { addEventToBar("🎁 ¡Regalo sorpresa para Cakiwaki!", "¡Qué emoción! Jugar minijuegos ayuda a Cakiwaki a divertirse y ganar recompensas."); petState.xp += 20; gainXP(20); } },
-  { probability: 0.02, action: () => { addEventToBar("🍀 ¡Día de suerte para Cakiwaki!", "La buena suerte sonríe a Cakiwaki hoy. ¡Aprovecha este momento especial!"); petState.fun = Math.min(100, petState.fun + 15); gainXP(5); } },
-  { probability: 0.01, action: () => { addEventToBar("📚 Cakiwaki aprendió algo nuevo", "¡Increíble! Cakiwaki está creciendo y aprendiendo. Sigue enseñándole cosas nuevas."); gainXP(15); } },
-  { probability: 0.02, action: () => { addEventToBar("🌈 Un arcoíris apareció en el cielo", "Los arcoíris traen alegría y fortuna. ¡Disfruta este momento mágico con Cakiwaki!"); petState.currency += 30; gainXP(10); } },
-  { probability: 0.01, action: () => { addEventToBar("🎈 Cakiwaki encontró un globo", "¡Qué divertido! Los globos siempre alegran el día de Cakiwaki."); petState.fun = Math.min(100, petState.fun + 20); gainXP(5); } }
-  ];
-  
-  events.forEach(event => {
-  if (Math.random() < event.probability) {
-  event.action();
-  updateFirestore();
-  }
-  });
-  }
-  
-  function petRandomMessage() {
-  if (petState.isDead || !petState.isLightOn) return;
-  addEventToBar(getRandomPhrase('random'), "Cakiwaki tiene mucho que decir. ¡Presta atención a sus ocurrencias!");
-  updateFirestore();
-  }
-  
-  function optimizePerformance() {
-  function animate() {
-  if (!petState.isDead) {
-  movePet();
-  }
-  requestAnimationFrame(animate);
-  }
-  requestAnimationFrame(animate);
-  
-  let firebaseUpdateTimeout;
-  function throttledFirebaseUpdate() {
-  if (!firebaseUpdateTimeout) {
-  firebaseUpdateTimeout = setTimeout(() => {
-  updateFirestore();
-  firebaseUpdateTimeout = null;
-  }, 5000);
-  }
-  }
-  
-  window.updateFirestore = throttledFirebaseUpdate;
-  }
-  
-  function manageMemory() {
-  setInterval(() => {
-  const poops = document.querySelectorAll('.poop');
-  if (poops.length > 6) {
-  poops[0].remove();
-  addEventToBar("🧹 Limpieza automática", "El entorno de Cakiwaki se mantiene limpio automáticamente para evitar problemas de salud.");
-  petState.hygiene = Math.max(0, petState.hygiene - 10);
-  updateFirestore();
-  }
-  }, 60000);
-  
-  const observer = new MutationObserver((mutations) => {
-  mutations.forEach((mutation) => {
-  if (mutation.type === 'childList') {
-  while (eventBar.childNodes.length > 5) {
-  eventBar.removeChild(eventBar.lastChild);
-  }
-  }
-  });
-  });
-  
-  observer.observe(eventBar, { childList: true });
-  }
-  
-  function dailyReward() {
-  const lastRewardDate = localStorage.getItem('lastRewardDate');
-  const today = new Date().toDateString();
-  
-  if (lastRewardDate !== today) {
-  const rewardAmount = 100 + (petState.level * 10);
-  petState.currency += rewardAmount;
-  addEventToBar(`🎁 ¡Recompensa diaria! +${rewardAmount} monedas`, "¡Vuelve mañana para otra recompensa! Jugar regularmente ayuda a Cakiwaki a crecer más rápido.");
-  localStorage.setItem('lastRewardDate', today);
-  updateFirestore();
-  }
-  }
-  
-  function achievementSystem() {
-  const achievements = [
-  { id: 'level10', name: 'Mascota Adolescente', condition: () => petState.level >= 10, reward: 500 },
-  { id: 'level20', name: 'Mascota Adulta', condition: () => petState.level >= 20, reward: 1000 },
-  { id: 'rich', name: 'Rico y Famoso', condition: () => petState.currency >= 10000, reward: 2000 },
-  { id: 'collector', name: 'Coleccionista', condition: () => petState.chestItems.length >= 10, reward: 1500 }
-  ];
-  
+}
+
+// Función para manejar logros
+const achievements = [
+  { id: 'firstLevel', name: 'Primer Nivel', description: 'Alcanza el nivel 2', check: () => petState.level >= 2, reward: 100 },
+  { id: 'wellFed', name: 'Bien Alimentado', description: 'Mantén el hambre al 100% por 1 minuto', check: () => petState.hunger === 100, reward: 50 },
+  { id: 'cleanFreak', name: 'Maniático de la Limpieza', description: 'Mantén la higiene al 100% por 1 minuto', check: () => petState.hygiene === 100, reward: 50 },
+  { id: 'partyAnimal', name: 'Alma de la Fiesta', description: 'Mantén la diversión al 100% por 1 minuto', check: () => petState.fun === 100, reward: 50 },
+  { id: 'richPet', name: 'Mascota Rica', description: 'Acumula 1000 monedas', check: () => petState.currency >= 1000, reward: 200 }
+];
+
+let achievementTimers = {};
+
+function checkAchievements() {
   achievements.forEach(achievement => {
-  if (achievement.condition() && !localStorage.getItem(`achievement_${achievement.id}`)) {
-  petState.currency += achievement.reward;
-  addEventToBar(`🏆 Logro desbloqueado: ${achievement.name}. +${achievement.reward} monedas`, "¡Fantástico! Los logros demuestran tu dedicación como cuidador de mascotas virtuales.");
-  localStorage.setItem(`achievement_${achievement.id}`, 'true');
-  updateFirestore();
-  }
+    if (!petState.achievements) petState.achievements = {};
+    if (!petState.achievements[achievement.id] && achievement.check()) {
+      if (!achievementTimers[achievement.id]) {
+        achievementTimers[achievement.id] = setTimeout(() => {
+          petState.achievements[achievement.id] = true;
+          petState.currency += achievement.reward;
+          addEventToBar(`🏆 ¡Logro desbloqueado: ${achievement.name}!`, `Recompensa: ${achievement.reward} monedas`);
+          saveGame();
+        }, 60000); // 1 minuto
+      }
+    } else {
+      if (achievementTimers[achievement.id]) {
+        clearTimeout(achievementTimers[achievement.id]);
+        delete achievementTimers[achievement.id];
+      }
+    }
   });
+}
+
+// Función para crear una caca
+function createPoop() {
+  if (Math.random() < 0.1 && !petState.isDead && !petState.isPaused) {  // 10% de probabilidad cada vez que se llama
+    const poops = document.querySelectorAll('.poop');
+    if (poops.length >= 6) return; // No crear más de 6 cacas
+
+    const poop = document.createElement('div');
+    poop.classList.add('poop');
+    poop.textContent = '💩';
+    poop.style.left = `${Math.random() * 80 + 10}%`;  // Posición aleatoria en el eje X
+    poop.style.top = `${Math.random() * 80 + 10}%`;   // Posición aleatoria en el eje Y
+    poop.style.fontSize = `${Math.random() * 20 + 20}px`; // Tamaño aleatorio
+    poop.style.zIndex = 11;
+
+    poop.onclick = () => {
+      poop.remove();
+      petState.hygiene = Math.min(100, petState.hygiene + 5);
+      petState.currency += 5;
+      addEventToBar("🧹 Limpiaste una caca", "+5 monedas y +5% higiene");
+      updateStatus();
+      saveGame();
+    };
+    document.querySelector('.pet-frame').appendChild(poop);
   }
-  
-  function specialEvents() {
-  const events = [
-  { name: 'Lluvia de Meteoritos', probability: 0.01, action: () => {
-  addEventToBar('☄️ ¡Lluvia de meteoritos! Cakiwaki está emocionado.', "Un evento raro y emocionante. ¡Disfrútalo con Cakiwaki!");
-  petState.fun = Math.min(100, petState.fun + 30);
-  gainXP(50);
-  updateFirestore();
-  }},
-  { name: 'Visita del Hada Madrina', probability: 0.005, action: () => {
-  addEventToBar('🧚‍♀️ El Hada Madrina visitó a Cakiwaki y le concedió un deseo.', "¡Qué suerte! El Hada Madrina trae magia y buenos deseos.");
-  const randomStat = Math.floor(Math.random() * 3);
-  switch(randomStat) {
-  case 0:
-  petState.hunger = 100;
-  addEventToBar('🍽️ ¡Cakiwaki está completamente satisfecho!', "El Hada Madrina llenó mágicamente el estómago de Cakiwaki.");
-  break;
-  case 1:
-  petState.fun = 100;
-  addEventToBar('🎉 ¡Cakiwaki está extremadamente feliz!', "El Hada Madrina trajo mucha diversión a Cakiwaki.");
-  break;
-  case 2:
-  petState.hygiene = 100;
-  addEventToBar('✨ ¡Cakiwaki está impecablemente limpio!', "El Hada Madrina dio un baño mágico a Cakiwaki.");
-  break;
-  }
-  updateFirestore();
-  }},
-  { name: 'Invasión Alienígena', probability: 0.002, action: () => {
-  addEventToBar('👽 ¡Una invasión alienígena! Cakiwaki está fascinado.', "¡Increíble! Los alienígenas trajeron tecnología avanzada y diversión.");
-  gainXP(100);
-  petState.currency += 500;
-  updateFirestore();
-  }}
-  ];
-  
-  events.forEach(event => {
-  if (Math.random() < event.probability) {
-  event.action();
-  }
-  });
-  }
-  
-  function seasonalEvents() {
-  const now = new Date();
-  const month = now.getMonth();
-  const day = now.getDate();
-  
-  if (month === 11 && day === 25) { // Navidad
-  addEventToBar("🎄 ¡Feliz Navidad!", "Cakiwaki ha recibido un regalo especial.");
-  petState.currency += 1000;
-  petState.chestItems.push('🎁');
-  } else if (month === 0 && day === 1) { // Año Nuevo
-  addEventToBar("🎆 ¡Feliz Año Nuevo!", "Cakiwaki está emocionado por un nuevo año de aventuras.");
-  gainXP(500);
-  } else if (month === 9 && day === 31) { // Halloween
-  addEventToBar("🎃 ¡Feliz Halloween!", "Cakiwaki se ha disfrazado para la ocasión.");
-  petState.chestItems.push('👻');
-  }
-  
-  updateFirestore();
-  }
-  
-  function handleSwipe() {
-  const petFrame = document.querySelector('.pet-frame');
-  
-  petFrame.addEventListener('touchstart', (e) => {
-  touchStartX = e.changedTouches[0].screenX;
-  }, false);
-  
-  petFrame.addEventListener('touchend', (e) => {
-  touchEndX = e.changedTouches[0].screenX;
-  handleGesture();
-  }, false);
-  
-  function handleGesture() {
-  const swipeDistance = touchEndX - touchStartX;
-  if (Math.abs(swipeDistance) > swipeThreshold) {
-  if (swipeDistance > 0) {
-  // Swipe a la derecha
-  petState.currentBackground = (petState.currentBackground % totalBackgrounds) + 1;
-  } else {
-  // Swipe a la izquierda
-  petState.currentBackground = (petState.currentBackground - 2 + totalBackgrounds) % totalBackgrounds + 1;
-  }
-  background.className = `background ${backgrounds[petState.currentBackground - 1]}`;
-  addEventToBar("🎨 ¡Fondo cambiado!", "Has cambiado el fondo de Cakiwaki.");
-  updateFirestore();
-  }
-  }
-  }
-  
-  function generatePoop() {
-  if (petState.isDead) return;
-  const poops = document.querySelectorAll('.poop');
-  if (poops.length >= 6) return;
-  
-  const poop = document.createElement('div');
-  poop.classList.add('poop');
-  poop.textContent = '💩';
-  const petFrame = document.querySelector('.pet-frame');
-  
-  let x, y;
-  do {
-  x = Math.random() * (petFrame.offsetWidth - 30);
-  y = Math.random() * (petFrame.offsetHeight - 30);
-  } while (
-  x > petFrame.offsetWidth / 2 - 50 && x < petFrame.offsetWidth / 2 + 50 &&
-  y > petFrame.offsetHeight / 2 - 50 && y < petFrame.offsetHeight / 2 + 50
-  );
-  
-  poop.style.left = `${x}px`;
-  poop.style.top = `${y}px`;
-  petFrame.appendChild(poop);
-  
-  poop.addEventListener('click', () => {
-  poop.remove();
-  petState.hygiene = Math.max(0, petState.hygiene - 10);
-  addEventToBar("🧹 Has limpiado una caca", "Mantener limpio el ambiente de Cakiwaki es importante para su salud.");
-  updateFirestore();
-  });
-  
-  petState.hygiene = Math.max(0, petState.hygiene - 5);
-  updateFirestore();
-  }
-  
-  function movePet() {
-  if (petState.isDead) return;
-  
-  const oscillationRange = 5;
-  const oscillationSpeed = 0.005;
-  const oscillationX = oscillationRange * Math.sin(Date.now() * oscillationSpeed);
-  const oscillationY = oscillationRange * Math.cos(Date.now() * oscillationSpeed);
-  
-  petContainer.style.left = `calc(50% + ${oscillationX}px)`;
-  petContainer.style.top = `calc(50% + ${oscillationY}px)`;
-  petContainer.style.transform = 'translate(-50%, -50%)';
-  }
-  
-  function resizePet() {
-  const size = 5 + (petState.hunger / 100) * 25;
-  pet.style.fontSize = `${size}vh`;
-  }
-  
-  function toggleCyclingExpressions() {
-  if (!isCyclingExpression) {
-  isCyclingExpression = true;
-  expressionInterval = setInterval(() => {
-  currentpetEmojiIndex = (currentpetEmojiIndex + 1) % petEmojis.length;
-  changeExpression(petEmojis[currentpetEmojiIndex]);
-  }, 1000);
-  addEventToBar("🔄 Ciclo de expresiones iniciado", "Cakiwaki está mostrando diferentes expresiones.");
-  } else {
-  isCyclingExpression = false;
-  clearInterval(expressionInterval);
-  changePetFace();
-  addEventToBar("🔄 Ciclo de expresiones detenido", "Cakiwaki ha vuelto a su expresión habitual.");
-  }
-  updateFirestore();
-  }
-  
-  function init() {
-  loadGame();
-  setInitialBackground();
-  setInterval(decreaseStats, 2000);
-  setInterval(changeWeather, 15000);
-  setInterval(randomEvent, 60000);
-  setInterval(petRandomMessage, 90000);
-  setInterval(generatePoop, Math.floor(Math.random() * 50000) + 20000);
-  setInterval(specialEvents, 300000);
-  setInterval(seasonalEvents, 86400000);
-  optimizePerformance();
-  manageMemory();
-  dailyReward();
-  achievementSystem();
-  handleSwipe();
-  }
-  
-  function setInitialBackground() {
-  background.className = `background ${backgrounds[petState.currentBackground - 1]}`;
-  }
-  
-  function updatePetAppearance() {
-  if (petState.level >= 20) {
-  pet.style.filter = 'drop-shadow(0 0 15px gold)';
-  } else if (petState.level >= 10) {
-  pet.style.filter = 'drop-shadow(0 0 10px silver)';
-  } else if (petState.level >= 5) {
-  pet.style.filter = 'drop-shadow(0 0 5px bronze)';
-  } else {
-  pet.style.filter = 'none';
-  }
-  }
-  
-  function changePetFace() {
-  if (!petState.isSick && petState.isLightOn) {
-  currentpetEmojiIndex = Math.floor(Math.random() * petEmojis.length);
-  changeExpression(petEmojis[currentpetEmojiIndex]);
-  }
-  }
-  
-  function resizeContent() {
-  const gameContainer = document.querySelector('.game-container');
-  const height = window.innerHeight;
-  gameContainer.style.height = `${height}px`;
-  }
-  
-  function applyBlurEffect() {
-  const gameContainer = document.querySelector('.game-container');
-  if (!petState.isLightOn) {
-  gameContainer.classList.add('blurred');
-  } else {
-  gameContainer.classList.remove('blurred');
-  }
-  }
-  
-  // Event listeners
-  window.addEventListener('resize', resizeContent);
-  
-  document.addEventListener('DOMContentLoaded', () => {
-  init();
-  resizeContent();
-  });
-  
-  // Cerrar modales al hacer clic en la "x"
-  const closeButtons = document.querySelectorAll('.close');
-  closeButtons.forEach(button => {
-  button.addEventListener('click', () => {
-  button.parentElement.parentElement.style.display = 'none';
-  });
-  });
-  
-  // Cerrar modales al hacer clic fuera del contenido
-  window.addEventListener('click', (e) => {
-  if (e.target == shopModal) {
-  shopModal.style.display = 'none';
-  }
-  if (e.target == foodModal) {
-  foodModal.style.display = 'none';
-  }
-  if (e.target == miniGameModal) {
-  miniGameModal.style.display = 'none';
-  }
-  if (e.target == chestModal) {
-  chestModal.style.display = 'none';
-  }
-  });
-  
-  // Función para enfermedad aleatoria
-  function randomSickness() {
-  if (!petState.isSick && Math.random() < 0.01) {
-  petState.isSick = true;
-  addEventToBar(getRandomPhrase('sick'), "Cakiwaki nose siente bien. Considera darle medicina.");
-  updateFirestore();
-  }
-  }
-  
-  // Función para aplicar el efecto de desenfoque
-  function applyBlurEffect() {
-  const gameContainer = document.querySelector('.game-container');
-  if (!petState.isLightOn) {
-  gameContainer.classList.add('blurred');
-  } else {
-  gameContainer.classList.remove('blurred');
-  }
-  }
-  
-  // Función para actualizar el fondo
-  function updateBackground() {
-  background.className = `background ${backgrounds[petState.currentBackground - 1]}`;
-  }
-  
-  // Evento para cambiar el fondo con las teclas de flecha
-  document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') {
-  petState.currentBackground = ((petState.currentBackground - 2 + totalBackgrounds) % totalBackgrounds) + 1;
-  updateBackground();
-  addEventToBar("🎨 ¡Fondo cambiado!", "Has cambiado el fondo de Cakiwaki con la flecha izquierda.");
-  updateFirestore();
-  } else if (e.key === 'ArrowRight') {
-  petState.currentBackground = (petState.currentBackground % totalBackgrounds) + 1;
-  updateBackground();
-  addEventToBar("🎨 ¡Fondo cambiado!", "Has cambiado el fondo de Cakiwaki con la flecha derecha.");
-  updateFirestore();
-  }
-  });
-  
-  // Función para manejar el bonus por caricia
-  function handleCaressBonus() {
-  petState.caressCount++;
-  if (petState.caressCount % 5 === 0) {
-  const bonusAmount = 10 + Math.floor(petState.level / 2);
-  petState.currency += bonusAmount;
-  addEventToBar(`💖 ¡Bonus por caricias! +${bonusAmount} monedas`, "Cakiwaki aprecia tus caricias constantes.");
-  showCaressBonusNotification();
-  updateFirestore();
-  }
-  }
-  
-  // Función para mostrar la notificación de bonus por caricia
-  function showCaressBonusNotification() {
-  caressBonus.style.display = 'block';
-  setTimeout(() => {
-  caressBonus.style.display = 'none';
-  }, 3000);
-  }
-  
-  // Actualizar el evento de clic en la mascota
-  pet.addEventListener('click', () => {
-  if (petState.isDead || !petState.isLightOn) return;
-  
-  toggleCyclingExpressions();
-  handleCaressBonus();
-  });
-  
-  // Función para manejar la muerte y resurrección
-  function handleDeathAndResurrection() {
-  if (petState.isDead) {
-  deathOverlay.classList.add('active');
-  document.body.classList.add('pet-dead');
-  } else {
-  deathOverlay.classList.remove('active');
-  document.body.classList.remove('pet-dead');
-  }
-  applyBlurEffect();
-  }
-  
-  // Actualizar la función feedPet para manejar la resurrección
-  function feedPet(food) {
-  if (petState.currency >= food.price && petState.level >= food.requiredLevel) {
-  petState.currency -= food.price;
-  if (petState.isDead) {
-  petState.isDead = false;
-  petState.hunger = 50;
-  petState.fun = 50;
-  petState.hygiene = 50;
-  petState.level = 1;
-  petState.xp = 0;
-  addEventToBar("🎉 Cakiwaki ha revivido!", "¡Increíble! Has traído a Cakiwaki de vuelta. Cuídalo bien esta vez.");
-  handleDeathAndResurrection();
-  } else {
-  petState.hunger = Math.min(100, petState.hunger + food.hunger);
-  }
-  addEventToBar(getRandomPhrase('feed'), "Alimentar a Cakiwaki regularmente lo mantendrá feliz y saludable.");
-  gainXP(5);
-  if (petState.hunger > 100) {
-  petState.isSick = true;
-  addEventToBar("🤢 Cakiwaki comió demasiado", "¡Uh oh! Parece que Cakiwaki se excedió. Un poco de descanso lo ayudará a sentirse mejor.");
-  }
-  updateFirestore();
-  foodModal.style.display = 'none';
-  } else if (petState.level < food.requiredLevel) {
-  addEventToBar(`❌ Necesitas nivel ${food.requiredLevel}`, "Sigue jugando y cuidando a Cakiwaki para desbloquear más opciones de comida.");
-  } else {
-  addEventToBar("💰❌ No tienes suficientes monedas", "¡No te desanimes! Juega minijuegos o completa logros para ganar más monedas.");
-  }
-  }
-  
-  // Actualizar la función updateUI para incluir el manejo de muerte y resurrección
-  function updateUI() {
-  updateStatus();
-  updateChestItems();
-  setInitialBackground();
-  lightSwitch.textContent = petState.isLightOn ? '💡' : '🌙';
-  crown.textContent = petState.accessories.crown;
-  glasses.textContent = petState.accessories.glasses;
-  hat.textContent = petState.accessories.hat;
-  changeExpression(petState.expression);
-  handleDeathAndResurrection();
-  }
-  
-  // Inicialización del juego
-  init();
-    </script>
+}
+
+// Llamadas cíclicas a funciones
+setInterval(handleSpecialEvents, DECREASE_INTERVAL);
+setInterval(checkAchievements, 1000); // Cada segundo
+setInterval(createPoop, 10000);
+
+// Inicializar el juego cuando la página cargue
+window.onload = function() {
+  initializeGame();
+  resizePet();
+  window.addEventListener('resize', resizePet);
+};
+
+</script>
+
 </body>
 </html>
+   
+   
+
