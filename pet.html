@@ -697,7 +697,7 @@ const DECREASE_INTERVAL = 5000;
 const HUNGER_DECREASE_RATE = 1;
 const FUN_DECREASE_RATE = 0.8;
 const HYGIENE_DECREASE_RATE = 0.7;
-const SICKNESS_PROBABILITY = 0.0003; // Incrementamos la probabilidad de enfermedad
+const SICKNESS_PROBABILITY = 0.01; // Incrementamos la probabilidad de enfermedad
 const SPECIAL_EVENT_PROBABILITY = 0.05; // Incrementamos la probabilidad de eventos especiales
 
 // Emojis para diferentes estados (añadidos más emojis)
@@ -1025,6 +1025,7 @@ function decreaseStats() {
 
   // Disminuir los niveles, asegurando que no caigan por debajo de 0
   petState.hunger = Math.max(0, petState.hunger - HUNGER_DECREASE_RATE);
+  console.log("Nivel de hambre actual: ", petState.hunger);  // Esto imprime el nivel de hambre en la consola
   petState.fun = Math.max(0, petState.fun - FUN_DECREASE_RATE);
   petState.hygiene = Math.max(0, petState.hygiene - HYGIENE_DECREASE_RATE);
 
