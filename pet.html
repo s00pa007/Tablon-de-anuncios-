@@ -159,35 +159,50 @@
             font-size: 1.5em;
         }
 
-        .display-container {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
+.display-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
 
-        .display-left, .display-right {
-            width: 48%;
-            border: 2px solid var(--neon-blue);
-            border-radius: 10px;
-            padding: 5px;
-            height: 70px;
-            overflow-y: auto;
-        }
+.display-left {
+    width: 75%; /* Aumentamos el tamaño del display */
+    border: 2px solid var(--neon-blue);
+    border-radius: 10px;
+    padding: 5px;
+    height: 70px;
+    overflow-y: auto;
+}
 
-        .display-right {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
+.display-right {
+    width: 20%; /* Reducimos el tamaño del contenedor derecho (solo para la tienda) */
+    display: flex;
+    justify-content: center; /* Centramos el icono horizontalmente */
+    align-items: center; /* Centramos el icono verticalmente */
+    border: 2px solid var(--neon-blue); /* Marco solo para la tienda */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 5px;
+    height: 70px; /* Aseguramos que tenga la misma altura que el display izquierdo */
+}
 
-        .event-icon {
-            font-size: 0.9em;
-            margin-bottom: 5px;
-            color: var(--neon-yellow);
-            text-shadow: 0 0 5px var(--neon-yellow);
-            opacity: 1;
-            transition: opacity 0.5s ease;
-        }
+.shop-icon {
+    font-size: 2em; /* Tamaño del icono */
+    text-align: center;
+}
+
+.event-icon {
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 5px var(--neon-yellow);
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+/* Eliminamos el cofre */
+.chest {
+    display: none;
+}
 
         .pet-frame {
             flex: 1;
@@ -948,6 +963,8 @@ function loadGame() {
   }
 }
 
+
+
 // Función para guardar el estado del juego en localStorage
 function saveGame() {
   localStorage.setItem('petState', JSON.stringify(petState));
@@ -1036,6 +1053,8 @@ function petDeath() {
 
   saveGame();
 }
+
+
 
 // Función para cambiar la expresión de la mascota
 function changeExpression(newExpression) {
@@ -1448,40 +1467,53 @@ function startFollowEmojiGame() {
     }
 
     // Función para finalizar el juego
-    function endGame() {
-        gameActive = false;
-        clearInterval(emojiCreationInterval);
-        clearTimeout(gameTimer);
-        
-        // Remover todos los emojis restantes
-        const remainingEmojis = document.querySelectorAll('.falling-emoji');
-        remainingEmojis.forEach(emoji => emoji.remove());
+function endGame() {
+    gameActive = false;
+    clearInterval(emojiCreationInterval);
+    clearTimeout(gameTimer);
+    
+    // Remover todos los emojis restantes
+    const remainingEmojis = document.querySelectorAll('.falling-emoji');
+    remainingEmojis.forEach(emoji => emoji.remove());
 
-        // Mostrar el puntaje final (sin el texto extra)
-        messageContainer.innerHTML = `⏰ ¡Juego terminado!<br>Has explotado <strong>${score}</strong> emojis.`;
+    // Mostrar el puntaje final (sin el texto extra)
+    messageContainer.innerHTML = `⏰ ¡Juego terminado!<br>Has explotado <strong>${score}</strong> emojis.`;
 
-        // Recompensas según el puntaje
-        const coinsEarned = score * 10; // 10 monedas por cada emoji explotado
-        const funEarned = Math.min(100, petState.fun + score * 0.5); // 0.5% diversión por emoji explotado
+    // Recompensas según el puntaje
+    const coinsEarned = score * 10; // 10 monedas por cada emoji explotado
+    const funEarned = Math.min(100, petState.fun + score * 0.5); // 0.5% diversión por emoji explotado
 
-        // Actualizar el estado de la mascota
-        petState.currency += coinsEarned;
-        petState.fun = funEarned;
-        addEventToBar(`💰 +${coinsEarned} monedas y 😊 +${score * 0.5}% diversión por el minijuego.`);
-        gainXP(score * 2); // 2 XP por cada emoji explotado
+    // Actualizar el estado de la mascota
+    petState.currency += coinsEarned;
+    petState.fun = funEarned;
+    addEventToBar(`💰 +${coinsEarned} monedas y 😊 +${score * 0.5}% diversión por el minijuego.`);
+    gainXP(score * 2); // 2 XP por cada emoji explotado
 
-        // Reanudar el juego principal (los niveles vuelven a bajar)
-        petState.isPaused = false; // Reanuda el juego principal
+    // Reanudar el juego principal (los niveles vuelven a bajar)
+    petState.isPaused = false; // Reanuda el juego principal
 
-        // Actualizar la interfaz
-        updateStatus();
+    // Actualizar la interfaz
+    updateStatus();
 
-        // Guardar el estado del juego
-        saveGame();
+    // Guardar el estado del juego
+    saveGame();
 
-        // Cerrar el modal del minijuego
-        gameModal.style.display = 'none';
+    // Cerrar el modal del minijuego
+    gameModal.style.display = 'none';
+
+    // Si la mascota está muerta, permite revivirla tocándola
+    if (petState.isDead) {
+        messageContainer.innerHTML += "<br>¡Toca a Kakiwaki para revivirlo!";
+        pet.addEventListener('click', function revivePet() {
+            petState.hunger = 50;  // Revive con hambre al 50%
+            petState.isDead = false;
+            addEventToBar("¡Kakiwaki ha revivido tocándolo! 🎉");
+            updateStatus();
+            saveGame();
+            pet.removeEventListener('click', revivePet);  // Remueve el evento después de revivir
+        });
     }
+}
 
     // Función para cerrar el juego si el usuario cierra el modal
     function closeGame() {
