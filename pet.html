@@ -304,6 +304,20 @@
     z-index: 10;  /* Asegura que los botones estén siempre visibles */
 }
 
+.action-buttons {
+    display: flex;
+    justify-content: center;  /* Centramos los botones */
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 20px; /* Aumentamos el margen inferior para alejarlos del borde */
+    flex-wrap: nowrap; /* Mantiene los botones en una sola línea */
+    position: sticky;
+    bottom: 20px;  /* Ajustamos para que los botones estén un poco más arriba */
+    background-color: var(--background-color);
+    width: 100%;
+    z-index: 10;  /* Asegura que los botones estén siempre visibles */
+}
+
 .action-btn {
     font-size: 1.5em;
     background: rgba(255, 255, 255, 0.1);
@@ -328,6 +342,7 @@
     }
     .action-buttons {
         justify-content: center;  /* Asegura que los botones también se centren en pantallas pequeñas */
+        bottom: 30px;  /* Ajusta el "bottom" en pantallas pequeñas para más separación */
     }
 }
 
