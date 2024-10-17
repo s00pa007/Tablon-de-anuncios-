@@ -528,6 +528,11 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-sizing: border-box;
         }
+       .emoji-sick-green {
+       filter: none;  /* Desactiva el brillo para mostrar el color verde natural */
+       transition: filter 0.5s ease;
+       }
+       
 
         /* Estilos para bonus de caricia */
         .caress-bonus {
@@ -709,7 +714,7 @@
     <script>
 // Variables globales
 let petState = {
-  hunger: 100,
+  hunger: 99,
   fun: 100,
   hygiene: 100,
   currency: 5000,
@@ -963,12 +968,12 @@ function initializeGame() {
   }
 
   // Evento para acariciar a la mascota
-  if (petContainer) {
-    petContainer.addEventListener('click', (e) => {
-      e.stopPropagation();
-      handleCaressBonus();
-    });
-  }
+if (petContainer) {
+  petContainer.addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleCaressBonus(e); // Pasar el evento 'e'
+  });
+}
 
   // Desactivar selección de texto en la mascota y accesorios
   disableTextSelection(pet);
@@ -1056,20 +1061,21 @@ function decreaseStats() {
   // Si el hambre llega a 0, la mascota muere
   if (petState.hunger <= 0) {
     petDeath();
+    return;  // Termina la función aquí si la mascota muere
   }
 
-  // Si el hambre llega a 100, la mascota se empacha
-  if (petState.hunger >= 100) {
+  // Si el hambre llega a 93, la mascota se empacha
+  if (petState.hunger >= 97 && !petState.isSick) {  // Asegurarse de que no vuelva a empacharse
     petState.isSick = true;
-    changeExpression('🤢');
-    addEventToBar(getRandomPhrase('overfed'), "Cakiwaki está empachado. Espera a que su hambre baje.");
+    changeExpression('🤢');  // Cambiar la expresión a la cara de vomitar
+    addEventToBar("¡Cakiwaki está empachado! Espera a que su hambre baje.", "🤢");
   }
 
-  // Si el hambre baja de 90 y estaba empachado, la mascota se recupera
-  if (petState.hunger < 90 && petState.isSick && petState.expression === '🤢') {
+  // Si el hambre baja de 85 y estaba empachado, la mascota se recupera
+  if (petState.hunger < 90 && petState.isSick) {
     petState.isSick = false;
-    updateExpression();
-    addEventToBar("😊 Cakiwaki se siente mejor", "El empacho ha pasado.");
+    updateExpression();  // Cambiar la expresión a algo normal o feliz
+    addEventToBar("😊 Cakiwaki se siente mejor. El empacho ha pasado.", "😊");
   }
 
   // Posibilidad de que la mascota se enferme aleatoriamente
@@ -1111,34 +1117,81 @@ function changeExpression(newExpression) {
 
 function updateExpression() {
   const now = Date.now();
+
+  // Array de emojis aleatorios para cuando la mascota está muerta
+  const deadEmojis = ['💀', '🧟', '👻', '😈', '🥑'];  // Calavera, zombie, fantasma, demonio y aguacate
+
+  // Verificamos si ha pasado suficiente tiempo para cambiar la expresión
   if (now - petState.lastExpressionChangeTime > petState.expressionChangeInterval) {
+
+    // Si la mascota está muerta
     if (petState.isDead) {
-      changeExpression('💀');
+      // Selecciona aleatoriamente uno de los emojis del array deadEmojis
+      const randomDeadEmoji = deadEmojis[Math.floor(Math.random() * deadEmojis.length)];
+      changeExpression(randomDeadEmoji);  // Cambia la expresión a uno de los emojis aleatorios
+      pet.style.filter = 'grayscale(100%)';  // Aplica el filtro de escala de grises
+
+    // Si la mascota está empachada (prioridad máxima)
+    } else if (petState.hunger >= 97) {
+      changeExpression('🤢');  // Cara de empacho (verde)
+      pet.style.filter = 'none';  // No aplicamos ningún filtro para el empacho (cara verde)
+
+    // Si el juego está pausado
     } else if (petState.isPaused) {
       changeExpression('😴');
-    } else if (petState.isSick) {
-      changeExpression(petState.hunger >= 100 ? '🤢' : '🤒');
+      pet.style.filter = 'none';  // No aplicamos filtro cuando el juego está pausado
+
+    // Si la mascota está enferma por enfermedad aleatoria (y no empachada)
+    } else if (petState.isSick && petState.hunger < 92) {
+      changeExpression('🤒');  // Cara de fiebre (termómetro)
+      pet.style.filter = 'hue-rotate(180deg)';  // Aplica el filtro de cambio de tono para la enfermedad
+
+    // Si la mascota está siendo acariciada
     } else if (petState.caressing) {
-      changeExpression(getRandomExpression(caressEmojis));
+      changeExpression(getRandomExpression(caressEmojis));  // Muestra una expresión feliz al acariciarlo
+      pet.style.filter = 'none';  // Sin filtro para las caricias
+
+    // Cambia la expresión según el nivel de hambre
     } else {
+      pet.style.filter = 'none';  // Restablecemos el filtro a ninguno
+
+      // Nivel alto de hambre
       if (petState.hunger >= 50) {
-        changeExpression(getRandomExpression(highStateEmojis));
+        changeExpression(getRandomExpression(highStateEmojis));  // Expresiones para hambre alta
+
+      // Nivel medio de hambre
       } else if (petState.hunger >= 30) {
-        changeExpression(getRandomExpression(mediumStateEmojis));
+        changeExpression(getRandomExpression(mediumStateEmojis));  // Expresiones para hambre media
+
+      // Nivel bajo de hambre
       } else {
-        changeExpression(getRandomExpression(lowStateEmojis));
+        changeExpression(getRandomExpression(lowStateEmojis));  // Expresiones para hambre baja
       }
+
+      // Aplicamos el brillo solo en estados normales
+      const brightness = 100 + (petState.fun / 2);
+      pet.style.filter += ` brightness(${brightness}%)`;
     }
+
+    // Actualizamos el tiempo de la última vez que se cambió la expresión
     petState.lastExpressionChangeTime = now;
   }
 }
 
-function handleCaressBonus() {
+function handleCaressBonus(event) {
   if (petState.isDead) return;
 
   petState.caressCount = (petState.caressCount || 0) + 1;
   petState.caressing = true;
   changeExpression(getRandomExpression(caressEmojis));
+
+  // Verifica si el evento tiene coordenadas
+  if (event && event.clientX && event.clientY) {
+    const x = event.clientX;
+    const y = event.clientY;
+    console.log('Coordenadas del clic:', x, y); // Añadir un log para verificar las coordenadas
+    showTapEffect(x, y);
+  }
 
   if (petState.caressCount % 3 === 0) {
     const funBonus = 10;
@@ -1156,6 +1209,9 @@ function handleCaressBonus() {
   updateStatus();
   saveGame();
 }
+
+
+
 
 function cleanPet() {
   if (petState.shampooCount > 0) {
@@ -1778,18 +1834,73 @@ function updateStatus() {
   applyVisualEffects();
 }
 
+
+
+function showTapEffect(x, y, particleCount = 5, duration = 2000) {
+  const emojis = ['💖', '🌟', '✨', '❤️', '⭐']; // Emojis de partículas
+  
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    particle.style.position = 'absolute';
+    particle.style.left = `${x}px`;
+    particle.style.top = `${y}px`;
+    particle.style.fontSize = '2.5em';
+    particle.style.pointerEvents = 'none';
+    particle.style.transition = `transform ${duration / 1000}s ease, opacity ${duration / 1000}s ease`;
+    particle.style.zIndex = '9999'; // Asegúrate de que las partículas estén al frente
+
+    // Agregar efecto de transformación para movimiento
+    const angle = Math.random() * 360; // Ángulo aleatorio en grados
+    const distance = Math.random() * 50 + 50; // Distancia aleatoria entre 50 y 100 píxeles
+    const transformX = Math.cos(angle) * distance;
+    const transformY = Math.sin(angle) * distance;
+
+    // Añadir el particle al DOM
+    document.body.appendChild(particle);
+
+    // Aplicar la transformación inicial
+    setTimeout(() => {
+      particle.style.transform = `translate(${transformX}px, ${transformY}px)`;
+      particle.style.opacity = '0'; // Desvanecer las partículas
+    }, 50); // Pequeña pausa antes de empezar la animación
+
+    // Eliminar la partícula después de la duración especificada
+    setTimeout(() => {
+      particle.remove();
+    }, duration);
+  }
+}
+
 function applyVisualEffects() {
+  // Si la mascota está muerta, aplicamos filtro en escala de grises
   if (petState.isDead) {
     pet.style.filter = 'grayscale(100%)';
-  } else if (petState.isSick) {
-    pet.style.filter = 'hue-rotate(180deg)';
+    changeExpression('💀');  // Cara de muerto
+
+  // Si está empachado (hambre >= 93), aplicamos la cara verde y bloqueamos cualquier otro cambio
+  } else if (petState.hunger >= 93) {
+    pet.style.filter = 'none';  // Desactivamos cualquier filtro (ni brillo ni hue-rotate)
+    changeExpression('🤢');  // Cara de empacho (verde)
+    
+    // Nos aseguramos de que el estado de empacho tenga la máxima prioridad y no sea sobreescrito
+
+  // Si está enferma por una enfermedad aleatoria (hambre < 93), aplicamos filtro de termómetro
+  } else if (petState.isSick && petState.hunger < 93) {
+    pet.style.filter = 'hue-rotate(180deg)';  // Cambia el tono para la enfermedad aleatoria
+    changeExpression('🤒');  // Cara de enfermo con termómetro
+
+  // Caso normal (ni empachado, ni muerto, ni enfermo), aplica brillo según la diversión
   } else {
-    pet.style.filter = 'none';
+    pet.style.filter = 'none';  // Restablecemos el filtro a ninguno
+    updateExpression();  // Cambia la expresión dependiendo del nivel de hambre y diversión
+
+    // Aplicamos el brillo solo en estados normales
+    const brightness = 100 + (petState.fun / 2);
+    pet.style.filter += ` brightness(${brightness}%)`;
   }
 
-  const brightness = 100 + (petState.fun / 2);
-  pet.style.filter += ` brightness(${brightness}%)`;
-
+  // Redimensiona la mascota
   resizePet();
 }
 
@@ -1798,7 +1909,7 @@ function resizePet() {
   const frameSize = Math.min(petFrame.offsetWidth, petFrame.offsetHeight);
 
   const hungerLevel = petState.hunger;
-  const petSizeFactor = 0.1 + (hungerLevel / 100);  // Cambia el divisor para hacer crecer o reducir más el emoji
+  const petSizeFactor = 0.1 + (hungerLevel / 170);  // Cambia el divisor para hacer crecer o reducir más el emoji
   const petSize = frameSize * petSizeFactor;
 
   pet.style.fontSize = `${petSize}px`;
