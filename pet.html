@@ -81,13 +81,65 @@
             box-shadow: 0 0 10px var(--neon-blue);
         }
 
-        .info-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
+.info-bar {
+  display: flex;
+  justify-content: space-between;  /* Distribuye los elementos en toda la barra */
+  align-items: center;             /* Alinea verticalmente */
+  margin-bottom: 10px;
+  flex-wrap: nowrap;               /* Asegura que todo quede en una sola línea */
+  padding: 5px;                    /* Añade algo de espacio interior */
+  background-color: #222;          /* Opcional: color de fondo para más visibilidad */
+}
+
+.currency, .xp, .level, .weather {
+  white-space: nowrap;             /* Evita que el texto salte a una nueva línea */
+  overflow: hidden;                /* Oculta cualquier contenido que se salga del contenedor */
+  text-overflow: ellipsis;         /* Añade "..." si el texto es muy largo */
+  text-align: center;              /* Centra el texto */
+  padding: 5px;                    /* Añade algo de espacio alrededor de los textos */
+  color: #fff;                     /* Color del texto */
+}
+
+.currency {
+  flex: 1 1 100px;                 /* Fija un ancho mínimo de 100px, pero permite que se expanda */
+}
+
+.xp {
+  flex: 1 1 80px;                  /* Similar para el XP, ajustable a tu preferencia */
+}
+
+.level {
+  flex: 1 1 120px;                 /* Ajuste dinámico para el nivel */
+}
+
+.weather {
+  flex: 0 1 50px;                  /* Fija un tamaño pequeño para el icono del clima */
+}
+
+.currency, .xp, .level, .weather {
+  white-space: nowrap;           /* Evita que el texto salte a una nueva línea */
+  overflow: hidden;              /* Oculta el contenido si se desborda */
+  text-overflow: ellipsis;       /* Añade '...' si el texto es demasiado largo */
+  width: 100px;                  /* Puedes ajustar este valor para cada item */
+  text-align: center;            /* Centra el texto dentro de cada div */
+  color: #fff;                   /* Color del texto */
+}
+
+.currency {
+  width: 120px;                  /* Puedes ajustar el ancho específico para el dinero */
+}
+
+.xp {
+  width: 80px;                   /* Ajusta el ancho del XP según lo que necesites */
+}
+
+.level {
+  width: 120px;                  /* Ajusta el ancho del nivel */
+}
+
+.weather {
+  width: 50px;                   /* Como es solo un icono, puede tener un ancho pequeño */
+}
 
         .currency, .xp, .level, .weather {
             font-size: 1.2em;
@@ -522,12 +574,12 @@
         <!-- Overlay para la muerte de la mascota -->
         <div class="overlay" id="deathOverlay"></div>
 
-        <div class="frame info-bar">
-            <div class="currency" id="currency">💰 2000</div>
-            <div class="xp" id="xp">⭐ 0</div>
-            <div class="level" id="level">🔺 Nivel 1</div>
-            <div class="weather" id="weather">☀️</div>
-        </div>
+ <div class="frame info-bar">
+ <div class="currency" id="currency">💰 2000</div>
+ <div class="xp" id="xp">⭐ 0</div>
+ <div class="level" id="level">🔺 Nivel 1</div>
+ <div class="weather" id="weather">☀️</div>
+ </div>
         <div class="frame status-bars">
             <div class="status-bar">
                 <div class="bar-container"><div id="hunger-fill" class="status-fill"></div></div>
