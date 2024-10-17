@@ -41,6 +41,11 @@
             position: relative;
             overflow: hidden;
             min-height: 100vh;
+        user-select: none;
+        -webkit-user-select: none; /* Para Safari */
+        -moz-user-select: none; /* Para Firefox */
+        -ms-user-select: none; /* Para Internet Explorer y Edge */
+        -o-user-select: none;
         }
 
         /* Overlay para atenuar la pantalla al morir */
@@ -213,6 +218,11 @@
             transition: all 0.5s ease;
             cursor: pointer;
             z-index: 10;
+        user-select: none;
+        -webkit-user-select: none; /* Para Safari */
+        -moz-user-select: none; /* Para Firefox */
+        -ms-user-select: none; /* Para Internet Explorer y Edge */
+        -o-user-select: none;
         }
 
         .pet-accessory {
@@ -225,7 +235,12 @@
 
         .accessory-crown { top: -5vh; left: 50%; transform: translateX(-50%); }
         .accessory-glasses { top: 4vh; left: 50%; transform: translateX(-50%); font-size: 11vh; }
-        .accessory-hat { top: -5.5vh; left: 50%; transform: translateX(-50%); }
+.accessory-hat {
+    top: -3vh;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 6vh; /* Ajusta este valor para reducir el tamaño */
+}
 
         .action-buttons {
             display: flex;
@@ -239,6 +254,13 @@
             background-color: var(--background-color);
         }
 
+
+.follow-emoji {
+    position: absolute;
+    font-size: 2em;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
         .action-btn {
             font-size: 2em;
             background: rgba(255, 255, 255, 0.1);
@@ -492,6 +514,9 @@
                 <div class="bar-container"><div id="hygiene-fill" class="status-fill"></div></div>
                 <div class="status-emoji">🚿</div>
             </div>
+           
+          
+          
         </div>
         <div class="display-container">
             <div class="display-left" id="eventBar"></div>
@@ -512,18 +537,29 @@
             </div>
             <div class="light-switch" id="lightSwitch">💡</div>
         </div>
-        <div class="action-buttons">
-            <button class="action-btn" id="feed-btn">🍽️</button>
-            <button class="action-btn" id="play-btn">🎮</button>
-            <button class="action-btn" id="clean-btn">🧼</button>
-        </div>
+<div class="action-buttons">
+    <button class="action-btn" id="feed-btn">🍽️</button>
+    <button class="action-btn" id="play-btn">🎮</button>
+    <button class="action-btn" id="clean-btn">🧼</button>
+    <!-- Botón para usar medicina, inicialmente oculto -->
+    <button class="action-btn" id="use-medicine-btn" style="display: none;">💊</button>
+</div>
 
         <!-- Bonus por caricia -->
         <div class="caress-bonus" id="caressBonus" style="display: none;">
             🎉 ¡Bonus por caricias activado! 🎉
         </div>
     </div>
-    
+<!-- Modal de Minijuego Único -->
+<div id="miniGameModal" class="modal">
+    <div class="modal-content">
+        <span class="close">❌</span>
+        <h2>🎮 Minijuego</h2>
+        <div id="mini-game-board" class="mini-game-board"></div>
+        <!-- Contenedor para mensajes -->
+        <div id="mini-game-message"></div>
+    </div>
+</div>
     <!-- Modales -->
     <div id="shopModal" class="modal">
         <div class="modal-content">
@@ -541,13 +577,7 @@
         </div>
     </div>
     
-    <div id="miniGameModal" class="modal">
-        <div class="modal-content">
-            <span class="close">❌</span>
-            <h2>🎮 Minijuego</h2>
-            <div id="mini-game-board" class="mini-game-board"></div>
-        </div>
-    </div>
+
     
     <div id="chestModal" class="chest-modal">
         <div class="chest-content">
@@ -557,13 +587,12 @@
         </div>
     </div>
     <script>
-                
 // Variables globales
 let petState = {
   hunger: 100,
   fun: 100,
   hygiene: 100,
-  currency: 2000,
+  currency: 5000,
   xp: 0,
   level: 1,
   isSick: false,
@@ -584,15 +613,17 @@ let petState = {
   weatherTimer: 0,
   weatherInterval: 60,
   lastExpressionChangeTime: 0,
-  expressionChangeInterval: 5000,
-  caressTimeout: null
+  expressionChangeInterval: 2000, // Reducimos el intervalo para cambiar expresiones más frecuentemente
+  caressTimeout: null,
+  poopsCleaned: 0 // Añadido para el logro de limpieza
 };
 
 // Elementos del DOM
 let pet, petContainer, crown, glasses, hat;
 let hungerFill, funFill, hygieneFill, currencyElement;
 let xpElement, levelElement, weatherElement, eventBar;
-let lightSwitch, background, deathOverlay, caressBonus;
+let lightSwitch, background, deathOverlay;
+let useMedicineBtn; // Botón para usar medicina
 
 // Botones de acción
 let feedBtn, playBtn, cleanBtn, shopIcon;
@@ -605,15 +636,28 @@ const DECREASE_INTERVAL = 5000;
 const HUNGER_DECREASE_RATE = 1;
 const FUN_DECREASE_RATE = 0.8;
 const HYGIENE_DECREASE_RATE = 0.7;
-const SICKNESS_PROBABILITY = 0.01;
-const SPECIAL_EVENT_PROBABILITY = 0.01;
+const SICKNESS_PROBABILITY = 0.0003; // Incrementamos la probabilidad de enfermedad
+const SPECIAL_EVENT_PROBABILITY = 0.05; // Incrementamos la probabilidad de eventos especiales
 
-// Emojis para diferentes estados
-const lowStateEmojis = ['😢', '😭', '😞', '😔', '🙁', '😕', '😖'];
-const mediumStateEmojis = ['😐', '🙂', '😌', '😑', '😒', '😶'];
-const highStateEmojis = ['😄', '😍', '😁', '😃', '😀', '😊', '😆'];
-const caressEmojis = ['😊', '😌', '😃', '😄', '😁', '😆'];
-const weatherEmojis = ['☀️', '🌧️', '❄️', '🌤️', '🌈'];
+// Emojis para diferentes estados (añadidos más emojis)
+const lowStateEmojis = [
+  '😢', '😭', '😞', '😔', '🙁', '😕', '😖', '😟', '😣', '😩', '😫', '🥺', 
+  '😥', '😰', '😨', '😧', '😓', '😱', '☹️', '😤', '😖', '😷', '😵'
+];
+
+const mediumStateEmojis = [
+  '😐', '🙂', '😌', '😑', '😒', '😶', '😏', '😬', '😗', '🤔', '😯', '😴', 
+  '🤨', '😑', '😕', '😦', '😟', '😳', '🙄', '😬', '🤥', '🤫',
+];
+
+const highStateEmojis = [
+  '😄', '😍', '😁', '😃', '😀', '😊', '😆', '🥰', '🤩', '😎', '😚', '😙', 
+  '😜', '🤗', '😝', '😇', '🤠', '🥳', '🤪', '😋', '🤓', '😹'
+];
+
+const caressEmojis = [
+  '😊', '😌', '😃', '😄', '😁', '😆', '🥰', '😇', '🤗', '😘', '😻', '💖'
+];const weatherEmojis = ['☀️', '🌧️', '❄️', '🌤️', '🌈', '⛈️', '🌪️', '🌙'];
 let currentWeatherIndex = 0;
 
 // Items
@@ -623,7 +667,9 @@ const shopItems = [
   { emoji: '🧢', price: 200, type: 'hat', requiredLevel: 2 },
   { emoji: '🧴', price: 50, type: 'shampoo', requiredLevel: 1 },
   { emoji: '💊', price: 100, type: 'medicine', requiredLevel: 1 },
-  // ... otros items
+  { emoji: '🎩', price: 1000, type: 'crown', requiredLevel: 10 },
+  { emoji: '🥽', price: 800, type: 'glasses', requiredLevel: 8 },
+  { emoji: '🎓', price: 600, type: 'hat', requiredLevel: 7 }
 ];
 
 const foodItems = [
@@ -632,13 +678,13 @@ const foodItems = [
   { emoji: '🍕', hunger: 20, price: 150, requiredLevel: 3 },
   { emoji: '🍦', hunger: 5, price: 80, requiredLevel: 1 },
   { emoji: '🥗', hunger: 15, price: 120, requiredLevel: 2 },
-  // Añadiendo más opciones de comida
   { emoji: '🍩', hunger: 8, price: 60, requiredLevel: 1 },
   { emoji: '🍣', hunger: 22, price: 160, requiredLevel: 4 },
   { emoji: '🍗', hunger: 28, price: 180, requiredLevel: 3 },
   { emoji: '🍰', hunger: 18, price: 140, requiredLevel: 2 },
   { emoji: '🍛', hunger: 30, price: 200, requiredLevel: 5 },
-  // ... otros alimentos
+  { emoji: '🍜', hunger: 20, price: 150, requiredLevel: 3 },
+  { emoji: '🌭', hunger: 15, price: 100, requiredLevel: 2 }
 ];
 
 // Frases variadas para la interfaz
@@ -656,7 +702,76 @@ const phrases = {
     "¡Delicioso! 🍗",
     "¡Más por favor! 🍰"
   ],
-  // ... otras categorías
+  clean: [
+    "¡Gracias por mantenerme limpio! 🛁",
+    "¡Me siento fresco! 🌸",
+    "¡A brillar! ✨",
+    "¡Ahora huelo genial! 🌺",
+    "¡Listo para jugar! 🏃‍♂️",
+    "¡Cakiwaki está reluciente! 💎",
+    "¡Nada como una buena limpieza! 🧽",
+    "¡Me encanta estar limpio! 😊",
+    "¡Fuera suciedad! 🧼",
+    "¡Gracias por cuidarme! ❤️",
+    "¡Baño refrescante! 🚿",
+    "¡Adiós, gérmenes! 🦠"
+  ],
+  overfed: [
+    "¡Uf, comí demasiado! 🤢",
+    "¡Me siento pesado! 😣",
+    "Creo que fue mucho... 😓",
+    "¡Ay, mi pancita! 🥴",
+    "Necesito descansar... 😴",
+    "¡No más comida por ahora! 😖",
+    "¡Estoy lleno! 🐷",
+    "¡Demasiado para mí! 🥵"
+  ],
+  sick: [
+    "No me siento bien... 🤒",
+    "Creo que estoy enfermo... 😷",
+    "Necesito medicina... 🤧",
+    "¡Achoo! 🤧",
+    "¿Puedes ayudarme? 😢",
+    "¡Me duele todo! 😫",
+    "¡Un poco de descanso me vendría bien! 🛌"
+  ],
+  dead: [
+    "Cakiwaki ha partido... 💀",
+    "Adiós, amigo... 🥀",
+    "Fue un buen tiempo juntos... 😢",
+    "Cakiwaki ya no está... 🕯️",
+    "Descansa en paz... 🌙",
+    "Siempre te recordaré... 😔",
+    "Hasta siempre... 🌹"
+  ],
+  levelUp: [
+    "¡Subí de nivel! 🎉",
+    "¡Soy más fuerte ahora! 💪",
+    "¡Nivel nuevo, aventuras nuevas! 🌟",
+    "¡Seguimos creciendo! 🌱",
+    "¡Gracias por ayudarme! 😊",
+    "¡Soy imparable! 🚀",
+    "¡Vamos por más! 🥳",
+    "¡Nuevos retos me esperan! 🏆"
+  ],
+  event: [
+    "¡Qué día tan bonito! 🌞",
+    "¡Me encanta pasar tiempo contigo! 🥰",
+    "¡Juguemos más! 🎈",
+    "¡Estoy aprendiendo cosas nuevas! 📚",
+    "¡La vida es maravillosa! 🌟",
+    "¡Gracias por estar ahí! ❤️",
+    "¡Me siento genial! 😃",
+    "¡Eres el mejor amigo! 🤗",
+    "¡Hoy es un gran día! ☀️",
+    "¡Siento una energía especial! ⚡"
+  ],
+  caressBonus: [
+    "¡Me encantan tus caricias! 😻",
+    "¡Eres el mejor! 🤗",
+    "¡Gracias por tu cariño! 💖",
+    "¡Esto es genial! 😍"
+  ]
 };
 
 // Función para obtener una frase aleatoria
@@ -670,14 +785,19 @@ function getRandomExpression(emojisArray) {
   return emojisArray[Math.floor(Math.random() * emojisArray.length)];
 }
 
-// Función para desactivar la selección de texto
+// Función para desactivar la selección de texto usando CSS y JavaScript
 function disableTextSelection(element) {
   if (element) {
     element.style.userSelect = 'none';
     element.style.webkitUserSelect = 'none';
     element.style.msUserSelect = 'none';
-    element.style.touchAction = 'manipulation';
-    element.addEventListener('selectstart', (e) => e.preventDefault());
+    element.style.mozUserSelect = 'none';
+    element.style.touchAction = 'none';
+    element.style.webkitTouchCallout = 'none';
+    element.onselectstart = () => false;
+    element.onmousedown = () => false;
+    element.onmousemove = () => false;
+    element.onmouseup = () => false;
   }
 }
 
@@ -699,7 +819,7 @@ function initializeGame() {
   lightSwitch = document.getElementById('lightSwitch');
   background = document.getElementById('background');
   deathOverlay = document.getElementById('deathOverlay');
-  caressBonus = document.getElementById('caressBonus');
+  useMedicineBtn = document.getElementById('use-medicine-btn');
 
   feedBtn = document.getElementById('feed-btn');
   playBtn = document.getElementById('play-btn');
@@ -730,6 +850,11 @@ function initializeGame() {
     });
   }
 
+  // Evento para usar medicina
+  if (useMedicineBtn) {
+    useMedicineBtn.addEventListener('click', useMedicine);
+  }
+
   // Agregar eventos a los botones de cierre de modales
   const closeButtons = document.querySelectorAll('.close');
   closeButtons.forEach(button => {
@@ -755,8 +880,8 @@ function initializeGame() {
   }
 
   // Evento para acariciar a la mascota
-  if (pet) {
-    pet.addEventListener('click', (e) => {
+  if (petContainer) {
+    petContainer.addEventListener('click', (e) => {
       e.stopPropagation();
       handleCaressBonus();
     });
@@ -767,6 +892,7 @@ function initializeGame() {
   disableTextSelection(crown);
   disableTextSelection(glasses);
   disableTextSelection(hat);
+  disableTextSelection(petContainer);
 
   // Cargar el juego y comenzar el ciclo de juego
   loadGame();
@@ -821,6 +947,9 @@ function gameLoop() {
 
   // Actualizar la expresión de la mascota
   updateExpression();
+
+  // Generar eventos especiales con mayor frecuencia
+  handleSpecialEvents();
 
   // Actualizar el estado visual del juego
   updateStatus();
@@ -892,32 +1021,30 @@ function changeExpression(newExpression) {
   }
 }
 
-// Función para actualizar la expresión de la mascota
 function updateExpression() {
-  if (petState.isDead) {
-    changeExpression('💀');
-  } else if (petState.isPaused) {
-    changeExpression('😴');
-  } else if (petState.isSick) {
-    changeExpression(petState.hunger >= 100 ? '🤢' : '🤒');
-  } else if (petState.caressing) {
-    changeExpression(getRandomExpression(caressEmojis));
-  } else {
-    const now = Date.now();
-    if (now - petState.lastExpressionChangeTime > petState.expressionChangeInterval) {
-      if (petState.hunger <= 30 || petState.fun <= 30 || petState.hygiene <= 30) {
-        changeExpression(getRandomExpression(lowStateEmojis));
-      } else if (petState.hunger >= 70 && petState.fun >= 70 && petState.hygiene >= 70) {
+  const now = Date.now();
+  if (now - petState.lastExpressionChangeTime > petState.expressionChangeInterval) {
+    if (petState.isDead) {
+      changeExpression('💀');
+    } else if (petState.isPaused) {
+      changeExpression('😴');
+    } else if (petState.isSick) {
+      changeExpression(petState.hunger >= 100 ? '🤢' : '🤒');
+    } else if (petState.caressing) {
+      changeExpression(getRandomExpression(caressEmojis));
+    } else {
+      if (petState.hunger >= 50) {
         changeExpression(getRandomExpression(highStateEmojis));
-      } else {
+      } else if (petState.hunger >= 30) {
         changeExpression(getRandomExpression(mediumStateEmojis));
+      } else {
+        changeExpression(getRandomExpression(lowStateEmojis));
       }
-      petState.lastExpressionChangeTime = now;
     }
+    petState.lastExpressionChangeTime = now;
   }
 }
 
-// Función para manejar el bonus por caricias
 function handleCaressBonus() {
   if (petState.isDead) return;
 
@@ -925,11 +1052,11 @@ function handleCaressBonus() {
   petState.caressing = true;
   changeExpression(getRandomExpression(caressEmojis));
 
-  if (petState.caressCount % 5 === 0) {
+  if (petState.caressCount % 3 === 0) {
     const funBonus = 10;
     petState.fun = Math.min(100, petState.fun + funBonus);
-    addEventToBar(`💖 ¡Bonus por caricias! +${funBonus}% diversión`, "Cakiwaki aprecia tus caricias.");
-    showCaressBonusNotification();
+    addEventToBar(`💖 ${getRandomPhrase('caressBonus')} +${funBonus}% diversión`);
+    gainXP(2);
   }
 
   clearTimeout(petState.caressTimeout);
@@ -942,15 +1069,6 @@ function handleCaressBonus() {
   saveGame();
 }
 
-// Función para mostrar la notificación de bonus por caricias
-function showCaressBonusNotification() {
-  caressBonus.style.display = 'block';
-  setTimeout(() => {
-    caressBonus.style.display = 'none';
-  }, 3000);
-}
-
-// Función para limpiar a la mascota
 function cleanPet() {
   if (petState.shampooCount > 0) {
     petState.hygiene = Math.min(100, petState.hygiene + 40);
@@ -965,20 +1083,18 @@ function cleanPet() {
   }
 }
 
-// Función para mostrar eventos en el event bar
 function addEventToBar(message, additionalInfo = "") {
-  const eventIcon = document.createElement('div');
-  eventIcon.classList.add('event-icon');
-  eventIcon.innerHTML = `${message}<br><small>${additionalInfo}</small>`;
-  eventIcon.style.fontSize = '0.8em';
-  eventBar.insertBefore(eventIcon, eventBar.firstChild);
+const eventIcon = document.createElement('div');
+eventIcon.classList.add('event-icon');
+eventIcon.innerHTML = `${message}<br><small>${additionalInfo}</small>`;
+eventIcon.style.fontSize = '0.8em';
+eventBar.insertBefore(eventIcon, eventBar.firstChild);
 
-  while (eventBar.childNodes.length > 5) {
-    eventBar.removeChild(eventBar.lastChild);
-  }
+while (eventBar.childNodes.length > 5) {
+eventBar.removeChild(eventBar.lastChild);
+}
 }
 
-// Función para manejar la pausa cuando se presiona el botón de bombillo
 function togglePause() {
   petState.isPaused = !petState.isPaused;
   if (petState.isPaused) {
@@ -991,13 +1107,11 @@ function togglePause() {
   saveGame();
 }
 
-// Función para abrir un modal y actualizar su contenido
 function openModal(modal, updateFunction) {
   modal.style.display = 'block';
   updateFunction();
 }
 
-// Función para actualizar los items de la tienda
 function updateShopItems() {
   const shopItemsContainer = document.getElementById('shop-items');
   if (shopItemsContainer) {
@@ -1009,19 +1123,18 @@ function updateShopItems() {
   }
 }
 
-// Función para crear un item de la tienda
 function createShopItem(item) {
   const itemElement = document.createElement('div');
   itemElement.classList.add('shop-item');
   itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
 
-  if (['crown', 'glasses', 'hat', 'goggles', 'topHat', 'graduationCap'].includes(item.type)) {
-    itemElement.onclick = () => toggleAccessoryButtons(item, itemElement);
+  if (petState.level >= item.requiredLevel) {
+    if (['crown', 'glasses', 'hat'].includes(item.type)) {
+      itemElement.onclick = () => toggleAccessoryButtons(item, itemElement);
+    } else {
+      itemElement.onclick = () => buyConsumableItem(item);
+    }
   } else {
-    itemElement.onclick = () => buyConsumableItem(item);
-  }
-
-  if (petState.level < item.requiredLevel || petState.currency < item.price) {
     itemElement.style.opacity = '0.5';
     itemElement.style.cursor = 'not-allowed';
   }
@@ -1029,26 +1142,6 @@ function createShopItem(item) {
   return itemElement;
 }
 
-// Función para actualizar el menú de comida
-function updateFoodMenu() {
-  const foodItemsContainer = document.getElementById('food-items');
-  foodItemsContainer.innerHTML = '';
-  foodItems.forEach(item => {
-    const itemElement = document.createElement('div');
-    itemElement.classList.add('food-item');
-    itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
-    itemElement.onclick = () => feedPet(item);
-
-    if (petState.level < item.requiredLevel || petState.currency < item.price) {
-      itemElement.style.opacity = '0.5';
-      itemElement.style.cursor = 'not-allowed';
-    }
-
-    foodItemsContainer.appendChild(itemElement);
-  });
-}
-
-// Función para alternar los botones de accesorios
 function toggleAccessoryButtons(item, itemElement) {
   if (itemElement.querySelector('.accessory-buttons')) return;
 
@@ -1077,7 +1170,6 @@ function toggleAccessoryButtons(item, itemElement) {
   itemElement.appendChild(buttonsContainer);
 }
 
-// Función para equipar un accesorio
 function equipAccessory(item, itemElement) {
   if (petState.currency < item.price || petState.level < item.requiredLevel) {
     addEventToBar("❌ No tienes suficientes recursos para equipar este accesorio.", "Asegúrate de tener el nivel y monedas necesarios.");
@@ -1095,7 +1187,6 @@ function equipAccessory(item, itemElement) {
   shopModal.style.display = 'none';
 }
 
-// Función para desequipar un accesorio
 function unequipAccessory(item, itemElement) {
   if (petState.accessories[getAccessoryType(item.type)] === item.emoji) {
     petState.accessories[getAccessoryType(item.type)] = '';
@@ -1107,7 +1198,6 @@ function unequipAccessory(item, itemElement) {
   removeAccessoryButtons(itemElement);
 }
 
-// Función para actualizar la visualización de accesorios
 function updateAccessoryDisplay(type, emoji) {
   const accessoryElement = document.getElementById(type);
   if (accessoryElement) {
@@ -1115,7 +1205,29 @@ function updateAccessoryDisplay(type, emoji) {
   }
 }
 
-// Función para comprar un item consumible
+function removeAccessoryButtons(itemElement) {
+  const buttonsContainer = itemElement.querySelector('.accessory-buttons');
+  if (buttonsContainer) {
+    buttonsContainer.remove();
+  }
+}
+
+function getAccessoryType(type) {
+  switch (type) {
+    case 'crown':
+    case 'topHat':
+    case 'graduationCap':
+      return 'crown';
+    case 'glasses':
+    case 'goggles':
+      return 'glasses';
+    case 'hat':
+      return 'hat';
+    default:
+      return type;
+  }
+}
+
 function buyConsumableItem(item) {
   if (petState.currency >= item.price && petState.level >= item.requiredLevel) {
     petState.currency -= item.price;
@@ -1139,32 +1251,26 @@ function buyConsumableItem(item) {
   }
 }
 
-// Función para obtener el tipo de accesorio
-function getAccessoryType(type) {
-  switch (type) {
-    case 'crown':
-    case 'topHat':
-    case 'graduationCap':
-      return 'crown';
-    case 'glasses':
-    case 'goggles':
-      return 'glasses';
-    case 'hat':
-      return 'hat';
-    default:
-      return type;
-  }
+function updateFoodMenu() {
+  const foodItemsContainer = document.getElementById('food-items');
+  foodItemsContainer.innerHTML = '';
+  foodItems.forEach(item => {
+    const itemElement = document.createElement('div');
+    itemElement.classList.add('food-item');
+    itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
+    
+
+    if (petState.level >= item.requiredLevel && petState.currency >= item.price) {
+      itemElement.onclick = () => feedPet(item);
+    } else {
+      itemElement.style.opacity = '0.5';
+      itemElement.style.cursor = 'not-allowed';
+    }
+
+    foodItemsContainer.appendChild(itemElement);
+  });
 }
 
-// Función para remover los botones de accesorios
-function removeAccessoryButtons(itemElement) {
-  const buttonsContainer = itemElement.querySelector('.accessory-buttons');
-  if (buttonsContainer) {
-    buttonsContainer.remove();
-  }
-}
-
-// Función para alimentar a la mascota
 function feedPet(food) {
   if (petState.isDead) {
     revivePet();
@@ -1186,7 +1292,6 @@ function feedPet(food) {
   }
 }
 
-// Función para revivir a la mascota
 function revivePet() {
   petState.isDead = false;
   petState.hunger = 50;
@@ -1198,78 +1303,273 @@ function revivePet() {
   saveGame();
 }
 
-// Función para iniciar un minijuego aleatorio
-function startRandomMiniGame() {
-  memoryGame();
-}
-
-// Implementación del minijuego 'Busca a tu pareja' (Memory Game)
-function memoryGame() {
-  const miniGameBoard = document.getElementById('mini-game-board');
-  miniGameBoard.innerHTML = '';
-  miniGameModal.style.display = 'block';
-
-  const emojis = ['🍎', '🍌', '🍒', '🍇', '🍉', '🍓', '🥝', '🍍'];
-  const gameEmojis = [...emojis, ...emojis];
-  gameEmojis.sort(() => 0.5 - Math.random());
-
-  let firstCard = null;
-  let secondCard = null;
-  let lockBoard = false;
-  let matchesFound = 0;
-
-  gameEmojis.forEach((emoji, index) => {
-    const card = document.createElement('div');
-    card.classList.add('mini-game-cell');
-    card.dataset.emoji = emoji;
-    card.dataset.index = index;
-    card.textContent = '❓';
-
-    card.addEventListener('click', () => {
-      if (lockBoard || card === firstCard || card.classList.contains('matched')) return;
-
-      card.textContent = emoji;
-
-      if (!firstCard) {
-        firstCard = card;
-      } else {
-        secondCard = card;
-        lockBoard = true;
-
-        if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
-          firstCard.classList.add('matched');
-          secondCard.classList.add('matched');
-          matchesFound++;
-          resetCards();
-
-          if (matchesFound === emojis.length) {
-            addEventToBar("🎉 ¡Ganaste el minijuego!", "+20% diversión y +50 monedas");
-            petState.fun = Math.min(100, petState.fun + 20);
-            petState.currency += 50;
-            gainXP(20);
-            miniGameModal.style.display = 'none';
-            saveGame();
-          }
-        } else {
-          setTimeout(() => {
-            firstCard.textContent = '❓';
-            secondCard.textContent = '❓';
-            resetCards();
-          }, 1000);
-        }
-      }
-    });
-
-    miniGameBoard.appendChild(card);
-  });
-
-  function resetCards() {
-    [firstCard, secondCard] = [null, null];
-    lockBoard = false;
+function useMedicine() {
+  if (petState.isSick && petState.medicineCount > 0) {
+    petState.isSick = false;
+    petState.medicineCount--;
+    updateExpression();
+    addEventToBar("💊 Cakiwaki se ha curado", "¡Bien hecho! Cakiwaki se siente mucho mejor gracias a ti.");
+    gainXP(5);
+    updateStatus();
+    saveGame();
+  } else if (petState.medicineCount <= 0) {
+    addEventToBar("❌ No tienes medicina.", "Compra medicina en la tienda para curar a Cakiwaki.");
+  } else {
+    addEventToBar("ℹ️ Cakiwaki no está enfermo.", "No necesitas usar medicina ahora.");
   }
 }
 
-// Función para ganar XP y subir de nivel
+function startRandomMiniGame() {
+    const miniGames = [memoryGame, startFollowEmojiGame];
+    const randomGame = miniGames[Math.floor(Math.random() * miniGames.length)];
+    randomGame();
+}
+
+function startFollowEmojiGame() {
+    const gameModal = document.getElementById('miniGameModal');
+    const gameBoard = document.getElementById('mini-game-board');
+    const messageContainer = document.getElementById('mini-game-message');
+    const closeButton = document.querySelector('.close'); // Botón de cierre del modal
+    
+    // Configuración del juego
+    const GAME_DURATION = 10 * 1000; // Duración de 10 segundos
+    const EMOJI_INTERVAL = 200; // Intervalo rápido, emojis cada 200 ms
+    const EMOJI_TYPES = ['🎈', '🎉', '💥', '💣', '🎊', '✨', '🌟', '🍀', '🎂', '🎶', '🍭', '🍬'];
+    let score = 0;
+    let gameActive = false;
+    let emojiCreationInterval;
+    let gameTimer;
+    let countdownInterval; // Intervalo para el contador de tiempo
+    let timeLeft = 10; // Tiempo inicial de 10 segundos para el contador
+
+    // PAUSAR el juego principal mientras se juega el minijuego
+    petState.isPaused = true; // Esto detiene los descensos de niveles
+
+    // Limpiar el tablero de juego
+    gameBoard.innerHTML = '';
+    messageContainer.innerHTML = `🎇<br>Puntos: <span id="emoji-count">${score}</span><br>time: <span id="countdown">${timeLeft}</span> segundos`;
+
+    // Actualizar el contador de tiempo
+    function updateCountdown() {
+        timeLeft--;
+        document.getElementById('countdown').textContent = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+        }
+    }
+
+    // Iniciar el juego
+    gameActive = true;
+    score = 0;
+    timeLeft = 10; // Reinicia el tiempo
+
+    // Crear y hacer caer un emoji
+    function createFallingEmoji() {
+        if (!gameActive) return;
+
+        const emoji = document.createElement('div');
+        emoji.classList.add('falling-emoji');
+        emoji.textContent = EMOJI_TYPES[Math.floor(Math.random() * EMOJI_TYPES.length)];
+        
+        // Tamaño aleatorio entre 30px y 60px
+        const size = Math.floor(Math.random() * 30) + 30;
+        emoji.style.width = `${size}px`;
+        emoji.style.height = `${size}px`;
+        emoji.style.fontSize = `${size}px`;
+        
+        // Posición aleatoria en el eje X
+        const maxLeft = gameBoard.offsetWidth - size;
+        const left = Math.floor(Math.random() * maxLeft);
+        emoji.style.left = `${left}px`;
+        emoji.style.top = `-100px`; // Empieza fuera de la pantalla
+
+        gameBoard.appendChild(emoji);
+
+        // Animación de caída rápida
+        const fallDuration = Math.floor(Math.random() * 2000) + 1000; // Duración entre 1 y 3 segundos
+        setTimeout(() => {
+            emoji.style.transition = `top ${fallDuration}ms linear`;
+            emoji.style.top = `${gameBoard.offsetHeight}px`;
+        }, 50);
+
+        // Remover el emoji si llega al fondo sin ser explotado
+        emoji.addEventListener('transitionend', () => {
+            if (emoji.parentElement === gameBoard) {
+                emoji.remove();
+            }
+        });
+
+        // Efecto al explotar el emoji
+        emoji.addEventListener('click', () => {
+            if (!gameActive) return;
+            explodeEmoji(emoji);
+        });
+    }
+
+    // Función para explotar un emoji
+    function explodeEmoji(emoji) {
+        // Efecto visual de explosión
+        emoji.classList.add('explode');
+        // Incrementar el puntaje
+        score++;
+        // Actualizar el contador de emojis explotados
+        document.getElementById('emoji-count').textContent = score;
+        // Remover el emoji después de la animación
+        setTimeout(() => {
+            if (emoji.parentElement === gameBoard) {
+                emoji.remove();
+            }
+        }, 300); // Duración de la explosión
+    }
+
+    // Función para finalizar el juego
+    function endGame() {
+        gameActive = false;
+        clearInterval(emojiCreationInterval);
+        clearTimeout(gameTimer);
+        
+        // Remover todos los emojis restantes
+        const remainingEmojis = document.querySelectorAll('.falling-emoji');
+        remainingEmojis.forEach(emoji => emoji.remove());
+
+        // Mostrar el puntaje final (sin el texto extra)
+        messageContainer.innerHTML = `⏰ ¡Juego terminado!<br>Has explotado <strong>${score}</strong> emojis.`;
+
+        // Recompensas según el puntaje
+        const coinsEarned = score * 10; // 10 monedas por cada emoji explotado
+        const funEarned = Math.min(100, petState.fun + score * 0.5); // 0.5% diversión por emoji explotado
+
+        // Actualizar el estado de la mascota
+        petState.currency += coinsEarned;
+        petState.fun = funEarned;
+        addEventToBar(`💰 +${coinsEarned} monedas y 😊 +${score * 0.5}% diversión por el minijuego.`);
+        gainXP(score * 2); // 2 XP por cada emoji explotado
+
+        // Reanudar el juego principal (los niveles vuelven a bajar)
+        petState.isPaused = false; // Reanuda el juego principal
+
+        // Actualizar la interfaz
+        updateStatus();
+
+        // Guardar el estado del juego
+        saveGame();
+
+        // Cerrar el modal del minijuego
+        gameModal.style.display = 'none';
+    }
+
+    // Función para cerrar el juego si el usuario cierra el modal
+    function closeGame() {
+        gameActive = false;
+        clearInterval(emojiCreationInterval);
+        clearInterval(countdownInterval); // Detenemos el contador de tiempo
+        clearTimeout(gameTimer); 
+
+        // Reanudar el juego principal (los niveles vuelven a bajar)
+        petState.isPaused = false; // Reanuda el juego principal
+
+        // Cerrar el modal del minijuego
+        gameModal.style.display = 'none';
+    }
+
+    // Iniciar la creación de emojis a intervalos regulares
+    emojiCreationInterval = setInterval(createFallingEmoji, EMOJI_INTERVAL);
+
+    // Iniciar el temporizador del juego
+    gameTimer = setTimeout(endGame, GAME_DURATION);
+
+    // Iniciar el contador de tiempo regresivo
+    countdownInterval = setInterval(updateCountdown, 1000);
+
+    // Evento para cerrar el juego si el usuario cierra el modal
+    if (closeButton) {
+        closeButton.addEventListener('click', closeGame);
+    }
+}
+
+function memoryGame() {
+    const gameBoard = document.getElementById('mini-game-board');
+    const messageContainer = document.getElementById('mini-game-message');
+
+    // Limpia el contenido del modal para empezar el nuevo minijuego
+    gameBoard.innerHTML = ''; 
+    messageContainer.innerHTML = 'Encuentra las parejas de emojis iguales';
+
+    // Lista de emojis para el juego
+    const emojiOptions = ['😎', '😊', '😂', '😜', '😍', '🥳', '🤔', '😇', '🤩', '😡'];
+    
+    // Duplicamos los emojis para formar las parejas
+    let emojis = [...emojiOptions, ...emojiOptions];
+
+    // Mezclamos los emojis de forma aleatoria
+    emojis = emojis.sort(() => 0.5 - Math.random());
+
+    // Variables del juego
+    let firstSelection = null;
+    let secondSelection = null;
+    let matches = 0;
+    const totalMatches = emojiOptions.length;
+
+    // Función para crear el tablero de memoria
+    function createMemoryBoard() {
+        emojis.forEach((emoji, index) => {
+            const cell = document.createElement('div');
+            cell.classList.add('mini-game-cell');
+            cell.dataset.emoji = emoji;
+            cell.dataset.index = index;
+            cell.addEventListener('click', handleEmojiClick);
+            gameBoard.appendChild(cell);
+        });
+    }
+
+    // Función que maneja el clic en un emoji
+    function handleEmojiClick(e) {
+        const clickedCell = e.target;
+
+        // Evitar que el mismo emoji se seleccione dos veces
+        if (clickedCell === firstSelection || clickedCell.classList.contains('matched')) {
+            return;
+        }
+
+        clickedCell.textContent = clickedCell.dataset.emoji;
+
+        if (!firstSelection) {
+            // Primera selección
+            firstSelection = clickedCell;
+        } else if (!secondSelection) {
+            // Segunda selección
+            secondSelection = clickedCell;
+
+            // Verificamos si coinciden
+            if (firstSelection.dataset.emoji === secondSelection.dataset.emoji) {
+                firstSelection.classList.add('matched');
+                secondSelection.classList.add('matched');
+                matches++;
+
+                // Comprobamos si el jugador ha encontrado todas las parejas
+                if (matches === totalMatches) {
+                    messageContainer.innerHTML = '¡Felicidades! Has encontrado todas las parejas 🎉';
+                }
+
+                // Reiniciamos la selección
+                firstSelection = null;
+                secondSelection = null;
+            } else {
+                // Si no coinciden, volvemos a ocultar los emojis después de un pequeño retraso
+                setTimeout(() => {
+                    firstSelection.textContent = '';
+                    secondSelection.textContent = '';
+                    firstSelection = null;
+                    secondSelection = null;
+                }, 1000);
+            }
+        }
+    }
+
+    // Iniciar el juego
+    createMemoryBoard();
+}
+
 function gainXP(amount) {
   petState.xp += amount;
   if (petState.xp >= petState.level * 100) {
@@ -1280,7 +1580,6 @@ function gainXP(amount) {
   updateStatus();
 }
 
-// Función para subir de nivel
 function levelUp() {
   petState.level++;
   petState.xp = 0;
@@ -1289,29 +1588,22 @@ function levelUp() {
   updateStatus();
 }
 
-// Función para manejar eventos especiales
 function handleSpecialEvents() {
   if (Math.random() < SPECIAL_EVENT_PROBABILITY && !petState.isDead && !petState.isPaused) {
-    const events = [
-      {
-        name: "Lluvia de monedas",
-        action: () => {
-          const coinsGained = Math.floor(Math.random() * 50) + 10;
-          petState.currency += coinsGained;
-          addEventToBar(`🌧️💰 ¡Lluvia de monedas! +${coinsGained} monedas`, "¡Una sorpresa agradable para Cakiwaki!");
-        }
-      },
-      // ... otros eventos
-    ];
-
-    const randomEvent = events[Math.floor(Math.random() * events.length)];
-    randomEvent.action();
-    updateStatus();
-    saveGame();
+    const randomEvent = getRandomPhrase('event');
+    addEventToBar(randomEvent);
   }
 }
 
-// Función para actualizar la rejilla del fondo
+function changeWeather() {
+  petState.weatherTimer++;
+  if (petState.weatherTimer >= petState.weatherInterval) {
+    currentWeatherIndex = (currentWeatherIndex + 1) % weatherEmojis.length;
+    weatherElement.textContent = weatherEmojis[currentWeatherIndex];
+    petState.weatherTimer = 0;
+  }
+}
+
 function updateGrid() {
   const gridContainer = document.getElementById('gridContainer');
   gridContainer.innerHTML = '';
@@ -1322,38 +1614,27 @@ function updateGrid() {
   }
 }
 
-// Función para manejar logros
 const achievements = [
   { id: 'firstLevel', name: 'Primer Nivel', description: 'Alcanza el nivel 2', check: () => petState.level >= 2, reward: 100 },
+  { id: 'petLover', name: 'Amante de Mascotas', description: 'Realiza 50 caricias', check: () => petState.caressCount >= 50, reward: 150 },
+  { id: 'cleanFreak', name: 'Limpieza Total', description: 'Limpia 10 cacas', check: () => petState.poopsCleaned >= 10, reward: 100 },
   // ... otros logros
 ];
-
-let achievementTimers = {};
 
 function checkAchievements() {
   achievements.forEach(achievement => {
     if (!petState.achievements) petState.achievements = {};
     if (!petState.achievements[achievement.id] && achievement.check()) {
-      if (!achievementTimers[achievement.id]) {
-        achievementTimers[achievement.id] = setTimeout(() => {
-          petState.achievements[achievement.id] = true;
-          petState.currency += achievement.reward;
-          addEventToBar(`🏆 ¡Logro desbloqueado: ${achievement.name}!`, `Recompensa: ${achievement.reward} monedas`);
-          saveGame();
-        }, 60000);
-      }
-    } else {
-      if (achievementTimers[achievement.id]) {
-        clearTimeout(achievementTimers[achievement.id]);
-        delete achievementTimers[achievement.id];
-      }
+      petState.achievements[achievement.id] = true;
+      petState.currency += achievement.reward;
+      addEventToBar(`🏆 ¡Logro desbloqueado: ${achievement.name}!`, `Recompensa: ${achievement.reward} monedas`);
+      saveGame();
     }
   });
 }
 
-// Función para crear una caca
 function createPoop() {
-  if (Math.random() < 0.1 && !petState.isDead && !petState.isPaused) {
+  if (Math.random() < 0.3 && !petState.isDead && !petState.isPaused) {
     const poops = document.querySelectorAll('.poop');
     if (poops.length >= 6) return;
 
@@ -1362,13 +1643,15 @@ function createPoop() {
     poop.textContent = '💩';
     poop.style.left = `${Math.random() * 80 + 10}%`;
     poop.style.top = `${Math.random() * 80 + 10}%`;
-    poop.style.fontSize = `${Math.random() * 20 + 20}px`;
+    const size = Math.random() < 0.2 ? Math.random() * 40 + 60 : Math.random() * 20 + 20;
+    poop.style.fontSize = `${size}px`;
     poop.style.zIndex = 11;
 
     poop.onclick = () => {
       poop.remove();
       petState.hygiene = Math.min(100, petState.hygiene + 5);
       petState.currency += 5;
+      petState.poopsCleaned = (petState.poopsCleaned || 0) + 1;
       addEventToBar("🧹 Limpiaste una caca", "+5 monedas y +5% higiene");
       updateStatus();
       saveGame();
@@ -1377,7 +1660,6 @@ function createPoop() {
   }
 }
 
-// Función para actualizar el estado visual del juego
 function updateStatus() {
   if (hungerFill) hungerFill.style.width = `${petState.hunger}%`;
   if (funFill) funFill.style.width = `${petState.fun}%`;
@@ -1386,10 +1668,15 @@ function updateStatus() {
   if (xpElement) xpElement.textContent = `⭐ ${petState.xp} / ${petState.level * 100}`;
   if (levelElement) levelElement.textContent = `🔺 Nivel ${petState.level}`;
 
+  if (petState.isSick && petState.medicineCount > 0) {
+    useMedicineBtn.style.display = 'inline-block';
+  } else {
+    useMedicineBtn.style.display = 'none';
+  }
+
   applyVisualEffects();
 }
 
-// Función para aplicar efectos visuales basados en el estado de la mascota
 function applyVisualEffects() {
   if (petState.isDead) {
     pet.style.filter = 'grayscale(100%)';
@@ -1399,73 +1686,82 @@ function applyVisualEffects() {
     pet.style.filter = 'none';
   }
 
-  // Efecto de brillo basado en la diversión
   const brightness = 100 + (petState.fun / 2);
   pet.style.filter += ` brightness(${brightness}%)`;
 
-  // Cambiar el tamaño de la mascota según sus niveles
   resizePet();
 }
 
-// Función para redimensionar la mascota y los accesorios
 function resizePet() {
   const petFrame = document.querySelector('.pet-frame');
   const frameSize = Math.min(petFrame.offsetWidth, petFrame.offsetHeight);
 
-  // Calcular el tamaño de la mascota basado en los niveles
-  const averageLevel = (petState.hunger + petState.fun + petState.hygiene) / 3;
-  const petSizeFactor = 0.4 + (averageLevel / 250); // Factor entre 0.4 y 0.8
-  const petSize = frameSize * petSizeFactor; // La mascota ocupa entre el 40% y 80% del frame
+  const hungerLevel = petState.hunger;
+  const petSizeFactor = 0.3 + (hungerLevel / 250);
+  const petSize = frameSize * petSizeFactor;
 
   pet.style.fontSize = `${petSize}px`;
   resizeAccessories();
 }
 
-// Función para redimensionar los accesorios
 function resizeAccessories() {
   const petSize = pet.getBoundingClientRect();
-  const scaleFactor = petSize.width / 100; // Escalar proporcionalmente al tamaño del emoji
+  const scaleFactor = petSize.width / 100;
 
   if (crown) crown.style.transform = `translate(-50%, -50%) scale(${scaleFactor})`;
   if (glasses) glasses.style.transform = `translate(-50%, -50%) scale(${scaleFactor})`;
   if (hat) hat.style.transform = `translate(-50%, -50%) scale(${scaleFactor})`;
 }
 
-// Función para iniciar la oscilación de la mascota
 function startPetOscillation() {
-  let angle = 0;
-  const baseAmplitude = 10;
-  let amplitude = baseAmplitude;
+    let angle = 0;
+    const baseAmplitude = 10;
+    let amplitude = baseAmplitude;
 
-  function oscillate() {
-    if (!petState.isPaused && !petState.isDead) {
-      if (petState.hunger > 80 && petState.fun > 80 && petState.hygiene > 80) {
-        amplitude = 20;
-        angle += 0.2;
-      } else {
-        amplitude = baseAmplitude;
-        angle += 0.1;
-      }
+    function oscillate() {
+        if (!petState.isPaused && !petState.isDead) {
+            if (petState.hunger > 80 && petState.fun > 80 && petState.hygiene > 80) {
+                amplitude = 20;
+                angle += 0.2;
+            } else {
+                amplitude = baseAmplitude;
+                angle += 0.1;
+            }
 
-      const offsetX = amplitude * Math.sin(angle);
-      pet.style.transform = `translate(-50%, -50%) translateX(${offsetX}px)`;
+            // Calculamos el desplazamiento en X para la oscilación
+            const offsetX = amplitude * Math.sin(angle);
+            pet.style.transform = `translate(-50%, -50%) translateX(${offsetX}px)`;
+
+            // Obtener el tamaño actual del emoji para usarlo en los accesorios
+            const petSize = pet.getBoundingClientRect();
+            const scaleFactor = petSize.width / 100; // Ajustar este valor para adaptar el tamaño
+
+            // Oscilar y redimensionar los accesorios
+            const accessories = document.querySelectorAll('.pet-accessory');
+            accessories.forEach(accessory => {
+                // Ajustamos el tamaño de los accesorios con el factor de escala
+                accessory.style.transform = `translate(-50%, -50%) translateX(${offsetX}px) scale(${scaleFactor})`;
+            });
+        }
+        requestAnimationFrame(oscillate);
     }
-    requestAnimationFrame(oscillate);
-  }
-  oscillate();
+    oscillate();
 }
 
-// Llamadas cíclicas a funciones
-setInterval(handleSpecialEvents, DECREASE_INTERVAL);
 setInterval(checkAchievements, 1000);
-setInterval(createPoop, 10000);
+setInterval(createPoop, 5000);
 
-// Inicializar el juego cuando la página cargue
 window.onload = function() {
   initializeGame();
   resizePet();
   window.addEventListener('resize', resizePet);
+  // Prevenir solo la selección de texto en el emoji sin interferir en los toques
+  document.getElementById('pet').addEventListener('selectstart', (e) => {
+  e.preventDefault(); // Esto previene la selección de texto sin afectar los toques
+  });
 };
+
+
 
 </script>
 
