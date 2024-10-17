@@ -207,23 +207,29 @@
             transition: transform 0.5s ease;
         }
 
-        .pet {
-            font-size: 15vh;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            filter: drop-shadow(0 0 5px var(--neon-yellow));
-            user-select: none;
-            transition: all 0.5s ease;
-            cursor: pointer;
-            z-index: 10;
-        user-select: none;
-        -webkit-user-select: none; /* Para Safari */
-        -moz-user-select: none; /* Para Firefox */
-        -ms-user-select: none; /* Para Internet Explorer y Edge */
-        -o-user-select: none;
-        }
+.pet {
+  font-size: 15vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 5px var(--neon-yellow));
+  user-select: none;            /* Deshabilitar selección en navegadores actuales */
+  -webkit-user-select: none;     /* Deshabilitar selección en Safari y Chrome */
+  -moz-user-select: none;        /* Deshabilitar selección en Firefox */
+  -ms-user-select: none;         /* Deshabilitar selección en Internet Explorer */
+  -o-user-select: none;
+  -webkit-touch-callout: none;   /* Prevenir menú contextual en móviles */
+  touch-action: none;            /* Prevenir gestos que puedan interferir con toques */
+  -webkit-tap-highlight-color: transparent;  /* Elimina el resalte azul en móviles */
+  transition: all 0.5s ease;
+  cursor: pointer;
+  z-index: 10;
+}
+
+
+
+
 
         .pet-accessory {
             position: absolute;
@@ -488,6 +494,27 @@
                 font-size: 1.2em;
             }
         }
+    
+#pet-container {
+  position: relative;
+}
+
+#pet-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+}
+    
+    
     </style>
 </head>
 <body>
@@ -530,6 +557,7 @@
             <div class="background background1" id="background"></div>
             <div class="grid-container" id="gridContainer"></div>
             <div class="pet-container">
+                   <div id="pet-overlay"></div>
                 <div class="pet" id="pet" draggable="true">😊</div>
                 <div id="crown" class="pet-accessory accessory-crown" draggable="true"></div>
                 <div id="glasses" class="pet-accessory accessory-glasses" draggable="true"></div>
@@ -537,6 +565,9 @@
             </div>
             <div class="light-switch" id="lightSwitch">💡</div>
         </div>
+       
+      
+      
 <div class="action-buttons">
     <button class="action-btn" id="feed-btn">🍽️</button>
     <button class="action-btn" id="play-btn">🎮</button>
@@ -586,6 +617,9 @@
             <div id="chestItems"></div>
         </div>
     </div>
+   
+  
+  
     <script>
 // Variables globales
 let petState = {
@@ -1755,12 +1789,26 @@ window.onload = function() {
   initializeGame();
   resizePet();
   window.addEventListener('resize', resizePet);
-  // Prevenir solo la selección de texto en el emoji sin interferir en los toques
-  document.getElementById('pet').addEventListener('selectstart', (e) => {
-  e.preventDefault(); // Esto previene la selección de texto sin afectar los toques
+
+  const pet = document.getElementById('pet');
+
+  // Prevenir selección de texto con selectstart
+  pet.addEventListener('selectstart', (e) => {
+    e.preventDefault();  // Evitar la selección de texto
+  });
+
+  // Permitir los toques sin interferir
+  pet.addEventListener('mousedown', (e) => {
+    if (e.button === 0) {  // Solo prevenir la selección en clic izquierdo (ratón)
+      e.preventDefault();  // Evita la selección de texto pero permite el toque
+    }
+  });
+
+  // Asegurar que no aparezca el menú contextual en long tap o clic derecho
+  pet.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
   });
 };
-
 
 
 </script>
