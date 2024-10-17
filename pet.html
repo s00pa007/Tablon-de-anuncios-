@@ -1758,7 +1758,7 @@ function resizePet() {
   const frameSize = Math.min(petFrame.offsetWidth, petFrame.offsetHeight);
 
   const hungerLevel = petState.hunger;
-  const petSizeFactor = 0.3 + (hungerLevel / 250);
+  const petSizeFactor = 0.1 + (hungerLevel / 100);  // Cambia el divisor para hacer crecer o reducir más el emoji
   const petSize = frameSize * petSizeFactor;
 
   pet.style.fontSize = `${petSize}px`;
