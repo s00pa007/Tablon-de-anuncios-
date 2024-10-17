@@ -290,17 +290,46 @@
     font-size: 6vh; /* Ajusta este valor para reducir el tamaño */
 }
 
-        .action-buttons {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            position: sticky;
-            bottom: 0;
-            background-color: var(--background-color);
-        }
+.action-buttons {
+    display: flex;
+    justify-content: center;  /* Centramos los botones */
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    flex-wrap: nowrap; /* Mantiene los botones en una sola línea */
+    position: sticky;
+    bottom: 0;
+    background-color: var(--background-color);
+    width: 100%;
+    z-index: 10;  /* Asegura que los botones estén siempre visibles */
+}
+
+.action-btn {
+    font-size: 1.5em;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--neon-blue);
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+    text-shadow: 0 0 5px var(--neon-blue);
+    margin: 5px;
+    flex: 1 1 auto;  /* Ajuste dinámico de tamaño */
+    max-width: 80px;  /* Ajusta el ancho máximo */
+    text-align: center;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .action-btn {
+        font-size: 1.2em;  /* Reduce el tamaño de los botones en pantallas más pequeñas */
+        padding: 5px;      /* Ajuste del padding */
+        flex: 1 1 60px;    /* Ajuste dinámico de tamaño en pantallas pequeñas */
+        max-width: 60px;   /* Ancho máximo ajustado para móviles */
+    }
+    .action-buttons {
+        justify-content: center;  /* Asegura que los botones también se centren en pantallas pequeñas */
+    }
+}
 
 
 .follow-emoji {
