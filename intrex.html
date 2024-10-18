@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tablón de anuncios anónimos</title>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
@@ -44,9 +45,6 @@
         }
 
         header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
             background-color: var(--header-bg);
             padding: 10px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -78,11 +76,16 @@
         .pet-status-container {
             display: flex;
             align-items: center;
-            background-color: rgba(255, 255, 255, 0.1);
+            justify-content: center;
+            background-color: var(--header-bg);
             padding: 5px;
             border-radius: 10px;
-            margin-top: 5px;
-            height: 40px;
+            height: 56px;
+            border: 2px solid var(--button-bg);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
         .pet-emoji {
@@ -92,32 +95,49 @@
             background-color: var(--button-bg);
             border-radius: 50%;
             text-decoration: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .pet-levels {
             display: flex;
-            gap: 5px;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .level-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .level-bar {
-            width: 15px;
-            height: 30px;
+            width: 14px;
+            height: 42px;
             background-color: #e0e0e0;
-            border-radius: 7px;
+            border-radius: 0;
             overflow: hidden;
+            position: relative;
         }
 
         .level-fill {
             width: 100%;
             height: 0%;
+            position: absolute;
+            bottom: 0;
             transition: height 0.3s ease;
         }
 
-        .level-icons {
-            display: flex;
-            gap: 10px;
-            margin-left: 5px;
+        #hunger-fill { background-color: #ff6347; }
+        #fun-fill { background-color: #4caf50; }
+        #hygiene-fill { background-color: #3498db; }
+
+        .level-icon {
             font-size: 12px;
+            margin-top: 2px;
         }
 
         #theme-toggle {
@@ -313,34 +333,24 @@
             width: 100%;
             border-top: 1px solid #ccc;
             padding-top: 10px;
-            position: sticky;
-            top: 140px;
             background-color: var(--background-color);
             z-index: 999;
         }
 
-        #load-more {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-top: 20px;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-family: 'Comfortaa', cursive;
-            font-weight: bold;
+        #loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
         }
 
         #pet-popup {
             display: none;
             position: fixed;
-            top: 10%;
-            left: 10%;
-            width: 80%;
-            height: 80%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 95%;
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
@@ -358,43 +368,231 @@
             border: none;
             z-index: 1002;
         }
-    </style>
+
+        #pet-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+       
+      .fixed-button-bar {
+      position: fixed;
+      top: 120px; /* Ajusta según la altura de tu header y slogan */
+      left: 0;
+      width: 100%;
+      background-color: var(--header-bg);
+      display: flex;
+      justify-content: center;
+      padding: 10px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 1000;
+      }
+      
+      .fixed-button-bar button {
+      background-color: var(--button-bg);
+      color: var(--button-text);
+      border: none;
+      padding: 10px 20px;
+      margin: 0 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-family: 'Comfortaa', cursive;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      }
+      
+      .fixed-button-bar button:hover {
+      opacity: 0.9;
+      }
+      
+      /* Estilos para el modal de la galería */
+      .modal {
+      display: none; /* Oculto por defecto */
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+      }
+      
+      .modal-content {
+      position: relative;
+      background-color: var(--background-color);
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 800px;
+      border-radius: 10px;
+      }
+      
+      .close-modal {
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      color: #aaa;
+      font-size: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      }
+      
+      .close-modal:hover,
+      .close-modal:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+      }
+      
+      /* Estilos para la galería */
+      .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      }
+      
+      .gallery img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: transform 0.2s;
+      }
+      
+      .gallery img:hover {
+      transform: scale(1.05);
+      }
+      
+      /* Imagen principal aleatoria */
+      #random-image-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      }
+      
+      #random-image {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      }
+      
+      #random-image:hover {
+      transform: scale(1.05);
+      }
+      
+      /* Navegación en el modal */
+      .modal-navigation {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+      }
+      
+      .modal-navigation span {
+      cursor: pointer;
+      font-size: 2em;
+      color: #fff;
+      padding: 10px;
+      background-color: rgba(0,0,0,0.5);
+      border-radius: 50%;
+      user-select: none;
+      }
+      
+      /* Swipe en dispositivos móviles */
+      @media (max-width: 600px) {
+      .gallery img {
+      width: 80px;
+      height: 80px;
+      }
+      
+      #random-image {
+      width: 150px;
+      height: 150px;
+      }
+      
+      .fixed-button-bar {
+      flex-direction: column;
+      gap: 10px;
+      top: 180px; /* Ajusta si es necesario */
+      }
+      
+      .fixed-button-bar button {
+      width: 80%;
+      justify-content: center;
+      }
+      }
+      </style>
+      
+
 </head>
 <body>
-<header>
-    <img src="cabecera.jpg" alt="Tablón de anuncios anónimos" id="header-image">
-    <div id="slogan"></div>
-    <div class="pet-status-container">
-        <a href="#" id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">😊</a>
-        <div class="pet-levels">
-            <div class="level-bar" id="hunger-bar"><div class="level-fill"></div></div>
-            <div class="level-bar" id="fun-bar"><div class="level-fill"></div></div>
-            <div class="level-bar" id="hygiene-bar"><div class="level-fill"></div></div>
+    <header>
+        <img src="cabecera.jpg" alt="Tablón de anuncios anónimos" id="header-image">
+        <div id="slogan"></div>
+        <div class="teletipo-wrapper">
+            <span class="rumores-label">RUMORES</span>
+            <div id="teletipo-container"></div>
         </div>
-        <div class="level-icons">
-            <span>🍔</span>
-            <span>🎮</span>
-            <span>🚿</span>
-        </div>
-        <button id="theme-toggle">🌓</button>
+    </header>
+
+<div class="fixed-button-bar">
+        <button id="kakiwaki-button">
+            🐾 Kakiwaki
+        </button>
+        <button id="gallery-button">
+            🖼️ Galería
+        </button>
     </div>
-</header>
 
     <div class="main-container">
         <div class="left-column">
-            <div class="teletipo-wrapper">
-                <span class="rumores-label">RUMORES</span>
-                <div id="teletipo-container"></div>
+            <!-- Imagen aleatoria -->
+            <div id="random-image-container">
+                <img id="random-image" src="" alt="Imagen aleatoria">
             </div>
-            
+
+            <!-- ... el resto de tu contenido existente ... -->
+        </div>
+    </div>
+
+    <!-- Modal de la Galería -->
+    <div id="gallery-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="gallery" id="image-gallery">
+                <!-- Las imágenes se cargarán dinámicamente -->
+            </div>
+            <div class="modal-navigation">
+                <span id="prev">&#10094;</span>
+                <span id="next">&#10095;</span>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="main-container">
+        <div class="left-column">
             <form id="message-form">
                 <textarea id="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
                 <button type="submit">Publicar</button>
             </form>
             
             <div id="bulletin-board"></div>
-            
-            <button id="load-more">Cargar más mensajes</button>
+            <div id="loading">Cargando más mensajes...</div>
             
             <div class="statistics">
                 <div id="days-operating">Días en funcionamiento: 1</div>
@@ -404,23 +602,23 @@
         </div>
     </div>
 
-    <div id="pet-popup">
-        <button id="close-popup">&times;</button>
-        <iframe id="pet-iframe" src="about:blank" width="100%" height="100%" frameborder="0"></iframe>
-    </div>
+<div id="pet-popup">
+    <button id="close-popup">&times;</button>
+    <iframe id="pet-iframe" src="about:blank" frameborder="0"></iframe>
+</div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
-            authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
-            projectId: "tablon-de-anuncios-d5dea",
-            storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
-            messagingSenderId: "67910184237",
-            appId: "1:67910184237:web:e43d424657a948ae5d77a4",
-            measurementId: "G-YL5W1VNM9Z"
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
+    authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
+    projectId: "tablon-de-anuncios-d5dea",
+    storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
+    messagingSenderId: "67910184237",
+    appId: "1:67910184237:web:e43d424657a948ae5d77a4",
+    measurementId: "G-YL5W1VNM9Z"
+};
 
-        firebase.initializeApp(firebaseConfig); console.log("Firebase inicializado en intrex.");
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         const bulletinBoard = document.getElementById('bulletin-board');
@@ -434,457 +632,521 @@
         const petEmoji = document.getElementById('pet-emoji');
         const petPopup = document.getElementById('pet-popup');
         const closePopup = document.getElementById('close-popup');
-        const loadMoreButton = document.getElementById('load-more');
+        const loadingElement = document.getElementById('loading');
 
+     const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
+     
+     const slogans = [
+     "Ahora más anónimo",
+     "Lo nunca visto",
+     "Publica sin miedo",
+     "Cuidado, no se pueden borrar",
+     "Tu voz, tu espacio",
+     "Comparte libremente",
+     "Ideas sin límites",
+     "El muro digital",
+     "Exprésate sin barreras",
+     "Tu mensaje importa",
+     "Anunciado en TV",
+     "Donde hasta Moncho opina",
+     "¡Cuéntalo, que nadie se entera!",
+     "El rincón de las ocurrencias familiares",
+     "Secretos de familia: ahora públicos",
+     "Anónimo... pero sabemos que es cosa de Samuel",
+     "Donde mamá pide caviar",
+     "¡Aquí se venden gatos pesados!",
+     "El tablón de los valientes",
+     "El diario secreto de la familia (versión pública)",
+     "La página de la gente que no se peina",
+     "Escribe lo que quieras, que no hay consecuencias",
+     "Al final seguro que papi se enfada"
+     ];
+     
+     let lastVisibleMessage = null;
+     const messagesPerPage = 10;
+     let isLoading = false;
+     let displayedMessageIds = new Set();
+     
+     function loadMessages(startAfter = null) {
+     if (isLoading) return;
+     isLoading = true;
+     loadingElement.style.display = 'block';
+     
+     let query = db.collection("messages").orderBy("timestamp", "desc").limit(messagesPerPage);
+     
+     if (startAfter) {
+     query = query.startAfter(startAfter);
+     }
+     
+     query.get().then((snapshot) => {
+     if (snapshot.empty) {
+     loadingElement.style.display = 'none';
+     isLoading = false;
+     return;
+     }
+     
+     snapshot.forEach((doc) => {
+     const message = { ...doc.data(), id: doc.id };
+     if (!displayedMessageIds.has(message.id)) {
+     const messageElement = createMessageElement(message);
+     bulletinBoard.appendChild(messageElement);
+     displayedMessageIds.add(message.id);
+     }
+     });
+     
+     lastVisibleMessage = snapshot.docs[snapshot.docs.length - 1];
+     updateMessagesPublished();
+     loadingElement.style.display = 'none';
+     isLoading = false;
+     }).catch((error) => {
+     console.error("Error loading messages: ", error);
+     loadingElement.style.display = 'none';
+     isLoading = false;
+     });
+     }
+     
+     function createMessageElement(message) {
+     const messageDiv = document.createElement('div');
+     messageDiv.className = 'message';
+     messageDiv.id = `message-${message.id}`;
+     messageDiv.dataset.id = message.id;
+     
+     const bgColor = message.bgColor || getRandomContrastColor();
+     messageDiv.style.backgroundColor = bgColor;
+     
+     const textColor = getContrastingTextColor(bgColor);
+     messageDiv.style.color = textColor;
+     
+     if (message.replyTo) {
+     const quotedMessage = createQuotedMessage(message.replyTo);
+     messageDiv.appendChild(quotedMessage);
+     }
+     
+     const contentDiv = document.createElement('div');
+     contentDiv.className = 'message-content';
+     
+     const emoji = document.createElement('div');
+     emoji.className = 'message-emoji';
+     emoji.textContent = message.emoji;
+     
+     const textDiv = document.createElement('div');
+     textDiv.className = 'message-text';
+     textDiv.textContent = message.text;
+     
+     contentDiv.appendChild(emoji);
+     contentDiv.appendChild(textDiv);
+     
+     const timestamp = document.createElement('div');
+     timestamp.className = 'message-timestamp';
+     if (message.timestamp) {
+     timestamp.textContent = new Date(message.timestamp.toDate()).toLocaleString();
+     } else {
+     timestamp.textContent = 'Fecha desconocida';
+     }
+     
+     const actions = document.createElement('div');
+     actions.className = 'message-actions';
+     
+     const likeBtn = document.createElement('button');
+     likeBtn.className = 'like-btn';
+     likeBtn.textContent = `👍 ${message.likes || 0}`;
+     likeBtn.onclick = () => updateLikes(message.id, 'likes');
+     
+     const dislikeBtn = document.createElement('button');
+     dislikeBtn.className = 'dislike-btn';
+     dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
+     dislikeBtn.onclick = () => updateLikes(message.id, 'dislikes');
+     
+     const replyBtn = document.createElement('button');
+     replyBtn.className = 'reply-btn';
+     replyBtn.textContent = '↩️';
+     replyBtn.onclick = () => showReplyForm(message.id, message);
+     
+     const deleteBtn = document.createElement('button');
+     deleteBtn.className = 'delete-btn';
+     deleteBtn.textContent = '🗑️';
+     deleteBtn.onclick = () => showDeleteConfirmation(message.id);
+     
+     actions.appendChild(likeBtn);
+     actions.appendChild(dislikeBtn);
+     actions.appendChild(replyBtn);
+     actions.appendChild(deleteBtn);
+     
+     messageDiv.appendChild(contentDiv);
+     messageDiv.appendChild(timestamp);
+     messageDiv.appendChild(actions);
+     
+     return messageDiv;
+     }
+     
+     function createQuotedMessage(originalMessage) {
+     const quotedDiv = document.createElement('div');
+     quotedDiv.className = 'quoted-message';
+     quotedDiv.style.backgroundColor = originalMessage.bgColor;
+     quotedDiv.style.color = getContrastingTextColor(originalMessage.bgColor);
+     quotedDiv.textContent = `${originalMessage.emoji} ${originalMessage.text}`;
+     quotedDiv.onclick = () => scrollToMessage(originalMessage.id);
+     return quotedDiv;
+     }
+     
+     function scrollToMessage(messageId) {
+     const targetMessage = document.getElementById(`message-${messageId}`);
+     if (targetMessage) {
+     targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+     targetMessage.style.animation = 'highlight 2s';
+     }
+     }
+     
+     function showReplyForm(parentId, parentMessage) {
+     const parentMessageElement = document.querySelector(`[data-id="${parentId}"]`);
+     let replyForm = parentMessageElement.querySelector('.reply-form');
+     
+     if (replyForm) {
+     parentMessageElement.removeChild(replyForm);
+     return;
+     }
+     
+     replyForm = document.createElement('form');
+     replyForm.className = 'reply-form';
+     replyForm.innerHTML = `
+     <textarea placeholder="Escribe tu respuesta..."></textarea>
+     <button type="submit">Responder</button>
+     `;
+     replyForm.onsubmit = (e) => {
+     e.preventDefault();
+     const replyText = e.target.querySelector('textarea').value;
+     if (replyText.trim()) {
+     addReply(parentId, replyText, parentMessage);
+     }
+     parentMessageElement.removeChild(replyForm);
+     };
+     parentMessageElement.appendChild(replyForm);
+     }
+     
+     function addReply(parentId, replyText, parentMessage) {
+     const reply = {
+     text: replyText,
+     emoji: getRandomAnimalEmoji(),
+     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+     replyTo: {
+     id: parentId,
+     text: parentMessage.text,
+     emoji: parentMessage.emoji,
+     bgColor: parentMessage.bgColor
+     },
+     bgColor: getRandomContrastColor(),
+     likes: 0,
+     dislikes: 0
+     };
+     
+     db.collection("messages").add(reply)
+     .then(() => {
+     console.log("Respuesta añadida con éxito");
+     })
+     .catch((error) => {
+     console.error("Error al añadir la respuesta: ", error);
+     alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
+     });
+     }
+     
+     function updateLikes(id, field) {
+     db.collection("messages").doc(id).update({
+     [field]: firebase.firestore.FieldValue.increment(1)
+     }).then(() => {
+     db.collection("messages").doc(id).get().then((doc) => {
+     if (doc.exists) {
+     const message = doc.data();
+     const messageElement = document.querySelector(`[data-id="${id}"]`);
+     const likeBtn = messageElement.querySelector('.like-btn');
+     const dislikeBtn = messageElement.querySelector('.dislike-btn');
+     likeBtn.textContent = `👍 ${message.likes || 0}`;
+     dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
+     }
+     });
+     }).catch((error) => {
+     console.error("Error updating likes: ", error);
+     });
+     }
+     
+     function showDeleteConfirmation(id) {
+     const messageElement = document.querySelector(`[data-id="${id}"]`);
+     const actions = messageElement.querySelector('.message-actions');
+     const deleteConfirmation = document.createElement('div');
+     deleteConfirmation.className = 'delete-confirmation';
+     deleteConfirmation.innerHTML = `
+     <button class="confirm-delete">✅</button>
+     <button class="cancel-delete">❌</button>
+     `;
+     actions.appendChild(deleteConfirmation);
+     
+     const confirmDelete = deleteConfirmation.querySelector('.confirm-delete');
+     const cancelDelete = deleteConfirmation.querySelector('.cancel-delete');
+     
+     confirmDelete.onclick = () => deleteMessage(id);
+     cancelDelete.onclick = () => actions.removeChild(deleteConfirmation);
+     }
+     
+     function deleteMessage(id) {
+     db.collection("messages").doc(id).delete().then(() => {
+     incrementMessagesDeleted();
+     const messageElement = document.querySelector(`[data-id="${id}"]`);
+     if (messageElement) {
+     bulletinBoard.removeChild(messageElement);
+     displayedMessageIds.delete(id);
+     }
+     }).catch((error) => {
+     console.error("Error removing message: ", error);
+     });
+     }
+     
+     messageForm.addEventListener('submit', (e) => {
+     e.preventDefault();
+     const text = messageInput.value.trim();
+     if (text) {
+     const message = {
+     text: text,
+     emoji: getRandomAnimalEmoji(),
+     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+     bgColor: getRandomContrastColor(),
+     likes: 0,
+     dislikes: 0
+     };
+     db.collection("messages").add(message).then(() => {
+     messageInput.value = '';
+     });
+     }
+     });
+     
+     function getRandomAnimalEmoji() {
+     return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
+     }
+     
+     function getRandomContrastColor() {
+     const hue = Math.floor(Math.random() * 360);
+     const saturation = 70 + Math.random() * 30;
+     const lightness = 65 + Math.random() * 25;
+     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+     }
+     
+     function getContrastingTextColor(bgColor) {
+     const hsl = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+     if (hsl) {
+     const l = parseInt(hsl[3]);
+     return l > 50 ? '#000000' : '#FFFFFF';
+     } else {
+     return '#000000';
+     }
+     }
+     
+     function updateMessagesPublished() {
+     db.collection("messages").get().then((snapshot) => {
+     messagesPublished.textContent = `Mensajes publicados: ${snapshot.size}`;
+     });
+     }
+     
+     function updateMessagesDeleted() {
+     db.collection("statistics").doc("counters").get().then((doc) => {
+     if (doc.exists) {
+     const deletedCount = doc.data().messagesDeleted || 0;
+     messagesDeleted.textContent = `Mensajes borrados: ${deletedCount}`;
+     }
+     });
+     }
+     
+     function incrementMessagesDeleted() {
+     db.collection("statistics").doc("counters").update({
+     messagesDeleted: firebase.firestore.FieldValue.increment(1)
+     }).then(() => {
+     updateMessagesDeleted();
+     });
+     }
+     
+     function changeSlogan() {
+     slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
+     }
+     
+     themeToggle.addEventListener('click', () => {
+     document.body.classList.toggle('dark-mode');
+     themeToggle.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌓';
+     });
+     
+function createEmojiBackground() {
+            const emojiContainer = document.createElement('div');
+            emojiContainer.style.position = 'fixed';
+            emojiContainer.style.top = '0';
+            emojiContainer.style.left = '0';
+            emojiContainer.style.width = '100%';
+            emojiContainer.style.height = '100%';
+            emojiContainer.style.pointerEvents = 'none';
+            emojiContainer.style.zIndex = '-1';
+            
+            for (let i = 0; i < 50; i++) {
+                const emoji = document.createElement('div');
+                emoji.className = 'floating-emoji';
+                emoji.textContent = getRandomAnimalEmoji();
+                emoji.style.left = `${Math.random() * 100}vw`;
+                emoji.style.top = `${Math.random() * 100}vh`;
+                emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                emoji.style.animationDelay = `${Math.random() * 2}s`;
+                emojiContainer.appendChild(emoji);
+            }
+            
+            document.body.appendChild(emojiContainer);
+        }
 
-        
-        const slogans = [
-        "Ahora más anónimo",
-        "Lo nunca visto",
-        "Publica sin miedo",
-        "Cuidado, no se pueden borrar",
-        "Tu voz, tu espacio",
-        "Comparte libremente",
-        "Ideas sin límites",
-        "El muro digital",
-        "Exprésate sin barreras",
-        "Tu mensaje importa",
-        "Anunciado en TV",
-        "Donde hasta Moncho opina",
-        "¡Cuéntalo, que nadie se entera!",
-        "El rincón de las ocurrencias familiares",
-        "Secretos de familia: ahora públicos",
-        "Anónimo... pero sabemos que es cosa de Samuel",
-        "Donde mamá pide caviar",
-        "¡Aquí se venden gatos pesados!",
-        "El tablón de los valientes",
-        "El diario secreto de la familia (versión pública)",
-        "La página de la gente que no se peina",
-        "Escribe lo que quieras, que no hay consecuencias",
-        "Al final seguro que papi se enfada"
-        ];
-        
-        let lastVisibleMessage = null;
-        const messagesPerPage = 10;
-        
-        function loadMessages(startAfter = null) {
-        let query = db.collection("messages").orderBy("timestamp", "desc").limit(messagesPerPage);
-        
-        if (startAfter) {
-        query = query.startAfter(startAfter);
-        }
-        
-        query.get().then((snapshot) => {
-        if (snapshot.empty) {
-        loadMoreButton.style.display = 'none';
-        return;
-        }
-        
-        snapshot.forEach((doc) => {
-        const message = { ...doc.data(), id: doc.id };
-        const messageElement = createMessageElement(message);
-        bulletinBoard.appendChild(messageElement);
-        });
-        
-        lastVisibleMessage = snapshot.docs[snapshot.docs.length - 1];
-        updateMessagesPublished(snapshot.size);
-        });
-        }
-        
-        function createMessageElement(message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message';
-        messageDiv.id = `message-${message.id}`;
-        messageDiv.dataset.id = message.id;
-        
-        const bgColor = message.bgColor || getRandomContrastColor();
-        messageDiv.style.backgroundColor = bgColor;
-        
-        const textColor = getContrastingTextColor(bgColor);
-        messageDiv.style.color = textColor;
-        
-        if (message.replyTo) {
-        const quotedMessage = createQuotedMessage(message.replyTo);
-        messageDiv.appendChild(quotedMessage);
-        }
-        
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
-        
-        const emoji = document.createElement('div');
-        emoji.className = 'message-emoji';
-        emoji.textContent = message.emoji;
-        
-        const textDiv = document.createElement('div');
-        textDiv.className = 'message-text';
-        textDiv.textContent = message.text;
-        
-        contentDiv.appendChild(emoji);
-        contentDiv.appendChild(textDiv);
-        
-        const timestamp = document.createElement('div');
-        timestamp.className = 'message-timestamp';
-        timestamp.textContent = new Date(message.timestamp.toDate()).toLocaleString();
-        
-        const actions = document.createElement('div');
-        actions.className = 'message-actions';
-        
-        const likeBtn = document.createElement('button');
-        likeBtn.className = 'like-btn';
-        likeBtn.textContent = `👍 ${message.likes || 0}`;
-        likeBtn.onclick = () => updateLikes(message.id, 'likes');
-        
-        const dislikeBtn = document.createElement('button');
-        dislikeBtn.className = 'dislike-btn';
-        dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
-        dislikeBtn.onclick = () => updateLikes(message.id, 'dislikes');
-        
-        const replyBtn = document.createElement('button');
-        replyBtn.className = 'reply-btn';
-        replyBtn.textContent = '↩️';
-        replyBtn.onclick = () => showReplyForm(message.id, message);
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.textContent = '🗑️';
-        deleteBtn.onclick = () => showDeleteConfirmation(message.id);
-        
-        actions.appendChild(likeBtn);
-        actions.appendChild(dislikeBtn);
-        actions.appendChild(replyBtn);
-        actions.appendChild(deleteBtn);
-        
-        messageDiv.appendChild(contentDiv);
-        messageDiv.appendChild(timestamp);
-        messageDiv.appendChild(actions);
-        
-        return messageDiv;
-        }
-        
-        function createQuotedMessage(originalMessage) {
-        const quotedDiv = document.createElement('div');
-        quotedDiv.className = 'quoted-message';
-        quotedDiv.style.backgroundColor = originalMessage.bgColor;
-        quotedDiv.style.color = getContrastingTextColor(originalMessage.bgColor);
-        quotedDiv.textContent = `${originalMessage.emoji} ${originalMessage.text}`;
-        quotedDiv.onclick = () => scrollToMessage(originalMessage.id);
-        return quotedDiv;
-        }
-        
-        function scrollToMessage(messageId) {
-        const targetMessage = document.getElementById(`message-${messageId}`);
-        if (targetMessage) {
-        targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        targetMessage.style.animation = 'highlight 2s';
-        }
-        }
-        
-        function showReplyForm(parentId, parentMessage) {
-        const parentMessageElement = document.querySelector(`[data-id="${parentId}"]`);
-        let replyForm = parentMessageElement.querySelector('.reply-form');
-        
-        if (replyForm) {
-        parentMessageElement.removeChild(replyForm);
-        return;
-        }
-        
-        replyForm = document.createElement('form');
-        replyForm.className = 'reply-form';
-        replyForm.innerHTML = `
-        <textarea placeholder="Escribe tu respuesta..."></textarea>
-        <button type="submit">Responder</button>
-        `;
-        replyForm.onsubmit = (e) => {
-        e.preventDefault();
-        const replyText = e.target.querySelector('textarea').value;
-        if (replyText.trim()) {
-        addReply(parentId, replyText, parentMessage);
-        }
-        parentMessageElement.removeChild(replyForm);
-        };
-        parentMessageElement.appendChild(replyForm);
-        }
-        
-        function addReply(parentId, replyText, parentMessage) {
-        const reply = {
-        text: replyText,
-        emoji: getRandomAnimalEmoji(),
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        replyTo: {
-        id: parentId,
-        text: parentMessage.text,
-        emoji: parentMessage.emoji,
-        bgColor: parentMessage.bgColor
-        },
-        bgColor: getRandomContrastColor(),
-        likes: 0,
-        dislikes: 0
-        };
-        
-        db.collection("messages").add(reply)
-        .then(() => {
-        console.log("Respuesta añadida con éxito");
-        })
-        .catch((error) => {
-        console.error("Error al añadir la respuesta: ", error);
-        alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
-        });
-        }
-        
-        function updateLikes(id, field) {
-        db.collection("messages").doc(id).update({
-        [field]: firebase.firestore.FieldValue.increment(1)
-        }).then(() => {
-        console.log("Obteniendo mensaje desde Firebase:", id); db.collection("messages").doc(id).get().then((doc) => {
-        console.log("Documento de mascota encontrado en intrex:", doc.data()); if (doc.exists) {
-        const message = doc.data();
-        const messageElement = document.querySelector(`[data-id="${id}"]`);
-        const likeBtn = messageElement.querySelector('.like-btn');
-        const dislikeBtn = messageElement.querySelector('.dislike-btn');
-        likeBtn.textContent = `👍 ${message.likes || 0}`;
-        dislikeBtn.textContent = `👎 ${message.dislikes || 0}`;
-        }
-        });
-        }).catch((error) => {
-        console.error("Error updating likes: ", error);
-        });
-        }
-        
-        function showDeleteConfirmation(id) {
-        const messageElement = document.querySelector(`[data-id="${id}"]`);
-        const actions = messageElement.querySelector('.message-actions');
-        const deleteConfirmation = document.createElement('div');
-        deleteConfirmation.className = 'delete-confirmation';
-        deleteConfirmation.innerHTML = `
-        <button class="confirm-delete">✅</button>
-        <button class="cancel-delete">❌</button>
-        `;
-        actions.appendChild(deleteConfirmation);
-        
-        const confirmDelete = deleteConfirmation.querySelector('.confirm-delete');
-        const cancelDelete = deleteConfirmation.querySelector('.cancel-delete');
-        
-        confirmDelete.onclick = () => deleteMessage(id);
-        cancelDelete.onclick = () => actions.removeChild(deleteConfirmation);
-        }
-        
-        function deleteMessage(id) {
-        db.collection("messages").doc(id).delete().then(() => {
-        incrementMessagesDeleted();
-        }).catch((error) => {
-        console.error("Error removing message: ", error);
-        });
-        }
-        
-        messageForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const text = messageInput.value.trim();
-        if (text) {
-        const message = {
-        text: text,
-        emoji: getRandomAnimalEmoji(),
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        bgColor: getRandomContrastColor(),
-        likes: 0,
-        dislikes: 0
-        };
-        db.collection("messages").add(message).then(() => {
-        messageInput.value = '';
-        });
-        }
-        });
-        
-        function getRandomAnimalEmoji() {
-        return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
-        }
-        
-        function getRandomContrastColor() {
-        const hue = Math.floor(Math.random() * 360);
-        const saturation = 70 + Math.random() * 30;
-        const lightness = 65 + Math.random() * 25;
-        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-        }
-        
-        function getContrastingTextColor(bgColor) {
-        const rgb = bgColor.match(/\d+/g).map(Number);
-        const luminance = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-        return luminance > 0.5 ? '#000000' : '#FFFFFF';
-        }
-        
-        function updateMessagesPublished(count) {
-        messagesPublished.textContent = `Mensajes publicados: ${count}`;
-        }
-        
-        function updateMessagesDeleted() {
-        db.collection("statistics").doc("counters").get().then((doc) => {
-        console.log("Documento de mascota encontrado en intrex:", doc.data()); if (doc.exists) {
-        const deletedCount = doc.data().messagesDeleted || 0;
-        messagesDeleted.textContent = `Mensajes borrados: ${deletedCount}`;
-        }
-        });
-        }
-        
-        function incrementMessagesDeleted() {
-        db.collection("statistics").doc("counters").update({
-        messagesDeleted: firebase.firestore.FieldValue.increment(1)
-        }).then(() => {
-        updateMessagesDeleted();
-        });
-        }
-        
-        function changeSlogan() {
-        slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
-        }
-        
-        themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        themeToggle.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌓';
-        });
-        
-        function createEmojiBackground() {
-        const emojiContainer = document.createElement('div');
-        emojiContainer.style.position = 'fixed';
-        emojiContainer.style.top = '0';
-        emojiContainer.style.left = '0';
-        emojiContainer.style.width = '100%';
-        emojiContainer.style.height = '100%';
-        emojiContainer.style.pointerEvents = 'none';
-        emojiContainer.style.zIndex = '-1';
-        
-        for (let i = 0; i < 50; i++) {
-        const emoji = document.createElement('div');
-        emoji.className = 'floating-emoji';
-        emoji.textContent = getRandomAnimalEmoji();
-        emoji.style.left = `${Math.random() * 100}vw`;
-        emoji.style.top = `${Math.random() * 100}vh`;
-        emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
-        emoji.style.animationDelay = `${Math.random() * 2}s`;
-        emojiContainer.appendChild(emoji);
-        }document.body.appendChild(emojiContainer);
-        }
-        
         function cargarTeletipo() {
-        fetch('teletipo.html')
-        .then(response => {
-        if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+            fetch('teletipo.html')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = data;
+                    
+                    // Extraer y aplicar los estilos
+                    const styleTag = tempDiv.querySelector('style');
+                    if (styleTag) {
+                        document.head.appendChild(styleTag);
+                    }
+                    
+                    // Extraer y aplicar el HTML del teletipo
+                    const teletipoContainer = tempDiv.querySelector('.teletipo-container');
+                    if (teletipoContainer) {
+                        document.getElementById('teletipo-container').appendChild(teletipoContainer);
+                    }
+                    
+                    // Extraer y ejecutar el script
+                    const scriptTag = tempDiv.querySelector('script');
+                    if (scriptTag) {
+                        const newScript = document.createElement('script');
+                        newScript.textContent = scriptTag.textContent;
+                        document.body.appendChild(newScript);
+                    }
+                    
+                    // Inicializar el teletipo
+                    if (typeof window.inicializarTeletipo === 'function') {
+                        window.inicializarTeletipo();
+                    } else {
+                        console.error('La función inicializarTeletipo no está disponible');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar el teletipo:', error);
+                    document.getElementById('teletipo-container').textContent = 'Error al cargar el teletipo';
+                });
         }
-        return response.text();
-        })
-        .then(data => {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = data;
-        
-        // Extraer y aplicar los estilos
-        const styleTag = tempDiv.querySelector('style');
-        if (styleTag) {
-        document.head.appendChild(styleTag);
+
+        function updatePetLevels() {
+            db.collection("pet").doc("status").onSnapshot((doc) => {
+                if (doc.exists) {
+                    const status = doc.data();
+                    document.querySelector('#hunger-fill').style.height = `${status.hunger || 0}%`;
+                    document.querySelector('#fun-fill').style.height = `${status.fun || 0}%`;
+                    document.querySelector('#hygiene-fill').style.height = `${status.hygiene || 0}%`;
+                    
+                    updatePetEmoji(status);
+                } else {
+                    console.log("No se encontró el documento de estado de la mascota");
+                }
+            }, (error) => {
+                console.error("Error getting pet status:", error);
+            });
         }
-        
-        // Extraer y aplicar el HTML del teletipo
-        const teletipoContainer = tempDiv.querySelector('.teletipo-container');
-        if (teletipoContainer) {
-        document.getElementById('teletipo-container').appendChild(teletipoContainer);
+
+        function updatePetEmoji(status) {
+            const averageStatus = (status.hunger + status.fun + status.hygiene) / 3;
+            let emoji;
+            if (averageStatus > 80) {
+                emoji = '😊'; // Feliz
+            } else if (averageStatus > 50) {
+                emoji = '😐'; // Neutral
+            } else if (averageStatus > 30) {
+                emoji = '😕'; // Preocupado
+            } else {
+                emoji = '😢'; // Triste
+            }
+            document.getElementById('pet-emoji').textContent = emoji;
         }
-        
-        // Extraer y ejecutar el script
-        const scriptTag = tempDiv.querySelector('script');
-        if (scriptTag) {
-        const newScript = document.createElement('script');
-        newScript.textContent = scriptTag.textContent;
-        document.body.appendChild(newScript);
-        }
-        
-        // Inicializar el teletipo
-        if (typeof window.inicializarTeletipo === 'function') {
-        window.inicializarTeletipo();
-        } else {
-        console.error('La función inicializarTeletipo no está disponible');
-        }
-        })
-        .catch(error => {
-        console.error('Error al cargar el teletipo:', error);
-        document.getElementById('teletipo-container').textContent = 'Error al cargar el teletipo';
-        });
-        }
-        
-        function updatepetLevels() {
-        console.log("Intentando actualizar niveles de mascota");
-        db.collection("pet").doc("status").onSnapshot((doc) => {
-        console.log("Documento de mascota encontrado en intrex:", doc.data()); if (doc.exists) {
-        const status = doc.data();
-        console.log("Datos de mascota recibidos:", status);
-        document.querySelector('#hunger-bar .level-fill').style.height = `${status.hunger || 0}%`;
-        document.querySelector('#fun-bar .level-fill').style.height = `${status.fun || 0}%`;
-        document.querySelector('#hygiene-bar .level-fill').style.height = `${status.hygiene || 0}%`;
-        
-        updatepetEmoji(status);
-        } else {
-        console.log("No se encontró el documento de estado de la mascota");
-        }
-        }, (error) => {
-        console.error("Error getting pet status:", error);
-        });
-        }
-        
-        function updatepetEmoji(status) {
-        console.log("Actualizando emoji de mascota con status:", status);
-        const averageStatus = (status.hunger + status.fun + status.hygiene) / 3;
-        let emoji;
-        if (averageStatus > 80) {
-        emoji = '😊'; // Feliz
-        } else if (averageStatus > 50) {
-        emoji = '😐'; // Neutral
-        } else if (averageStatus > 30) {
-        emoji = '😕'; // Preocupado
-        } else {
-        emoji = '😢'; // Triste
-        }
-        document.getElementById('pet-emoji').textContent = emoji;
-        }
-        
+
         petEmoji.addEventListener('click', (e) => {
-        e.preventDefault();
-        petPopup.style.display = 'block';
-        document.getElementById('pet-iframe').src = 'https://s00pa007.github.io/Tablon-de-anuncios-/pet.html';
+            e.preventDefault();
+            petPopup.style.display = 'block';
+            document.getElementById('pet-iframe').src = 'pet.html';
         });
-        
+
         closePopup.addEventListener('click', () => {
-        petPopup.style.display = 'none';
-        document.getElementById('pet-iframe').src = 'about:blank';
+            petPopup.style.display = 'none';
+            document.getElementById('pet-iframe').src = 'about:blank';
         });
-        
-        loadMoreButton.addEventListener('click', () => {
-        loadMessages(lastVisibleMessage);
+
+        function adjustPetPopupSize() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const popupWidth = windowWidth * 0.95;
+            const popupHeight = windowHeight * 0.95;
+            petPopup.style.width = `${popupWidth}px`;
+            petPopup.style.height = `${popupHeight}px`;
+        }
+
+        window.addEventListener('resize', adjustPetPopupSize);
+
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoading) {
+                loadMessages(lastVisibleMessage);
+            }
         });
-        
+
         function initApp() {
-        console.log("Iniciando aplicación...");
-        loadMessages();
-        changeSlogan();
-        createEmojiBackground();
-        updateMessagesDeleted();
-        cargarTeletipo();
-        updatepetLevels();
-        
-        const startDate = new Date('2023-06-08');
-        const today = new Date();
-        const daysOperatingCount = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-        daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
-        
-        setInterval(changeSlogan, 10000);
-        setInterval(updatepetLevels, 5000); // Actualiza los niveles de la mascota cada 5 segundos
+            loadMessages();
+            changeSlogan();
+            createEmojiBackground();
+            updateMessagesDeleted();
+            cargarTeletipo();
+            updatePetLevels();
+            adjustPetPopupSize();
+            
+            const startDate = new Date('2023-06-08');
+            const today = new Date();
+            const daysOperatingCount = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
+            
+            setInterval(changeSlogan, 10000);
+            setInterval(updatePetLevels, 5000); // Actualiza los niveles de la mascota cada 5 segundos
         }
-        
-        window.addEventListener('load', initApp);
-        
-        // Comunicación con el iframe de la mascota
-        window.addEventListener('message', (event) => {
-        if (event.data.type === 'updatepetStatus') {
-        console.log("Recibida actualización de estado de la mascota:", event.data.status);
-        updatepetEmoji(event.data.status);
+
+        // Función para mostrar nuevos mensajes automáticamente
+        function listenForNewMessages() {
+            db.collection("messages")
+                .orderBy("timestamp", "desc")
+                .limit(1)
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const newMessage = { ...change.doc.data(), id: change.doc.id };
+                            if (!displayedMessageIds.has(newMessage.id)) {
+                                const messageElement = createMessageElement(newMessage);
+                                bulletinBoard.insertBefore(messageElement, bulletinBoard.firstChild);
+                                displayedMessageIds.add(newMessage.id);
+                                updateMessagesPublished();
+                            }
+                        }
+                    });
+                });
         }
+
+        window.addEventListener('load', () => {
+            initApp();
+            listenForNewMessages(); // Iniciar la escucha de nuevos mensajes
         });
-        </script>
-        </body>
-        </html>
+
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'updatePetStatus') {
+                updatePetEmoji(event.data.status);
+            }
+        });
+    </script>
+</body>
+</html>
