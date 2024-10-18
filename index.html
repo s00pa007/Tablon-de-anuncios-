@@ -88,61 +88,26 @@
             z-index: 1000;
         }
 
-        .pet-emoji {
-            font-size: 24px;
-            margin-right: 10px;
-            padding: 3px;
-            background-color: var(--button-bg);
-            border-radius: 50%;
-            text-decoration: none;
+        .pet-emoji, .gallery-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+        }
+
+        .pet-emoji img, .gallery-link img {
             width: 40px;
             height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .pet-levels {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        .level-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .level-bar {
-            width: 14px;
-            height: 42px;
-            background-color: #e0e0e0;
-            border-radius: 0;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .level-fill {
-            width: 100%;
-            height: 0%;
-            position: absolute;
-            bottom: 0;
-            transition: height 0.3s ease;
-        }
-
-        #hunger-fill { background-color: #ff6347; }
-        #fun-fill { background-color: #4caf50; }
-        #hygiene-fill { background-color: #3498db; }
-
-        .level-icon {
-            font-size: 12px;
-            margin-top: 2px;
+            border-radius: 50%;
+            cursor: pointer;
         }
 
         #theme-toggle {
             font-size: 20px;
-            margin-left: 10px;
+            margin-left: auto;
+            cursor: pointer;
+            background: none;
+            border: none;
         }
 
         .main-container {
@@ -342,19 +307,105 @@
             padding: 20px;
             display: none;
         }
+       
+        #theme-toggle {
+            font-size: 20px;
+            margin-left: auto;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
 
+        /* Estilos para la ventana modal de la galería */
+        #gallery-modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            top: 0; /* Para que cubra toda la pantalla */
+            left: 0;
+            width: 100%; /* Ancho completo */
+            height: 100%; /* Altura completa */
+            background-color: rgba(0, 0, 0, 0.8); /* Fondo semitransparente */
+            z-index: 1002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #gallery-modal .close-gallery {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: #fff;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        #gallery-modal .gallery-container {
+            width: 80%;
+            max-width: 800px;
+            height: 80%;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #gallery-modal .gallery-container img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+
+        #gallery-modal .gallery-container img.active {
+            display: block;
+        }
+
+        /* Botones de navegación */
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 36px;
+            color: rgba(0,0,0,0.7);
+            background: rgba(255,255,255,0.7);
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            user-select: none;
+        }
+
+        #prev-btn {
+            left: 10px;
+        }
+
+        #next-btn {
+            right: 10px;
+        }
+
+        .gallery-nav:hover {
+            color: rgba(0,0,0,0.9);
+            background: rgba(255,255,255,1);
+        }
+
+        /* Ajustes para la ventana popup de la mascota */
         #pet-popup {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
+            width: 90%; /* Ajustado a 90% */
+            height: 90%; /* Ajustado a 90% */
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
-            z-index: 1001;
+            z-index: 5001;
             overflow: hidden;
         }
 
@@ -374,9 +425,38 @@
             height: 100%;
             border: none;
         }
+
+        /* Estilos para la galería responsive */
+        @media (max-width: 600px) {
+            #gallery-modal .gallery-container {
+                width: 95%;
+                height: 70%;
+            }
+
+            .gallery-nav {
+                font-size: 28px;
+                padding: 8px;
+            }
+
+            #gallery-modal .close-gallery {
+                font-size: 30px;
+                top: 10px;
+                right: 20px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Ventana Modal para la Galería -->
+    <div id="gallery-modal">
+        <button class="close-gallery" id="close-gallery">&times;</button>
+        <div class="gallery-container" id="gallery-container">
+            <!-- Las imágenes se cargarán dinámicamente con JavaScript -->
+        </div>
+        <button class="gallery-nav" id="prev-btn">&#10094;</button>
+        <button class="gallery-nav" id="next-btn">&#10095;</button>
+    </div>
+
     <header>
         <img src="cabecera.jpg" alt="Tablón de anuncios anónimos" id="header-image">
         <div id="slogan"></div>
@@ -387,21 +467,16 @@
     </header>
 
     <div class="pet-status-container">
-        <a href="#" id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">😊</a>
-        <div class="pet-levels">
-            <div class="level-container">
-                <div class="level-bar"><div id="hunger-fill" class="level-fill"></div></div>
-                <div class="level-icon">🍔</div>
-            </div>
-            <div class="level-container">
-                <div class="level-bar"><div id="fun-fill" class="level-fill"></div></div>
-                <div class="level-icon">🎮</div>
-            </div>
-            <div class="level-container">
-                <div class="level-bar"><div id="hygiene-fill" class="level-fill"></div></div>
-                <div class="level-icon">🚿</div>
-            </div>
-        </div>
+        <!-- Enlace de la mascota virtual -->
+        <a href="#" id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">
+            <img src="img/pet-icon.png" alt="Mascota Virtual">
+        </a>
+
+        <!-- Nuevo enlace para la galería de imágenes -->
+        <a href="#" id="gallery-link" class="gallery-link" title="Ver Galería">
+            <img src="img/gallery-icon.png" alt="Galería">
+        </a>
+
         <button id="theme-toggle">🌓</button>
     </div>
 
@@ -791,29 +866,7 @@ const firebaseConfig = {
      themeToggle.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌓';
      });
      
-function createEmojiBackground() {
-            const emojiContainer = document.createElement('div');
-            emojiContainer.style.position = 'fixed';
-            emojiContainer.style.top = '0';
-            emojiContainer.style.left = '0';
-            emojiContainer.style.width = '100%';
-            emojiContainer.style.height = '100%';
-            emojiContainer.style.pointerEvents = 'none';
-            emojiContainer.style.zIndex = '-1';
-            
-            for (let i = 0; i < 50; i++) {
-                const emoji = document.createElement('div');
-                emoji.className = 'floating-emoji';
-                emoji.textContent = getRandomAnimalEmoji();
-                emoji.style.left = `${Math.random() * 100}vw`;
-                emoji.style.top = `${Math.random() * 100}vh`;
-                emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                emoji.style.animationDelay = `${Math.random() * 2}s`;
-                emojiContainer.appendChild(emoji);
-            }
-            
-            document.body.appendChild(emojiContainer);
-        }
+
 
         function cargarTeletipo() {
             fetch('teletipo.html')
@@ -860,37 +913,9 @@ function createEmojiBackground() {
                 });
         }
 
-        function updatePetLevels() {
-            db.collection("pet").doc("status").onSnapshot((doc) => {
-                if (doc.exists) {
-                    const status = doc.data();
-                    document.querySelector('#hunger-fill').style.height = `${status.hunger || 0}%`;
-                    document.querySelector('#fun-fill').style.height = `${status.fun || 0}%`;
-                    document.querySelector('#hygiene-fill').style.height = `${status.hygiene || 0}%`;
-                    
-                    updatePetEmoji(status);
-                } else {
-                    console.log("No se encontró el documento de estado de la mascota");
-                }
-            }, (error) => {
-                console.error("Error getting pet status:", error);
-            });
-        }
+  
 
-        function updatePetEmoji(status) {
-            const averageStatus = (status.hunger + status.fun + status.hygiene) / 3;
-            let emoji;
-            if (averageStatus > 80) {
-                emoji = '😊'; // Feliz
-            } else if (averageStatus > 50) {
-                emoji = '😐'; // Neutral
-            } else if (averageStatus > 30) {
-                emoji = '😕'; // Preocupado
-            } else {
-                emoji = '😢'; // Triste
-            }
-            document.getElementById('pet-emoji').textContent = emoji;
-        }
+
 
         petEmoji.addEventListener('click', (e) => {
             e.preventDefault();
@@ -923,10 +948,10 @@ function createEmojiBackground() {
         function initApp() {
             loadMessages();
             changeSlogan();
-            createEmojiBackground();
+
             updateMessagesDeleted();
             cargarTeletipo();
-            updatePetLevels();
+     
             adjustPetPopupSize();
             
             const startDate = new Date('2023-06-08');
@@ -935,7 +960,7 @@ function createEmojiBackground() {
             daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
             
             setInterval(changeSlogan, 10000);
-            setInterval(updatePetLevels, 5000); // Actualiza los niveles de la mascota cada 5 segundos
+
         }
 
         // Función para mostrar nuevos mensajes automáticamente
@@ -963,11 +988,123 @@ function createEmojiBackground() {
             listenForNewMessages(); // Iniciar la escucha de nuevos mensajes
         });
 
-        window.addEventListener('message', (event) => {
-            if (event.data.type === 'updatePetStatus') {
-                updatePetEmoji(event.data.status);
+
+        ;
+
+    // Galería de Imágenes
+    const galleryLink = document.getElementById('gallery-link');
+    const galleryModal = document.getElementById('gallery-modal');
+    const closeGalleryBtn = document.getElementById('close-gallery');
+    const galleryContainer = document.getElementById('gallery-container');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    let currentImageIndex = 0;
+    const totalImages = 46; // Total de imágenes en la carpeta img
+    const imageFolder = 'img/';
+
+    // Función para cargar todas las imágenes en el contenedor de la galería
+    function loadGalleryImages() {
+        for (let i = 1; i <= totalImages; i++) {
+            const imgNumber = String(i).padStart(4, '0'); // 0001, 0002, ..., 0046
+            const imgPath = `${imageFolder}${imgNumber}.jpg`;
+            const imgElement = document.createElement('img');
+            imgElement.src = imgPath;
+            imgElement.alt = `Imagen ${imgNumber}`;
+            if (i === currentImageIndex + 1) {
+                imgElement.classList.add('active');
             }
+            galleryContainer.appendChild(imgElement);
+        }
+    }
+
+    // Función para mostrar una imagen específica
+    function showImage(index) {
+        const images = galleryContainer.querySelectorAll('img');
+        images.forEach((img, i) => {
+            img.classList.toggle('active', i === index);
         });
-    </script>
+    }
+
+    // Función para mostrar la siguiente imagen
+    function nextImage() {
+        const images = galleryContainer.querySelectorAll('img');
+        currentImageIndex = (currentImageIndex + 1) % images.length;
+        showImage(currentImageIndex);
+    }
+
+    // Función para mostrar la imagen anterior
+    function prevImage() {
+        const images = galleryContainer.querySelectorAll('img');
+        currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+        showImage(currentImageIndex);
+    }
+
+    // Evento para abrir la galería
+    galleryLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        galleryModal.style.display = 'block';
+        if (galleryContainer.children.length === 0) {
+            loadGalleryImages();
+        }
+    });
+
+    // Evento para cerrar la galería
+    closeGalleryBtn.addEventListener('click', () => {
+        galleryModal.style.display = 'none';
+    });
+
+    // Eventos para los botones de navegación
+    nextBtn.addEventListener('click', nextImage);
+    prevBtn.addEventListener('click', prevImage);
+
+    // Cerrar la galería al hacer clic fuera del contenedor
+    window.addEventListener('click', (e) => {
+        if (e.target === galleryModal) {
+            galleryModal.style.display = 'none';
+        }
+    });
+
+    // Funcionalidad de Swipe para dispositivos móviles
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    galleryContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    galleryContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleGesture();
+    }, false);
+
+    function handleGesture() {
+        if (touchEndX < touchStartX - 50) {
+            // Swipe izquierdo
+            nextImage();
+        }
+        if (touchEndX > touchStartX + 50) {
+            // Swipe derecho
+            prevImage();
+        }
+    }
+
+    // Función para obtener una imagen aleatoria de la galería
+    function getRandomGalleryImage() {
+        const randomIndex = Math.floor(Math.random() * totalImages) + 1;
+        const imgNumber = String(randomIndex).padStart(4, '0');
+        return `${imageFolder}${imgNumber}.jpg`;
+    }
+
+    // Establecer una imagen aleatoria como enlace de la galería al cargar la página
+    window.addEventListener('load', () => {
+        const galleryLinkImg = document.querySelector('#gallery-link img');
+        galleryLinkImg.src = getRandomGalleryImage();
+    });
+</script>
 </body>
 </html>
+
+
+
+
