@@ -73,42 +73,29 @@
             height: 60px;
         }
 
-        .pet-status-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--header-bg);
-            padding: 5px;
-            border-radius: 10px;
-            height: 56px;
-            border: 2px solid var(--button-bg);
-            position: sticky;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
+.pet-status-container {
+    display: flex;
+    justify-content: space-evenly; /* Esto distribuye los iconos de manera equitativa */
+    align-items: center; /* Centra verticalmente los íconos */
+    background-color: var(--header-bg);
+    padding: px;
+    border-radius: 10px;
+    height: 110px; /* Ajustamos la altura */
+    border: 2px solid var(--button-bg);
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+        font-size: 1px;
+}
 
-        .pet-emoji, .gallery-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 10px;
-        }
+.pet-emoji img, .gallery-link img {
+    width: 65x; /* Ajustamos el tamaño de los iconos */
+    height: 65px;
 
-        .pet-emoji img, .gallery-link img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        #theme-toggle {
-            font-size: 20px;
-            margin-left: auto;
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
+    border-radius: 10%;
+    cursor: pointer;
+}
 
         .main-container {
             display: flex;
@@ -423,7 +410,7 @@
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .pet-emoji, .gallery-link {
-                margin: 5px 0;
+                margin: 25px 0;
             }
 
             #gallery-modal .gallery-container {
@@ -448,19 +435,25 @@
         </div>
     </header>
 
-    <div class="pet-status-container">
-        <!-- Enlace de la mascota virtual -->
-        <a href="#" id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">
-            <img src="pet-icon.png" alt="Mascota Virtual">
-        </a>
+<div class="pet-status-container">
+    <!-- Enlace de la mascota virtual -->
+    <div id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">
+        <img src="pet-icon.png" alt="Mascota Virtual">
 
-        <!-- Nuevo enlace para la galería de imágenes -->
-        <a href="#" id="gallery-link" class="gallery-link" title="Ver Galería">
-            <img src="gallery-icon.png" alt="Galería">
-        </a>
-
-        <button id="theme-toggle">🌓</button>
     </div>
+
+    <!-- Enlace para la galería de imágenes -->
+    <div id="gallery-link" class="gallery-link" title="Ver Galería">
+        <img src="gallery-icon.png">
+        <span>Galería</span>
+    </div>
+
+    <!-- Botón para cambiar el tema -->
+    <button id="theme-toggle">
+        🌓
+        <span>Modo oscuro</span>
+    </button>
+</div>
 
     <div class="main-container">
         <div class="left-column">
