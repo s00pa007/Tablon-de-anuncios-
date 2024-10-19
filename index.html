@@ -10,427 +10,477 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-        :root {
-            --background-color: #f0f0f0;
-            --text-color: #333333;
-            --header-bg: #ffffff;
-            --counter-bg: #e0e0e0;
-            --button-bg: #4caf50;
-            --button-text: #ffffff;
-        }
-        
-        body.dark-mode {
-            --background-color: #121212;
-            --text-color: #ffffff;
-            --header-bg: #1e1e1e;
-            --counter-bg: #333333;
-            --button-bg: #bb86fc;
-            --button-text: #000000;
-        }
+:root {
+    --background-color: #f0f0f0;
+    --text-color: #333333;
+    --header-bg: #ffffff;
+    --counter-bg: #e0e0e0;
+    --button-bg: #4caf50;
+    --button-text: #ffffff;
+}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+body.dark-mode {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --header-bg: #1e1e1e;
+    --counter-bg: #333333;
+    --button-bg: #bb86fc;
+    --button-text: #000000;
+}
 
-        body {
-            background-color: var(--background-color);
-            color: var(--text-color);
-            font-family: 'Comfortaa', cursive;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        header {
-            background-color: var(--header-bg);
-            padding: 10px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            width: 100%;
-        }
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Comfortaa', cursive;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
 
-        #header-image {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
+header {
+    background-color: var(--header-bg);
+    padding: 10px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 100%;
+}
 
-        #slogan {
-            background-color: #ffff00;
-            color: #000000;
-            padding: 5px;
-            margin-top: 5px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            height: 60px;
-        }
+#header-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+#slogan {
+    background-color: #ffff00;
+    color: #000000;
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    height: 60px;
+}
 
 .pet-status-container {
     display: flex;
-    justify-content: space-evenly; /* Esto distribuye los iconos de manera equitativa */
-    align-items: center; /* Centra verticalmente los íconos */
+    justify-content: center; /* Centra los iconos horizontalmente */
+    align-items: center; /* Centra los iconos verticalmente */
     background-color: var(--header-bg);
-    padding: px;
+    padding: 10px 20px; /* Ajustado para mayor espacio lateral */
     border-radius: 10px;
-    height: 110px; /* Ajustamos la altura */
     border: 2px solid var(--button-bg);
     position: sticky;
     top: 0;
     width: 100%;
     z-index: 1000;
-        font-size: 1px;
+    gap: 40px; /* Espacio entre los iconos */
+    flex-wrap: nowrap; /* Evita que los elementos se envuelvan */
 }
 
 .pet-emoji img, .gallery-link img {
-    width: 65px; /* Ajustamos el tamaño de los iconos correctamente */
-    height: 65px;
+    width: 100px; /* Aumentado en un 40% desde 65px */
+    height: 100px; /* Aumentado en un 40% desde 65px */
     border-radius: 10%;
     cursor: pointer;
-    border: 4px solid var(--button-bg); /* Añadimos un borde sólido */
+    border: 4px solid var(--button-bg);
     padding: 5px;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6); /* Efecto resplandor alrededor */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Suaviza los cambios */
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.gallery-link img:hover {
-    transform: scale(1.1); /* Efecto de ampliación al pasar el ratón */
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.8); /* Incremento del resplandor */
+.gallery-link img:hover, .pet-emoji img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
 }
 
-        .main-container {
-            display: flex;
-            flex: 1;
-            padding: 20px;
-            position: relative;
-        }
+#theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px; /* Aumentado para mayor tamaño */
+    height: 100px; /* Aumentado para mayor tamaño */
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 50%; /* Botón circular */
+    cursor: pointer;
+    font-size: 24px; /* Aumentado para icono más grande */
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
 
-        .left-column {
-            flex: 1;
-            padding-right: 20px;
-        }
+#theme-toggle:hover {
+    transform: scale(1.1);
+    background-color: var(--button-bg-hover, #45a049);
+}
 
-        #message-form {
-            background-color: var(--header-bg);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+.main-container {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+    position: relative;
+}
 
-        #message-form textarea {
-            width: 100%;
-            height: 80px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            resize: vertical;
-            font-size: 16px;
-            font-family: 'Comfortaa', cursive;
-        }
+.left-column {
+    flex: 1;
+    padding-right: 20px;
+}
 
-        #message-form button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-            font-family: 'Comfortaa', cursive;
-            font-weight: bold;
-        }
+#message-form {
+    background-color: var(--header-bg);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
-        #bulletin-board {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+#message-form textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical;
+    font-size: 16px;
+    font-family: 'Comfortaa', cursive;
+}
 
-        .message {
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 14px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border: 1px solid #333;
-            margin-bottom: 15px;
-        }
+#message-form button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'Comfortaa', cursive;
+    font-weight: bold;
+}
 
-        .message-content {
-            display: flex;
-            align-items: flex-start;
-        }
+#bulletin-board {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
 
-        .message-emoji {
-            font-size: 36px;
-            margin-right: 10px;
-        }
+.message {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #333;
+    margin-bottom: 15px;
+}
 
-        .message-text {
-            flex: 1;
-            margin-bottom: 5px;
-            line-height: 1.3;
-        }
+.message-content {
+    display: flex;
+    align-items: flex-start;
+}
 
-        .message-timestamp {
-            font-size: 10px;
-            opacity: 0.7;
-            text-align: right;
-            margin-top: 5px;
-        }
+.message-emoji {
+    font-size: 36px;
+    margin-right: 10px;
+}
 
-        .message-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 5px;
-        }
+.message-text {
+    flex: 1;
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
 
-        .like-btn, .dislike-btn, .reply-btn, .delete-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-        }
+.message-timestamp {
+    font-size: 10px;
+    opacity: 0.7;
+    text-align: right;
+    margin-top: 5px;
+}
 
-        .quoted-message {
-            font-size: 12px;
-            padding: 5px;
-            border-left: 3px solid #ccc;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
+.message-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 5px;
+}
 
-        .quoted-message:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
+.like-btn, .dislike-btn, .reply-btn, .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
 
-        .reply-form {
-            margin-top: 10px;
-        }
+.quoted-message {
+    font-size: 12px;
+    padding: 5px;
+    border-left: 3px solid #ccc;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
 
-        .reply-form textarea {
-            width: 100%;
-            padding: 5px;
-            margin-bottom: 5px;
-        }
+.quoted-message:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
 
-        .reply-form button {
-            padding: 5px 10px;
-        }
+.reply-form {
+    margin-top: 10px;
+}
 
-        .statistics {
-            background-color: var(--counter-bg);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            font-size: 14px;
-        }
+.reply-form textarea {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 5px;
+}
 
-        .statistics div {
-            margin-bottom: 5px;
-        }
+.reply-form button {
+    padding: 5px 10px;
+}
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
+.statistics {
+    background-color: var(--counter-bg);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    font-size: 14px;
+}
 
-        .floating-emoji {
-            position: fixed;
-            font-size: 30px;
-            animation: float 3s ease-in-out infinite;
-            pointer-events: none;
-            z-index: -1;
-        }
+.statistics div {
+    margin-bottom: 5px;
+}
 
-        .delete-confirmation {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 5px;
-        }
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
 
-        .delete-confirmation button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-        }
+.floating-emoji {
+    position: fixed;
+    font-size: 30px;
+    animation: float 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
 
-        .teletipo-wrapper {
-            position: relative;
-            width: 100%;
-            margin-bottom: 20px;
-        }
+.delete-confirmation {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 5px;
+}
 
-        .rumores-label {
-            position: absolute;
-            top: -15px;
-            left: 0;
-            font-size: 12px;
-            font-weight: bold;
-            color: #ff6347;
-            text-transform: uppercase;
-            background-color: var(--background-color);
-            padding: 0 5px;
-            z-index: 1;
-        }
+.delete-confirmation button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
 
-        #teletipo-container {
-            width: 100%;
-            border-top: 1px solid #ccc;
-            padding-top: 10px;
-            background-color: var(--background-color);
-            z-index: 999;
-        }
+.teletipo-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
 
-        #loading {
-            text-align: center;
-            padding: 20px;
-            display: none;
-        }
+.rumores-label {
+    position: absolute;
+    top: -15px;
+    left: 0;
+    font-size: 12px;
+    font-weight: bold;
+    color: #ff6347;
+    text-transform: uppercase;
+    background-color: var(--background-color);
+    padding: 0 5px;
+    z-index: 1;
+}
 
-        /* Estilos para la ventana modal de la galería */
-        #gallery-modal {
-            display: none; /* Oculto por defecto */
-            position: fixed;
-            top: 0; /* Asegura que cubra toda la pantalla */
-            left: 0;
-            width: 100%; /* Cubre toda la anchura */
-            height: 100%; /* Cubre toda la altura */
-            background-color: rgba(0, 0, 0, 0.8); /* Fondo semitransparente */
-            z-index: 1002;
-            /* Eliminado 'display: flex;' para mantener el modal oculto por defecto */
-            align-items: center;
-            justify-content: center;
-        }
+#teletipo-container {
+    width: 100%;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    background-color: var(--background-color);
+    z-index: 999;
+}
 
-        #gallery-modal .close-gallery {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 40px;
-            color: #fff;
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
+#loading {
+    text-align: center;
+    padding: 20px;
+    display: none;
+}
 
-        #gallery-modal .gallery-container {
-            width: 80%;
-            max-width: 800px;
-            height: 80%;
-            background-color: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+/* Estilos para la ventana modal de la galería */
+#gallery-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1002;
+    align-items: center;
+    justify-content: center;
+}
 
-        #gallery-modal .gallery-container img {
-            max-width: 100%;
-            max-height: 100%;
-            display: none;
-            object-fit: contain;
-        }
+#gallery-modal .close-gallery {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 40px;
+    color: #fff;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
 
-        #gallery-modal .gallery-container img.active {
-            display: block;
-        }
+#gallery-modal .gallery-container {
+    width: 80%;
+    max-width: 800px;
+    height: 80%;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        /* Botones de navegación */
-        .gallery-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 36px;
-            color: rgba(0,0,0,0.7);
-            background: rgba(255,255,255,0.7);
-            border: none;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 50%;
-            user-select: none;
-        }
+#gallery-modal .gallery-container img {
+    max-width: 100%;
+    max-height: 100%;
+    display: none;
+    object-fit: contain;
+}
 
-        #prev-btn {
-            left: 10px;
-        }
+#gallery-modal .gallery-container img.active {
+    display: block;
+}
 
-        #next-btn {
-            right: 10px;
-        }
+/* Botones de navegación */
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 36px;
+    color: rgba(0,0,0,0.7);
+    background: rgba(255,255,255,0.7);
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    user-select: none;
+}
 
-        .gallery-nav:hover {
-            color: rgba(0,0,0,0.9);
-            background: rgba(255,255,255,1);
-        }
+#prev-btn {
+    left: 10px;
+}
 
-        /* Estilos para el popup de la mascota virtual */
-        #pet-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 85%; /* Ajusta el ancho al 85% */
-            height: 85%; /* Ajusta la altura al 85% */
-            background-color: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 5001;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
+#next-btn {
+    right: 10px;
+}
 
-        #close-popup {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            z-index: 1002;
-        }
+.gallery-nav:hover {
+    color: rgba(0,0,0,0.9);
+    background: rgba(255,255,255,1);
+}
 
-        #pet-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+/* Estilos para el popup de la mascota virtual */
+#pet-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    height: 85%;
+    background-color: white;
+    border: 2px solid #333;
+    border-radius: 10px;
+    z-index: 5001;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .pet-emoji, .gallery-link {
-                margin: 25px 0;
-            }
+#close-popup {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    z-index: 1002;
+}
 
-            #gallery-modal .gallery-container {
-                width: 90%;
-                height: 70%;
-            }
+#pet-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
 
-            #pet-popup {
-                width: 90%;
-                height: 90%;
-            }
-        }
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .pet-status-container {
+        gap: 30px; /* Reducir el espacio entre iconos en pantallas medianas */
+    }
+
+    .pet-emoji img, .gallery-link img {
+        width: 80px;
+        height: 80px;
+    }
+
+    #theme-toggle {
+        width: 80px;
+        height: 80px;
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pet-status-container {
+        flex-wrap: wrap; /* Permite que los iconos se ajusten si el espacio es limitado */
+        gap: 20px; /* Espacio reducido entre iconos */
+    }
+
+    .pet-emoji img, .gallery-link img {
+        width: 90px;
+        height: 90px;
+    }
+
+    #theme-toggle {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+    }
+
+    #gallery-modal .gallery-container {
+        width: 90%;
+        height: 70%;
+    }
+
+    #pet-popup {
+        width: 90%;
+        height: 90%;
+    }
+}
     </style>
 </head>
 <body>
@@ -443,25 +493,23 @@
         </div>
     </header>
 
-<div class="pet-status-container">
-    <!-- Enlace de la mascota virtual -->
-    <div id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">
-        <img src="pet-icon.png" alt="Mascota Virtual">
+    <div class="pet-status-container">
+        <!-- Enlace de la mascota virtual -->
+        <div id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">
+            <img src="pet-icon.png" alt="Mascota Virtual">
+        </div>
 
+        <!-- Enlace para la galería de imágenes -->
+        <div id="gallery-link" class="gallery-link" title="Ver Galería">
+            <img src="gallery-icon.png" alt="Galería de Imágenes">
+        </div>
+
+        <!-- Botón para cambiar el tema -->
+        <button id="theme-toggle" title="Cambiar Modo">
+            🌓
+
+        </button>
     </div>
-
-    <!-- Enlace para la galería de imágenes -->
-    <div id="gallery-link" class="gallery-link" title="Ver Galería">
-        <img src="gallery-icon.png">
-    
-    </div>
-
-    <!-- Botón para cambiar el tema -->
-    <button id="theme-toggle">
-        🌓
-        <span>Modo oscuro</span>
-    </button>
-</div>
 
     <div class="main-container">
         <div class="left-column">
@@ -496,6 +544,9 @@
         <iframe id="pet-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
+
+
+</body>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
