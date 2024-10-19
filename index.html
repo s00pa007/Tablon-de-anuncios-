@@ -90,11 +90,19 @@
 }
 
 .pet-emoji img, .gallery-link img {
-    width: 65x; /* Ajustamos el tamaño de los iconos */
+    width: 65px; /* Ajustamos el tamaño de los iconos correctamente */
     height: 65px;
-
     border-radius: 10%;
     cursor: pointer;
+    border: 4px solid var(--button-bg); /* Añadimos un borde sólido */
+    padding: 5px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6); /* Efecto resplandor alrededor */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Suaviza los cambios */
+}
+
+.gallery-link img:hover {
+    transform: scale(1.1); /* Efecto de ampliación al pasar el ratón */
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.8); /* Incremento del resplandor */
 }
 
         .main-container {
@@ -445,7 +453,7 @@
     <!-- Enlace para la galería de imágenes -->
     <div id="gallery-link" class="gallery-link" title="Ver Galería">
         <img src="gallery-icon.png">
-        <span>Galería</span>
+    
     </div>
 
     <!-- Botón para cambiar el tema -->
