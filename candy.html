@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Emojis</title>
+    <style>
+        /* Estilos combinados de styles.css */
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('background.png'); /* Ruta a la nueva imagen de fondo */
+            background-size: cover;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative; /* Añadido para la posición absoluta del Game Over */
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(7, 50px);
+            grid-template-rows: repeat(7, 50px);
+            gap: 5px;
+        }
+
+        .grid div {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(128, 0, 128, 0.5); /* Fondo morado con 50% de transparencia */
+            border: 1px solid transparent; /* Sin borde */
+            cursor: pointer;
+            font-size: 30px;
+            position: relative;
+            transition: transform 0.5s, opacity 0.5s; /* Transiciones para escala y opacidad */
+        }
+
+        .emoji-img {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .score-container {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        /* Añadir animación de atenuación y transparencia */
+        .fade-out {
+            animation: fadeOut 0.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Efectos de escalado y rotación */
+        .explode {
+            transform: scale(0) rotate(720deg); /* Aumento a 720 grados para mayor rotación */
+            opacity: 0;
+            transition: transform 1s, opacity 1s; /* Duración del efecto duplicada */
+        }
+
+        .move-counter {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .game-over {
+            display: none;
+            font-size: 48px;
+            color: red;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="move-counter" class="move-counter">3</div>
+        <div class="grid"></div>
+        <div id="game-over" class="game-over">Game Over</div>
+        <div class="score-board">
+            <h2>Puntuación: <span id="score">0</span></h2>
+            <button id="restart">Reiniciar</button>
+        </div>
+    </div>
+    <audio id="audio1" src="audio1.mp3"></audio>
+    <audio id="audio2" src="audio2.mp3"></audio>
+    <audio id="audioSpecial" src="audioSpecial.mp3"></audio>
+    <script>
+        // Código JavaScript combinado y corregido
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.querySelector('.grid');
+            const width = 7;
+            const allEmojis = [
+                '😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊',
+                '😋', '😎', '😍', '😘', '😗', '😙', '😚', '🙂', '🤗', '🤔',
+                '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯',
+                '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🐣',
+                '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝',
+                '🐛', '🦋', '🐌', '🐞', '🐜', '🦗', '🕷️', '🦂', '🐢', '🐍',
+                '🦎', '🐙', '🦑', '🦞', '🦐', '🦀', '🐡', '🐠', '🐟', '🐬',
+                '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🦣',
+                '🦒', '🐘', '🦏', '🦛', '🐪', '🐫', '🦙', '🐃', '🐂', '🐄',
+                '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺',
+                '🐈', '🐈‍⬛', '🦜', '🦚', '🦢', '🦩', '🦨', '🦡', '🦦', '🦥',
+                '🐁', '🐀', '🐇', '🦝', '🦔', '🐾', '🐉', '🐲', '🌵', '🎄',
+                '🌲', '🌳', '🌴', '🌱', '🌿', '☘️', '🍀', '🎍', '🎋', '🍃',
+                '🍂', '🍁', '🍄', '🌾', '💐', '🌷', '🌹', '🌺', '🌸', '🌼',
+                '🌻', '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘',
+                '🌑', '🌒', '🌓', '🌔', '🌙', '🌎', '🌍', '🌏', '💫', '⭐',
+                '🌟', '✨', '⚡', '☄️', '💥', '🔥', '🌪️', '🌈', '☀️', '🌤️',
+                '⛅', '🌥️', '☁️', '🌦️', '🌧️', '⛈️', '🌩️', '🌨️', '❄️', '☃️',
+                '⛄', '🌬️', '💨', '💧', '💦', '☔', '☂️', '🌊', '🌫️'
+            ];
+            let emojis = [];
+            const squares = [];
+            let dragStartId, dragEndId;
+            let score = 0;
+            const audio1 = document.getElementById('audio1');
+            const audio2 = document.getElementById('audio2');
+            const audioSpecial = document.getElementById('audioSpecial');
+            let audioSequence = [];
+            let emojisCount = 4; // Comenzar con 4 emojis normales más el especial
+            let moveCounter = 3; // Contador de movimientos
+
+            const moveCounterDisplay = document.getElementById('move-counter');
+            const gameOverDisplay = document.getElementById('game-over');
+
+            function selectRandomEmojis() {
+                emojis = [];
+                while (emojis.length < emojisCount) {
+                    const randomEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
+                    if (!emojis.includes(randomEmoji)) {
+                        emojis.push(randomEmoji);
+                    }
+                }
+                emojis.push('<img src="fondo.png" class="emoji-img">'); // Añadir el emoji especial
+            }
+
+            function createBoard() {
+                selectRandomEmojis();
+                grid.style.visibility = 'hidden'; // Ocultar la cuadrícula mientras se configura
+                for (let i = 0; i < width * width; i++) {
+                    const square = document.createElement('div');
+                    square.setAttribute('draggable', true);
+                    square.setAttribute('id', i);
+                    let randomEmoji = Math.floor(Math.random() * emojis.length);
+                    square.innerHTML = emojis[randomEmoji];
+                    grid.appendChild(square);
+                    squares.push(square);
+
+                    square.addEventListener('dragstart', dragStart);
+                    square.addEventListener('dragover', dragOver);
+                    square.addEventListener('dragenter', dragEnter);
+                    square.addEventListener('dragleave', dragLeave);
+                    square.addEventListener('drop', dragDrop);
+                    square.addEventListener('dragend', dragEnd);
+
+                    square.addEventListener('touchstart', touchStart);
+                    square.addEventListener('touchmove', touchMove);
+                    square.addEventListener('touchend', touchEnd);
+                }
+
+                stabilizeBoard();
+            }
+
+            function stabilizeBoard() {
+                removeInitialMatches(() => {
+                    setTimeout(() => {
+                        removeInitialMatches(() => {
+                            grid.style.visibility = 'visible';
+                        });
+                    }, 100);
+                });
+            }
+
+            function removeInitialMatches(callback) {
+                removeMatches(callback);
+            }
+
+            function dragStart(e) {
+                dragStartId = parseInt(this.id);
+                e.dataTransfer.setData('text/html', this.innerHTML);
+            }
+
+            function dragOver(e) {
+                e.preventDefault();
+            }
+
+            function dragEnter(e) {
+                e.preventDefault();
+            }
+
+            function dragLeave() {}
+
+            function dragDrop(e) {
+                dragEndId = parseInt(this.id);
+                e.preventDefault();
+            }
+
+            function dragEnd() {
+                let validMoves = [
+                    dragStartId - 1,
+                    dragStartId + 1,
+                    dragStartId - width,
+                    dragStartId + width
+                ];
+                let validMove = validMoves.includes(dragEndId);
+
+                if (dragEndId && validMove) {
+                    swapEmojis(dragStartId, dragEndId);
+                    if (isMatch()) {
+                        setTimeout(() => {
+                            const matches = checkRowForThree().concat(checkColumnForThree());
+                            animateAndRemoveMatches(matches, true);
+                            if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
+                                playSpecialAudio();
+                            } else {
+                                playAudio();
+                            }
+                            checkAudioSequence();
+                        }, 200);
+                        dragEndId = null;
+                    } else {
+                        swapEmojis(dragStartId, dragEndId);
+                    }
+                }
+                checkForPossibleMoves();
+            }
+
+            function swapEmojis(startId, endId) {
+                let temp = squares[startId].innerHTML;
+                squares[startId].innerHTML = squares[endId].innerHTML;
+                squares[endId].innerHTML = temp;
+            }
+
+            function isMatch() {
+                return checkRowForThree().length > 0 || checkColumnForThree().length > 0;
+            }
+
+            function touchStart(e) {
+                dragStartId = parseInt(e.target.closest('div').id);
+            }
+
+            function touchMove(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const endElement = document.elementFromPoint(touch.clientX, touch.clientY);
+                dragEndId = endElement ? parseInt(endElement.closest('div').id) : null;
+            }
+
+            function touchEnd(e) {
+                if (dragEndId !== null) {
+                    let validMoves = [
+                        dragStartId - 1,
+                        dragStartId + 1,
+                        dragStartId - width,
+                        dragStartId + width
+                    ];
+                    let validMove = validMoves.includes(dragEndId);
+
+                    if (dragEndId && validMove) {
+                        swapEmojis(dragStartId, dragEndId);
+                        if (isMatch()) {
+                            setTimeout(() => {
+                                const matches = checkRowForThree().concat(checkColumnForThree());
+                                animateAndRemoveMatches(matches, true);
+                                if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
+                                    playSpecialAudio();
+                                } else {
+                                    playAudio();
+                                }
+                                checkAudioSequence();
+                            }, 200);
+                            dragEndId = null;
+                        } else {
+                            swapEmojis(dragStartId, dragEndId);
+                        }
+                    }
+                }
+                checkForPossibleMoves();
+            }
+
+            function removeMatches(callback) {
+                let matches = checkRowForThree().concat(checkColumnForThree());
+                if (matches.length > 0) {
+                    animateAndRemoveMatches(matches, false);
+                    setTimeout(() => {
+                        moveIntoSquareBelow();
+                        fillEmptySquares();
+                        removeMatches(callback);
+                    }, 200);
+                } else if (callback) {
+                    callback();
+                }
+            }
+
+            function animateAndRemoveMatches(matches, isPlayerMove) {
+                matches.forEach(match => {
+                    match.forEach(index => {
+                        squares[index].classList.add('fade-out');
+                    });
+                });
+
+                setTimeout(() => {
+                    matches.forEach(match => {
+                        match.forEach(index => {
+                            squares[index].classList.remove('fade-out');
+                            if (isPlayerMove) {
+                                if (squares[index].innerHTML.includes('fondo.png')) {
+                                    score += 3; // 3 puntos por emoji especial
+                                } else {
+                                    score += 1; // 1 punto por emoji normal
+                                }
+                            }
+                            squares[index].innerHTML = '';
+                            document.getElementById('score').innerText = score;
+                        });
+                    });
+                    setTimeout(() => {
+                        moveIntoSquareBelow();
+                        fillEmptySquares();
+                        checkForPossibleMoves(); // Verificar posibles movimientos después de llenar
+                    }, 200);
+                }, 500);
+            }
+
+            createBoard();
+
+   function moveIntoSquareBelow() {
+   for (let i = (width * width) - 1; i >= 0; i--) {
+   if (squares[i].innerHTML === '') {
+   let aboveIndex = i - width;
+   while (aboveIndex >= 0) {
+   if (squares[aboveIndex].innerHTML !== '') {
+   squares[i].innerHTML = squares[aboveIndex].innerHTML;
+   squares[aboveIndex].innerHTML = '';
+   break;
+   }
+   aboveIndex -= width;
+   }
+   if (aboveIndex < 0) {
+   squares[i].innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+   }
+   }
+   }
+   }
+   
+   function checkRowForThree() {
+   const matches = [];
+   for (let i = 0; i < width * width - 2; i++) {
+   let rowOfThree = [i, i + 1, i + 2];
+   let decidedEmoji = squares[i].innerHTML;
+   const isBlank = squares[i].innerHTML === '';
+   const notValid = [
+   5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
+   47, 48, 54, 55
+   ]; // Actualizado para filas de 7 columnas
+   if (notValid.includes(i)) continue;
+   if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
+   matches.push(rowOfThree);
+   }
+   }
+   return matches;
+   }
+   
+   function checkColumnForThree() {
+   const matches = [];
+   for (let i = 0; i < width * (width - 2); i++) {
+   let columnOfThree = [i, i + width, i + width * 2];
+   let decidedEmoji = squares[i].innerHTML;
+   const isBlank = squares[i].innerHTML === '';
+   if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
+   matches.push(columnOfThree);
+   }
+   }
+   return matches;
+   }
+   
+   function playAudio() {
+   if (audioSequence.length === 0 || audioSequence[audioSequence.length - 1] !== 'audio1') {
+   audio1.play();
+   audioSequence.push('audio1');
+   } else if (audioSequence[audioSequence.length - 1] === 'audio1') {
+   audio2.play();
+   audioSequence.push('audio2');
+   }
+   updateMoveCounter();
+   checkAudioSequence();
+   }
+   
+   function playSpecialAudio() {
+   audioSpecial.play();
+   audioSequence.push('special');
+   updateMoveCounter();
+   checkAudioSequence();
+   }
+   
+   function checkAudioSequence() {
+   const requiredSequence = ['audio1', 'audio2', 'special'];
+   if (audioSequence.length >= 3) {
+   const lastThree = audioSequence.slice(-3).join(',');
+   if (lastThree === requiredSequence.join(',')) {
+   score += 1000; // 1000 puntos por completar la secuencia
+   document.getElementById('score').innerText = score;
+   explodeBoard();
+   moveCounter = 3; // Reiniciar el contador de movimientos
+   moveCounterDisplay.innerText = moveCounter;
+   audioSequence = []; // Reiniciar la secuencia
+   } else if (lastThree.some(audio => audio === 'special')) {
+   // Si la secuencia incluye 'special' pero no es correcta
+   audioSequence = []; // Reiniciar la secuencia
+   }
+   }
+   }
+   
+   function updateMoveCounter() {
+   moveCounter--;
+   moveCounterDisplay.innerText = moveCounter;
+   if (moveCounter === 0) {
+   moveCounter = 3;
+   moveCounterDisplay.innerText = "BOOM";
+   setTimeout(() => {
+   moveCounterDisplay.innerText = moveCounter;
+   }, 1000);
+   explodeBoard();
+   }
+   }
+   
+   function explodeBoard() {
+   squares.forEach(square => {
+   square.classList.add('explode');
+   });
+   
+   setTimeout(() => {
+   squares.forEach(square => {
+   square.classList.remove('explode');
+   square.innerHTML = '';
+   });
+   emojisCount++; // Aumentar el número de emojis
+   selectRandomEmojis(); // Selecciona un nuevo conjunto de emojis
+   setTimeout(() => {
+   fillEmptySquares();
+   checkForPossibleMoves(); // Verificar combinaciones después de llenar los espacios
+   }, 500);
+   }, 1000); // Duración del efecto duplicada a 1000ms
+   }
+   
+   function fillEmptySquares() {
+   for (let i = 0; i < width * width; i++) {
+   if (squares[i].innerHTML === '') {
+   let randomEmoji = Math.floor(Math.random() * emojis.length);
+   squares[i].innerHTML = emojis[randomEmoji];
+   }
+   }
+   }
+   
+   function checkForPossibleMoves() {
+   let possibleMoves = false;
+   for (let i = 0; i < width * width; i++) {
+   if (canSwap(i, i + 1) || canSwap(i, i - 1) || canSwap(i, i + width) || canSwap(i, i - width)) {
+   possibleMoves = true;
+   break;
+   }
+   }
+   if (!possibleMoves) {
+   gameOver();
+   }
+   }
+   
+   function canSwap(index1, index2) {
+   if (index2 < 0 || index2 >= width * width || squares[index1] === undefined || squares[index2] === undefined) {
+   return false;
+   }
+   swapEmojis(index1, index2);
+   const isValidMove = isMatch();
+   swapEmojis(index1, index2);
+   return isValidMove;
+   }
+   
+   function gameOver() {
+   gameOverDisplay.style.display = 'block';
+   gameOverDisplay.innerText = 'Game Over';
+   gameOverDisplay.style.fontSize = '2rem';
+   gameOverDisplay.style.color = 'red';
+   gameOverDisplay.style.textAlign = 'center';
+   }
+   
+   document.getElementById('restart').addEventListener('click', () => {
+   grid.innerHTML = '';
+   squares.length = 0;
+   score = 0;
+   emojisCount = 4; // Reiniciar el número de emojis
+   moveCounter = 3; // Reiniciar el contador de movimientos
+   document.getElementById('score').innerText = score;
+   moveCounterDisplay.innerText = moveCounter;
+   gameOverDisplay.style.display = 'none';
+   audioSequence = []; // Reiniciar la secuencia de audio
+   createBoard();
+   });
+   
+   setInterval(removeMatches, 100); // Verificar y eliminar combinaciones ganadoras continuamente
+   });
+   </script>
+   </body>
+   </html>
