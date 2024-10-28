@@ -60,19 +60,14 @@
         }
 
         .stat {
+            font-size: 2rem;
+            color: #333;
             position: relative;
-            width: 60px;
-            height: 60px;
-        }
-
-        .stat img {
-            width: 100%;
-            height: 100%;
         }
 
         .stat .counter {
             position: absolute;
-            bottom: -10px;
+            top: -10px;
             right: -10px;
             background: #ff4081;
             color: white;
@@ -243,6 +238,39 @@
                 font-size: 2rem;
             }
         }
+
+        /* Efecto de Partículas */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 15px;
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #ff4081;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particle 1s forwards;
+        }
+
+        @keyframes particle {
+            from {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(2);
+            }
+        }
     </style>
 </head>
 <body>
@@ -251,18 +279,9 @@
             <h1>🎉 Emoji Match 🎉</h1>
         </div>
         <div class="stats">
-            <div class="stat">
-                <img src="icons/move.png" alt="Movimientos">
-                <div class="counter" id="move-counter">3</div>
-            </div>
-            <div class="stat">
-                <img src="icons/level.png" alt="Nivel">
-                <div class="counter" id="level-indicator">1</div>
-            </div>
-            <div class="stat">
-                <img src="icons/high-score.png" alt="Puntuación Máxima">
-                <div class="counter" id="high-score-value">0</div>
-            </div>
+            <div class="stat">🔄 <span class="counter" id="move-counter">3</span></div>
+            <div class="stat">📈 <span class="counter" id="level-indicator">1</span></div>
+            <div class="stat">🏆 <span class="counter" id="high-score-value">0</span></div>
         </div>
         <div class="grid"></div>
         <div id="game-over" class="game-over">💥 ¡Game Over! 💥</div>
@@ -274,32 +293,34 @@
                 <button id="sound-toggle" title="Alternar Sonido">🔊</button>
             </div>
         </div>
+        <!-- Efectos de Partículas -->
+        <div class="particles" id="particles"></div>
     </div>
 
-    <!-- Elementos de audio con múltiples formatos y preload -->
+    <!-- Elementos de audio sin carpeta "audio/" -->
     <audio id="audio1" preload="auto">
-        <source src="audio/audio1.mp3" type="audio/mpeg">
-        <source src="audio/audio1.ogg" type="audio/ogg">
+        <source src="audio1.mp3" type="audio/mpeg">
+        <source src="audio1.ogg" type="audio/ogg">
         Tu navegador no soporta el elemento de audio.
     </audio>
     <audio id="audio2" preload="auto">
-        <source src="audio/audio2.mp3" type="audio/mpeg">
-        <source src="audio/audio2.ogg" type="audio/ogg">
+        <source src="audio2.mp3" type="audio/mpeg">
+        <source src="audio2.ogg" type="audio/ogg">
         Tu navegador no soporta el elemento de audio.
     </audio>
     <audio id="audioSpecial" preload="auto">
-        <source src="audio/audioSpecial.mp3" type="audio/mpeg">
-        <source src="audio/audioSpecial.ogg" type="audio/ogg">
+        <source src="audioSpecial.mp3" type="audio/mpeg">
+        <source src="audioSpecial.ogg" type="audio/ogg">
         Tu navegador no soporta el elemento de audio.
     </audio>
     <audio id="audioWin" preload="auto">
-        <source src="audio/win.mp3" type="audio/mpeg">
-        <source src="audio/win.ogg" type="audio/ogg">
+        <source src="win.mp3" type="audio/mpeg">
+        <source src="win.ogg" type="audio/ogg">
         Tu navegador no soporta el elemento de audio.
     </audio>
     <audio id="audioLose" preload="auto">
-        <source src="audio/lose.mp3" type="audio/mpeg">
-        <source src="audio/lose.ogg" type="audio/ogg">
+        <source src="lose.mp3" type="audio/mpeg">
+        <source src="lose.ogg" type="audio/ogg">
         Tu navegador no soporta el elemento de audio.
     </audio>
 
@@ -340,7 +361,7 @@
         const audioLose = document.getElementById('audioLose');
         let audioSequence = [];
         let currentAudio = 1; // Para alternar entre audio1 y audio2
-        let emojisCount = 4; // Número de emojis normales
+        let emojisCount = 10; // Incrementar el número de emojis normales para reducir combinaciones iniciales
         let moveCounter = 3; // Movimientos restantes
         let level = 1; // Nivel actual
         let isPaused = false; // Estado de pausa
@@ -354,6 +375,7 @@
         const restartButton = document.getElementById('restart');
         const pauseButton = document.getElementById('pause');
         const soundToggleButton = document.getElementById('sound-toggle');
+        const particlesContainer = document.getElementById('particles');
 
         // Manejo de errores en los elementos de audio
         const audiosList = ['audio1', 'audio2', 'audioSpecial', 'audioWin', 'audioLose'];
@@ -478,6 +500,7 @@
                         await animateAndRemoveMatches(matches, true);
                         if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
                             playSpecialAudio();
+                            createParticles(30, '#ff4081');
                         } else {
                             playAudio();
                         }
@@ -546,6 +569,7 @@
                             await animateAndRemoveMatches(matches, true);
                             if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
                                 playSpecialAudio();
+                                createParticles(30, '#ff4081');
                             } else {
                                 playAudio();
                             }
@@ -854,7 +878,7 @@
             squares.length = 0;
             score = 0;
             level = 1;
-            emojisCount = 4; // Reiniciar el número de emojis normales
+            emojisCount = 10; // Reiniciar el número de emojis normales
             moveCounter = 3; // Reiniciar el contador de movimientos
             scoreDisplay.innerText = score;
             moveCounterDisplay.innerText = moveCounter;
@@ -864,6 +888,7 @@
             audioSequence = []; // Reiniciar la secuencia de audio
             currentAudio = 1; // Reiniciar el audio actual
             isPaused = false;
+            clearParticles();
             createBoard();
         }
 
@@ -939,6 +964,38 @@
             requestAnimationFrame(gameLoop);
         }
         gameLoop();
+
+        /**
+         * Crea partículas para efectos visuales.
+         * @param {number} count - Número de partículas.
+         * @param {string} color - Color de las partículas.
+         */
+        function createParticles(count, color) {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.background = color;
+                // Generar posiciones aleatorias
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                // Generar desplazamientos aleatorios
+                particle.style.setProperty('--tx', (Math.random() * 200 - 100) + 'px');
+                particle.style.setProperty('--ty', (Math.random() * 200 - 100) + 'px');
+                particlesContainer.appendChild(particle);
+
+                // Eliminar partículas después de la animación
+                particle.addEventListener('animationend', () => {
+                    particle.remove();
+                });
+            }
+        }
+
+        /**
+         * Limpia todas las partículas existentes.
+         */
+        function clearParticles() {
+            particlesContainer.innerHTML = '';
+        }
     });
     </script>
 </body>
