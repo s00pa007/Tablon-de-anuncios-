@@ -1,3140 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 Emoji Match Profesional 🎉</title>
+    <style>
+        /* Reset de Estilos */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
- <!DOCTYPE html>
- <html lang="es">
- <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Juego de Emojis Profesional</title>
- <style>
- /* Reset de estilos básicos */
- * {
- margin: 0;
- padding: 0;
- box-sizing: border-box;
- }
- 
- body {
- display: flex;
- justify-content: center;
- align-items: center;
- min-height: 100vh;
- background-image: url('background.png'); /* Asegúrate de que esta imagen exista en tu directorio */
- background-size: cover;
- background-position: center;
- font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
- }
- 
- .game-container {
- display: flex;
- flex-direction: column;
- align-items: center;
- position: relative; /* Posición relativa para el Game Over */
- background: rgba(255, 255, 255, 0.95);
- padding: 20px;
- border-radius: 15px;
- box-shadow: 0 8px 16px rgba(0,0,0,0.3);
- width: 90vw;
- max-width: 500px;
- }
- 
- .header {
- display: flex;
- justify-content: space-between;
- width: 100%;
- margin-bottom: 15px;
- }
- 
- .header div {
- font-size: 1.2rem;
- color: #333;
- }
- 
- .grid {
- display: grid;
- grid-template-columns: repeat(7, 50px);
- grid-template-rows: repeat(7, 50px);
- gap: 5px;
- width: 100%;
- justify-content: center;
- }
- 
- .grid div {
- width: 50px;
- height: 50px;
- display: flex;
- justify-content: center;
- align-items: center;
- background-color: rgba(128, 0, 128, 0.8); /* Fondo morado con 80% de transparencia */
- border: 2px solid #4B0082; /* Borde índigo */
- border-radius: 8px;
- cursor: pointer;
- font-size: 24px;
- position: relative;
- transition: transform 0.2s, box-shadow 0.2s;
- }
- 
- .grid div:active {
- transform: scale(0.95);
- box-shadow: 0 4px 8px rgba(0,0,0,0.2);
- }
- 
- .emoji-img {
- width: 100%;
- height: 100%;
- object-fit: cover;
- border-radius: 6px;
- }
- 
- button {
- margin-top: 15px;
- padding: 12px 30px;
- font-size: 1rem;
- border: none;
- border-radius: 8px;
- background-color: #4B0082;
- color: white;
- cursor: pointer;
- transition: background-color 0.3s, transform 0.2s;
- }
- 
- button:hover {
- background-color: #6A0DAD;
- }
- 
- button:active {
- transform: scale(0.98);
- }
- 
- .score-container, .move-counter, .level-indicator {
- font-size: 1.1rem;
- color: #333;
- }
- 
- .score-container {
- margin-top: 10px;
- }
- 
- .fade-out {
- animation: fadeOut 0.5s forwards;
- }
- 
- @keyframes fadeOut {
- 0% {
- opacity: 1;
- }
- 100% {
- opacity: 0;
- }
- }
- 
- .explode {
- animation: explodeAnim 1s forwards;
- }
- 
- @keyframes explodeAnim {
- 0% {
- transform: scale(1);
- opacity: 1;
- }
- 100% {
- transform: scale(1.5) rotate(720deg);
- opacity: 0;
- }
- }
- 
- .game-over {
- display: none;
- font-size: 3rem;
- color: #FF0000;
- position: absolute;
- top: 50%;
- left: 50%;
- transform: translate(-50%, -50%);
- z-index: 10;
- text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
- animation: fadeIn 0.5s forwards;
- }
- 
- @keyframes fadeIn {
- from { opacity: 0; }
- to { opacity: 1; }
- }
- 
- /* Responsividad para dispositivos móviles */
- @media (max-width: 600px) {
- .grid {
- grid-template-columns: repeat(7, 40px);
- grid-template-rows: repeat(7, 40px);
- gap: 4px;
- }
- 
- .grid div {
- width: 40px;
- height: 40px;
- font-size: 20px;
- }
- 
- button {
- padding: 10px 25px;
- font-size: 0.9rem;
- }
- 
- .score-container, .move-counter, .level-indicator {
- font-size: 1rem;
- }
- }
- </style>
- </head>
- <body>
- <div class="game-container">
- <div class="header">
- <div id="move-counter" class="move-counter">Movimientos: 3</div>
- <div id="level-indicator" class="level-indicator">Nivel: 1</div>
- </div>
- <div class="grid"></div>
- <div id="game-over" class="game-over">¡Game Over!</div>
- <div class="score-container">
- <h2>Puntuación: <span id="score">0</span></h2>
- <button id="restart">Reiniciar Juego</button>
- </div>
- </div>
- 
- <!-- Elementos de audio con múltiples formatos y preload -->
- <audio id="audio1" preload="auto">
- <source src="audio/audio1.mp3" type="audio/mpeg">
- <source src="audio/audio1.ogg" type="audio/ogg">
- Tu navegador no soporta el elemento de audio.
- </audio>
- <audio id="audio2" preload="auto">
- <source src="audio/audio2.mp3" type="audio/mpeg">
- <source src="audio/audio2.ogg" type="audio/ogg">
- Tu navegador no soporta el elemento de audio.
- </audio>
- <audio id="audioSpecial" preload="auto">
- <source src="audio/audioSpecial.mp3" type="audio/mpeg">
- <source src="audio/audioSpecial.ogg" type="audio/ogg">
- Tu navegador no soporta el elemento de audio.
- </audio>
-  
- <script>
- document.addEventListener('DOMContentLoaded', () => {
- const grid = document.querySelector('.grid');
- const width = 7;
- const allEmojis = [
- '😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊',
- '😋', '😎', '😍', '😘', '😗', '😙', '😚', '🙂', '🤗', '🤔',
- '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯',
- '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🐣',
- '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝',
- '🐛', '🦋', '🐌', '🐞', '🐜', '🦗', '🕷️', '🦂', '🐢', '🐍',
- '🦎', '🐙', '🦑', '🦞', '🦐', '🦀', '🐡', '🐠', '🐟', '🐬',
- '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🦣',
- '🦒', '🐘', '🦏', '🦛', '🐪', '🐫', '🦙', '🐃', '🐂', '🐄',
- '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺',
- '🐈', '🐈‍⬛', '🦜', '🦚', '🦢', '🦩', '🦨', '🦡', '🦦', '🦥',
- '🐁', '🐀', '🐇', '🦝', '🦔', '🐾', '🐉', '🐲', '🌵', '🎄',
- '🌲', '🌳', '🌴', '🌱', '🌿', '☘️', '🍀', '🎍', '🎋', '🍃',
- '🍂', '🍁', '🍄', '🌾', '💐', '🌷', '🌹', '🌺', '🌸', '🌼',
- '🌻', '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘',
- '🌑', '🌒', '🌓', '🌔', '🌙', '🌎', '🌍', '🌏', '💫', '⭐',
- '🌟', '✨', '⚡', '☄️', '💥', '🔥', '🌪️', '🌈', '☀️', '🌤️',
- '⛅', '🌥️', '☁️', '🌦️', '🌧️', '⛈️', '🌩️', '🌨️', '❄️', '☃️',
- '⛄', '🌬️', '💨', '💧', '💦', '☔', '☂️', '🌊', '🌫️'
- ];
- 
- let emojis = [];
- const squares = [];
- let dragStartId, dragEndId;
- let score = 0;
- const audio1 = document.getElementById('audio1');
- const audio2 = document.getElementById('audio2');
- const audioSpecial = document.getElementById('audioSpecial');
- let audioSequence = [];
- let currentAudio = 1; // Para alternar entre audio1 y audio2
- let emojisCount = 4; // Número de emojis normales
- let moveCounter = 3; // Movimientos restantes
- let level = 1; // Nivel actual
- let isRemoving = false; // Bandera para evitar múltiples ejecuciones de removeMatches
- 
- const moveCounterDisplay = document.getElementById('move-counter');
- const gameOverDisplay = document.getElementById('game-over');
- const scoreDisplay = document.getElementById('score');
- const levelDisplay = document.getElementById('level-indicator');
- const restartButton = document.getElementById('restart');
- 
- // Manejo de errores en los elementos de audio
- const audios = ['audio1', 'audio2', 'audioSpecial'];
- audios.forEach(id => {
- const audio = document.getElementById(id);
- audio.addEventListener('error', (e) => {
- console.error(`Error cargando el audio ${id}:`, e);
- });
- });
- 
- /**
- * Selecciona emojis aleatoriamente, incluyendo un emoji especial con mayor frecuencia.
- */
- function selectRandomEmojis() {
- emojis = [];
- // Aumentar la probabilidad de emojis especiales
- const specialEmoji = '<img src="fondo.png" class="emoji-img">'; // Asegúrate de que esta imagen exista en tu directorio
- const specialProbability = 0.2; // 20% de probabilidad de ser especial
- 
- for (let i = 0; i < emojisCount; i++) {
- if (Math.random() < specialProbability) {
- emojis.push(specialEmoji);
- } else {
- const randomEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
- emojis.push(randomEmoji);
- }
- }
- }
- 
- /**
- * Crea el tablero de juego.
- */
- function createBoard() {
- selectRandomEmojis();
- grid.style.visibility = 'hidden';
- for (let i = 0; i < width * width; i++) {
- const square = document.createElement('div');
- square.setAttribute('draggable', true);
- square.setAttribute('id', i);
- let randomEmoji = Math.floor(Math.random() * emojis.length);
- square.innerHTML = emojis[randomEmoji];
- grid.appendChild(square);
- squares.push(square);
- 
- // Eventos de arrastre y tacto
- square.addEventListener('dragstart', dragStart);
- square.addEventListener('dragover', dragOver);
- square.addEventListener('dragenter', dragEnter);
- square.addEventListener('dragleave', dragLeave);
- square.addEventListener('drop', dragDrop);
- square.addEventListener('dragend', dragEnd);
- 
- square.addEventListener('touchstart', touchStart);
- square.addEventListener('touchmove', touchMove);
- square.addEventListener('touchend', touchEnd);
- }
- 
- stabilizeBoard(() => {
- console.log(`Tablero creado con ${squares.length} elementos.`);
- });
- }
- 
- /**
- * Elimina combinaciones iniciales.
- */
- function stabilizeBoard(callback) {
- removeInitialMatches(() => {
- setTimeout(() => {
- removeInitialMatches(() => {
- grid.style.visibility = 'visible';
- if (callback) callback();
- });
- }, 100);
- });
- }
- 
- /**
- * Elimina combinaciones iniciales recursivamente.
- */
- function removeInitialMatches(callback) {
- removeMatches(callback);
- }
- 
- /**
- * Eventos de arrastre.
- */
- function dragStart(e) {
- dragStartId = parseInt(this.id);
- e.dataTransfer.setData('text/html', this.innerHTML);
- }
- 
- function dragOver(e) {
- e.preventDefault();
- }
- 
- function dragEnter(e) {
- e.preventDefault();
- }
- 
- function dragLeave() {}
- 
- function dragDrop(e) {
- dragEndId = parseInt(this.id);
- e.preventDefault();
- }
- 
- function dragEnd() {
- let validMoves = [
- dragStartId - 1,
- dragStartId + 1,
- dragStartId - width,
- dragStartId + width
- ];
- let validMove = validMoves.includes(dragEndId);
- 
- if (dragEndId !== undefined && validMove) {
- swapEmojis(dragStartId, dragEndId);
- if (isMatch()) {
- setTimeout(() => {
- const matches = checkRowForThree().concat(checkColumnForThree());
- animateAndRemoveMatches(matches, true);
- if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
- playSpecialAudio();
- } else {
- playAudio();
- }
- checkAudioSequence();
- }, 200);
- dragEndId = null;
- } else {
- swapEmojis(dragStartId, dragEndId);
- }
- }
- // No llamar a checkForPossibleMoves aquí
- }
- 
- /**
- * Intercambia el contenido de dos emojis.
- */
- function swapEmojis(startId, endId) {
- if (startId < 0 || startId >= squares.length || endId < 0 || endId >= squares.length) {
- console.error(`Índices inválidos en swapEmojis: startId=${startId}, endId=${endId}`);
- return;
- }
- let temp = squares[startId].innerHTML;
- squares[startId].innerHTML = squares[endId].innerHTML;
- squares[endId].innerHTML = temp;
- }
- 
- /**
- * Verifica si hay alguna combinación.
- */
- function isMatch() {
- return checkRowForThree().length > 0 || checkColumnForThree().length > 0;
- }
- 
- /**
- * Eventos de tacto para dispositivos móviles.
- */
- function touchStart(e) {
- dragStartId = parseInt(e.target.closest('div').id);
- }
- 
- function touchMove(e) {
- e.preventDefault();
- const touch = e.touches[0];
- const endElement = document.elementFromPoint(touch.clientX, touch.clientY);
- dragEndId = endElement ? parseInt(endElement.closest('div').id) : null;
- }
- 
- function touchEnd(e) {
- if (dragEndId !== null) {
- let validMoves = [
- dragStartId - 1,
- dragStartId + 1,
- dragStartId - width,
- dragStartId + width
- ];
- let validMove = validMoves.includes(dragEndId);
- 
- if (dragEndId !== undefined && validMove) {
- swapEmojis(dragStartId, dragEndId);
- if (isMatch()) {
- setTimeout(() => {
- const matches = checkRowForThree().concat(checkColumnForThree());
- animateAndRemoveMatches(matches, true);
- if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
- playSpecialAudio();
- } else {
- playAudio();
- }
- checkAudioSequence();
- }, 200);
- dragEndId = null;
- } else {
- swapEmojis(dragStartId, dragEndId);
- }
- }
- }
- // No llamar a checkForPossibleMoves aquí
- }
- 
- /**
- * Elimina combinaciones y actualiza el tablero.
- */
- function removeMatches(callback) {
- if (isRemoving) return; // Evita múltiples ejecuciones
- isRemoving = true;
- 
- let matches = checkRowForThree().concat(checkColumnForThree());
- if (matches.length > 0) {
- animateAndRemoveMatches(matches, false);
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- removeMatches(callback); // Llamada recursiva después de llenar
- }, 200);
- } else {
- isRemoving = false; // Resetear la bandera si no hay más matches
- if (callback) {
- callback();
- }
- checkForPossibleMoves(); // Llamar a checkForPossibleMoves aquí
- }
- }
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Mueve los emojis hacia abajo para llenar los espacios vacíos.
- */
- function moveIntoSquareBelow() {
- for (let i = (width * width) - 1; i >= 0; i--) {
- if (squares[i].innerHTML === '') {
- let aboveIndex = i - width;
- while (aboveIndex >= 0) {
- if (squares[aboveIndex].innerHTML !== '') {
- squares[i].innerHTML = squares[aboveIndex].innerHTML;
- squares[aboveIndex].innerHTML = '';
- break;
- }
- aboveIndex -= width;
- }
- if (aboveIndex < 0) {
- // Generar un nuevo emoji con mayor probabilidad de especial
- let newEmoji;
- if (Math.random() < 0.2) { // 20% de probabilidad de especial
- newEmoji = '<img src="fondo.png" class="emoji-img">';
- } else {
- newEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
- }
- squares[i].innerHTML = newEmoji;
- }
- }
- }
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Reproduce audioSpecial para combinaciones especiales y realiza la progresión de nivel.
- */
- function playSpecialAudio() {
- audioSpecial.play().catch(error => {
- console.error('Error al reproducir audioSpecial:', error);
- });
- audioSequence.push('special');
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Reproduce audio1 y audio2 alternadamente para combinaciones normales.
- */
- function playAudio() {
- if (currentAudio === 1) {
- audio1.play().catch(error => {
- console.error('Error al reproducir audio1:', error);
- });
- audioSequence.push('audio1');
- currentAudio = 2;
- } else {
- audio2.play().catch(error => {
- console.error('Error al reproducir audio2:', error);
- });
- audioSequence.push('audio2');
- currentAudio = 1;
- }
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Verifica la secuencia de audios para detectar combinaciones especiales.
- */
- function checkAudioSequence() {
- const requiredSequence = ['audio1', 'audio2', 'special'];
- if (audioSequence.length >= requiredSequence.length) {
- const lastSequence = audioSequence.slice(-requiredSequence.length);
- if (lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- score += 1000; // Puntos por completar la secuencia
- scoreDisplay.innerText = score;
- levelUp();
- audioSequence = []; // Reiniciar la secuencia
- } else if (lastSequence.includes('special') && !lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- audioSequence = []; // Reiniciar si hay un 'special' pero no la secuencia correcta
- }
- }
- }
- 
- /**
- * Actualiza el contador de movimientos y verifica si se ha agotado.
- */
- function updateMoveCounter() {
- moveCounter--;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- if (moveCounter === 0) {
- moveCounter = 3;
- moveCounterDisplay.innerText = "BOOM";
- setTimeout(() => {
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- }, 1000);
- explodeBoard();
- }
- }
- 
- /**
- * Aumenta el nivel del juego, incrementando la dificultad.
- */
- function levelUp() {
- level++;
- levelDisplay.innerText = `Nivel: ${level}`;
- emojisCount += 1; // Incrementar el número de emojis normales para aumentar la dificultad
- moveCounter = 3; // Reiniciar el contador de movimientos
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- explodeBoard();
- }
- 
- /**
- * Anima el tablero y reinicia el nivel.
- */
- function explodeBoard() {
- squares.forEach(square => {
- square.classList.add('explode');
- });
- 
- setTimeout(() => {
- squares.forEach(square => {
- square.classList.remove('explode');
- square.innerHTML = '';
- });
- selectRandomEmojis(); // Seleccionar nuevos emojis con mayor dificultad
- setTimeout(() => {
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí, ya que removeMatches lo hará
- }, 500);
- }, 1000); // Duración del efecto
- }
- 
- /**
- * Rellena los espacios vacíos con nuevos emojis.
- */
- function fillEmptySquares() {
- for (let i = 0; i < width * width; i++) {
- if (squares[i].innerHTML === '') {
- let randomEmoji = Math.floor(Math.random() * emojis.length);
- squares[i].innerHTML = emojis[randomEmoji];
- }
- }
- // Después de llenar, verifica y remueve posibles combinaciones iniciales
- removeMatches();
- }
- 
- /**
- * Verifica si hay movimientos posibles restantes.
- */
- function checkForPossibleMoves() {
- let possibleMoves = false;
- for (let i = 0; i < width * width; i++) {
- if (canSwap(i, i + 1) || canSwap(i, i - 1) || canSwap(i, i + width) || canSwap(i, i - width)) {
- possibleMoves = true;
- break;
- }
- }
- if (!possibleMoves) {
- gameOver();
- }
- }
- 
- /**
- * Verifica si un intercambio es válido.
- */
- function canSwap(index1, index2) {
- if (index2 < 0 || index2 >= width * width || squares[index1] === undefined || squares[index2] === undefined) {
- return false;
- }
- swapEmojis(index1, index2);
- const isValidMove = isMatch();
- swapEmojis(index1, index2);
- return isValidMove;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Mueve los emojis hacia abajo para llenar los espacios vacíos.
- */
- function moveIntoSquareBelow() {
- for (let i = (width * width) - 1; i >= 0; i--) {
- if (squares[i].innerHTML === '') {
- let aboveIndex = i - width;
- while (aboveIndex >= 0) {
- if (squares[aboveIndex].innerHTML !== '') {
- squares[i].innerHTML = squares[aboveIndex].innerHTML;
- squares[aboveIndex].innerHTML = '';
- break;
- }
- aboveIndex -= width;
- }
- if (aboveIndex < 0) {
- // Generar un nuevo emoji con mayor probabilidad de especial
- let newEmoji;
- if (Math.random() < 0.2) { // 20% de probabilidad de especial
- newEmoji = '<img src="fondo.png" class="emoji-img">';
- } else {
- newEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
- }
- squares[i].innerHTML = newEmoji;
- }
- }
- }
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Reproduce audioSpecial para combinaciones especiales y realiza la progresión de nivel.
- */
- function playSpecialAudio() {
- audioSpecial.play().catch(error => {
- console.error('Error al reproducir audioSpecial:', error);
- });
- audioSequence.push('special');
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Reproduce audio1 y audio2 alternadamente para combinaciones normales.
- */
- function playAudio() {
- if (currentAudio === 1) {
- audio1.play().catch(error => {
- console.error('Error al reproducir audio1:', error);
- });
- audioSequence.push('audio1');
- currentAudio = 2;
- } else {
- audio2.play().catch(error => {
- console.error('Error al reproducir audio2:', error);
- });
- audioSequence.push('audio2');
- currentAudio = 1;
- }
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Verifica la secuencia de audios para detectar combinaciones especiales.
- */
- function checkAudioSequence() {
- const requiredSequence = ['audio1', 'audio2', 'special'];
- if (audioSequence.length >= requiredSequence.length) {
- const lastSequence = audioSequence.slice(-requiredSequence.length);
- if (lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- score += 1000; // Puntos por completar la secuencia
- scoreDisplay.innerText = score;
- levelUp();
- audioSequence = []; // Reiniciar la secuencia
- } else if (lastSequence.includes('special') && !lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- audioSequence = []; // Reiniciar si hay un 'special' pero no la secuencia correcta
- }
- }
- }
- 
- /**
- * Actualiza el contador de movimientos y verifica si se ha agotado.
- */
- function updateMoveCounter() {
- moveCounter--;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- if (moveCounter === 0) {
- moveCounter = 3;
- moveCounterDisplay.innerText = "BOOM";
- setTimeout(() => {
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- }, 1000);
- explodeBoard();
- }
- }
- 
- /**
- * Aumenta el nivel del juego, incrementando la dificultad.
- */
- function levelUp() {
- level++;
- levelDisplay.innerText = `Nivel: ${level}`;
- emojisCount += 1; // Incrementar el número de emojis normales para aumentar la dificultad
- moveCounter = 3; // Reiniciar el contador de movimientos
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- explodeBoard();
- }
- 
- /**
- * Anima el tablero y reinicia el nivel.
- */
- function explodeBoard() {
- squares.forEach(square => {
- square.classList.add('explode');
- });
- 
- setTimeout(() => {
- squares.forEach(square => {
- square.classList.remove('explode');
- square.innerHTML = '';
- });
- selectRandomEmojis(); // Seleccionar nuevos emojis con mayor dificultad
- setTimeout(() => {
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí, ya que removeMatches lo hará
- }, 500);
- }, 1000); // Duración del efecto
- }
- 
- /**
- * Rellena los espacios vacíos con nuevos emojis.
- */
- function fillEmptySquares() {
- for (let i = 0; i < width * width; i++) {
- if (squares[i].innerHTML === '') {
- let randomEmoji = Math.floor(Math.random() * emojis.length);
- squares[i].innerHTML = emojis[randomEmoji];
- }
- }
- // Después de llenar, verifica y remueve posibles combinaciones iniciales
- removeMatches();
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica si hay movimientos posibles restantes.
- */
- function checkForPossibleMoves() {
- let possibleMoves = false;
- for (let i = 0; i < width * width; i++) {
- if (canSwap(i, i + 1) || canSwap(i, i - 1) || canSwap(i, i + width) || canSwap(i, i - width)) {
- possibleMoves = true;
- break;
- }
- }
- if (!possibleMoves) {
- gameOver();
- }
- }
- 
- /**
- * Verifica si un intercambio es válido.
- */
- function canSwap(index1, index2) {
- if (index2 < 0 || index2 >= width * width || squares[index1] === undefined || squares[index2] === undefined) {
- return false;
- }
- swapEmojis(index1, index2);
- const isValidMove = isMatch();
- swapEmojis(index1, index2);
- return isValidMove;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Mueve los emojis hacia abajo para llenar los espacios vacíos.
- */
- function moveIntoSquareBelow() {
- for (let i = (width * width) - 1; i >= 0; i--) {
- if (squares[i].innerHTML === '') {
- let aboveIndex = i - width;
- while (aboveIndex >= 0) {
- if (squares[aboveIndex].innerHTML !== '') {
- squares[i].innerHTML = squares[aboveIndex].innerHTML;
- squares[aboveIndex].innerHTML = '';
- break;
- }
- aboveIndex -= width;
- }
- if (aboveIndex < 0) {
- // Generar un nuevo emoji con mayor probabilidad de especial
- let newEmoji;
- if (Math.random() < 0.2) { // 20% de probabilidad de especial
- newEmoji = '<img src="fondo.png" class="emoji-img">';
- } else {
- newEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
- }
- squares[i].innerHTML = newEmoji;
- }
- }
- }
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Verifica si hay alguna combinación.
- */
- function isMatch() {
- return checkRowForThree().length > 0 || checkColumnForThree().length > 0;
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica si hay movimientos posibles restantes.
- */
- function checkForPossibleMoves() {
- let possibleMoves = false;
- for (let i = 0; i < width * width; i++) {
- if (canSwap(i, i + 1) || canSwap(i, i - 1) || canSwap(i, i + width) || canSwap(i, i - width)) {
- possibleMoves = true;
- break;
- }
- }
- if (!possibleMoves) {
- gameOver();
- }
- }
- 
- /**
- * Verifica si un intercambio es válido.
- */
- function canSwap(index1, index2) {
- if (index2 < 0 || index2 >= width * width || squares[index1] === undefined || squares[index2] === undefined) {
- return false;
- }
- swapEmojis(index1, index2);
- const isValidMove = isMatch();
- swapEmojis(index1, index2);
- return isValidMove;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Mueve los emojis hacia abajo para llenar los espacios vacíos.
- */
- function moveIntoSquareBelow() {
- for (let i = (width * width) - 1; i >= 0; i--) {
- if (squares[i].innerHTML === '') {
- let aboveIndex = i - width;
- while (aboveIndex >= 0) {
- if (squares[aboveIndex].innerHTML !== '') {
- squares[i].innerHTML = squares[aboveIndex].innerHTML;
- squares[aboveIndex].innerHTML = '';
- break;
- }
- aboveIndex -= width;
- }
- if (aboveIndex < 0) {
- // Generar un nuevo emoji con mayor probabilidad de especial
- let newEmoji;
- if (Math.random() < 0.2) { // 20% de probabilidad de especial
- newEmoji = '<img src="fondo.png" class="emoji-img">';
- } else {
- newEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
- }
- squares[i].innerHTML = newEmoji;
- }
- }
- }
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica si hay alguna combinación.
- */
- function isMatch() {
- return checkRowForThree().length > 0 || checkColumnForThree().length > 0;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Verifica si hay movimientos posibles restantes.
- */
- function checkForPossibleMoves() {
- let possibleMoves = false;
- for (let i = 0; i < width * width; i++) {
- if (canSwap(i, i + 1) || canSwap(i, i - 1) || canSwap(i, i + width) || canSwap(i, i - width)) {
- possibleMoves = true;
- break;
- }
- }
- if (!possibleMoves) {
- gameOver();
- }
- }
- 
- /**
- * Verifica si un intercambio es válido.
- */
- function canSwap(index1, index2) {
- if (index2 < 0 || index2 >= width * width || squares[index1] === undefined || squares[index2] === undefined) {
- return false;
- }
- swapEmojis(index1, index2);
- const isValidMove = isMatch();
- swapEmojis(index1, index2);
- return isValidMove;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Mueve los emojis hacia abajo para llenar los espacios vacíos.
- */
- function moveIntoSquareBelow() {
- for (let i = (width * width) - 1; i >= 0; i--) {
- if (squares[i].innerHTML === '') {
- let aboveIndex = i - width;
- while (aboveIndex >= 0) {
- if (squares[aboveIndex].innerHTML !== '') {
- squares[i].innerHTML = squares[aboveIndex].innerHTML;
- squares[aboveIndex].innerHTML = '';
- break;
- }
- aboveIndex -= width;
- }
- if (aboveIndex < 0) {
- // Generar un nuevo emoji con mayor probabilidad de especial
- let newEmoji;
- if (Math.random() < 0.2) { // 20% de probabilidad de especial
- newEmoji = '<img src="fondo.png" class="emoji-img">';
- } else {
- newEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
- }
- squares[i].innerHTML = newEmoji;
- }
- }
- }
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica si hay alguna combinación.
- */
- function isMatch() {
- return checkRowForThree().length > 0 || checkColumnForThree().length > 0;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Mueve los emojis hacia abajo para llenar los espacios vacíos.
- */
- function moveIntoSquareBelow() {
- for (let i = (width * width) - 1; i >= 0; i--) {
- if (squares[i].innerHTML === '') {
- let aboveIndex = i - width;
- while (aboveIndex >= 0) {
- if (squares[aboveIndex].innerHTML !== '') {
- squares[i].innerHTML = squares[aboveIndex].innerHTML;
- squares[aboveIndex].innerHTML = '';
- break;
- }
- aboveIndex -= width;
- }
- if (aboveIndex < 0) {
- // Generar un nuevo emoji con mayor probabilidad de especial
- let newEmoji;
- if (Math.random() < 0.2) { // 20% de probabilidad de especial
- newEmoji = '<img src="fondo.png" class="emoji-img">';
- } else {
- newEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
- }
- squares[i].innerHTML = newEmoji;
- }
- }
- }
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica si hay alguna combinación.
- */
- function isMatch() {
- return checkRowForThree().length > 0 || checkColumnForThree().length > 0;
- }
- 
- /**
- * Verifica si hay movimientos posibles restantes.
- */
- function checkForPossibleMoves() {
- let possibleMoves = false;
- for (let i = 0; i < width * width; i++) {
- if (canSwap(i, i + 1) || canSwap(i, i - 1) || canSwap(i, i + width) || canSwap(i, i - width)) {
- possibleMoves = true;
- break;
- }
- }
- if (!possibleMoves) {
- gameOver();
- }
- }
- 
- /**
- * Verifica si un intercambio es válido.
- */
- function canSwap(index1, index2) {
- if (index2 < 0 || index2 >= width * width || squares[index1] === undefined || squares[index2] === undefined) {
- return false;
- }
- swapEmojis(index1, index2);
- const isValidMove = isMatch();
- swapEmojis(index1, index2);
- return isValidMove;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Mueve los emojis hacia abajo para llenar los espacios vacíos.
- */
- function moveIntoSquareBelow() {
- for (let i = (width * width) - 1; i >= 0; i--) {
- if (squares[i].innerHTML === '') {
- let aboveIndex = i - width;
- while (aboveIndex >= 0) {
- if (squares[aboveIndex].innerHTML !== '') {
- squares[i].innerHTML = squares[aboveIndex].innerHTML;
- squares[aboveIndex].innerHTML = '';
- break;
- }
- aboveIndex -= width;
- }
- if (aboveIndex < 0) {
- // Generar un nuevo emoji con mayor probabilidad de especial
- let newEmoji;
- if (Math.random() < 0.2) { // 20% de probabilidad de especial
- newEmoji = '<img src="fondo.png" class="emoji-img">';
- } else {
- newEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
- }
- squares[i].innerHTML = newEmoji;
- }
- }
- }
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Reproduce audioSpecial para combinaciones especiales y realiza la progresión de nivel.
- */
- function playSpecialAudio() {
- audioSpecial.play().catch(error => {
- console.error('Error al reproducir audioSpecial:', error);
- });
- audioSequence.push('special');
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Reproduce audio1 y audio2 alternadamente para combinaciones normales.
- */
- function playAudio() {
- if (currentAudio === 1) {
- audio1.play().catch(error => {
- console.error('Error al reproducir audio1:', error);
- });
- audioSequence.push('audio1');
- currentAudio = 2;
- } else {
- audio2.play().catch(error => {
- console.error('Error al reproducir audio2:', error);
- });
- audioSequence.push('audio2');
- currentAudio = 1;
- }
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Verifica la secuencia de audios para detectar combinaciones especiales.
- */
- function checkAudioSequence() {
- const requiredSequence = ['audio1', 'audio2', 'special'];
- if (audioSequence.length >= requiredSequence.length) {
- const lastSequence = audioSequence.slice(-requiredSequence.length);
- if (lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- score += 1000; // Puntos por completar la secuencia
- scoreDisplay.innerText = score;
- levelUp();
- audioSequence = []; // Reiniciar la secuencia
- } else if (lastSequence.includes('special') && !lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- audioSequence = []; // Reiniciar si hay un 'special' pero no la secuencia correcta
- }
- }
- }
- 
- /**
- * Actualiza el contador de movimientos y verifica si se ha agotado.
- */
- function updateMoveCounter() {
- moveCounter--;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- if (moveCounter === 0) {
- moveCounter = 3;
- moveCounterDisplay.innerText = "BOOM";
- setTimeout(() => {
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- }, 1000);
- explodeBoard();
- }
- }
- 
- /**
- * Aumenta el nivel del juego, incrementando la dificultad.
- */
- function levelUp() {
- level++;
- levelDisplay.innerText = `Nivel: ${level}`;
- emojisCount += 1; // Incrementar el número de emojis normales para aumentar la dificultad
- moveCounter = 3; // Reiniciar el contador de movimientos
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- explodeBoard();
- }
- 
- /**
- * Anima el tablero y reinicia el nivel.
- */
- function explodeBoard() {
- squares.forEach(square => {
- square.classList.add('explode');
- });
- 
- setTimeout(() => {
- squares.forEach(square => {
- square.classList.remove('explode');
- square.innerHTML = '';
- });
- selectRandomEmojis(); // Seleccionar nuevos emojis con mayor dificultad
- setTimeout(() => {
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí, ya que removeMatches lo hará
- }, 500);
- }, 1000); // Duración del efecto
- }
- 
- /**
- * Rellena los espacios vacíos con nuevos emojis.
- */
- function fillEmptySquares() {
- for (let i = 0; i < width * width; i++) {
- if (squares[i].innerHTML === '') {
- let randomEmoji = Math.floor(Math.random() * emojis.length);
- squares[i].innerHTML = emojis[randomEmoji];
- }
- }
- // Después de llenar, verifica y remueve posibles combinaciones iniciales
- removeMatches();
- }
- 
- /**
- * Elimina combinaciones y actualiza el tablero.
- */
- function removeMatches(callback) {
- if (isRemoving) return; // Evita múltiples ejecuciones
- isRemoving = true;
- 
- let matches = checkRowForThree().concat(checkColumnForThree());
- if (matches.length > 0) {
- animateAndRemoveMatches(matches, false);
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- removeMatches(callback); // Llamada recursiva después de llenar
- }, 200);
- } else {
- isRemoving = false; // Resetear la bandera si no hay más matches
- if (callback) {
- callback();
- }
- checkForPossibleMoves(); // Llamar a checkForPossibleMoves aquí
- }
- }
- 
- /**
- * Verifica si hay movimientos posibles restantes.
- */
- function checkForPossibleMoves() {
- let possibleMoves = false;
- for (let i = 0; i < width * width; i++) {
- if (canSwap(i, i + 1) || canSwap(i, i - 1) || canSwap(i, i + width) || canSwap(i, i - width)) {
- possibleMoves = true;
- break;
- }
- }
- if (!possibleMoves) {
- gameOver();
- }
- }
- 
- /**
- * Verifica si un intercambio es válido.
- */
- function canSwap(index1, index2) {
- if (index2 < 0 || index2 >= width * width || squares[index1] === undefined || squares[index2] === undefined) {
- return false;
- }
- swapEmojis(index1, index2);
- const isValidMove = isMatch();
- swapEmojis(index1, index2);
- return isValidMove;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Verifica si hay alguna combinación.
- */
- function isMatch() {
- return checkRowForThree().length > 0 || checkColumnForThree().length > 0;
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Reproduce audioSpecial para combinaciones especiales y realiza la progresión de nivel.
- */
- function playSpecialAudio() {
- audioSpecial.play().catch(error => {
- console.error('Error al reproducir audioSpecial:', error);
- });
- audioSequence.push('special');
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Reproduce audio1 y audio2 alternadamente para combinaciones normales.
- */
- function playAudio() {
- if (currentAudio === 1) {
- audio1.play().catch(error => {
- console.error('Error al reproducir audio1:', error);
- });
- audioSequence.push('audio1');
- currentAudio = 2;
- } else {
- audio2.play().catch(error => {
- console.error('Error al reproducir audio2:', error);
- });
- audioSequence.push('audio2');
- currentAudio = 1;
- }
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Verifica la secuencia de audios para detectar combinaciones especiales.
- */
- function checkAudioSequence() {
- const requiredSequence = ['audio1', 'audio2', 'special'];
- if (audioSequence.length >= requiredSequence.length) {
- const lastSequence = audioSequence.slice(-requiredSequence.length);
- if (lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- score += 1000; // Puntos por completar la secuencia
- scoreDisplay.innerText = score;
- levelUp();
- audioSequence = []; // Reiniciar la secuencia
- } else if (lastSequence.includes('special') && !lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- audioSequence = []; // Reiniciar si hay un 'special' pero no la secuencia correcta
- }
- }
- }
- 
- /**
- * Actualiza el contador de movimientos y verifica si se ha agotado.
- */
- function updateMoveCounter() {
- moveCounter--;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- if (moveCounter === 0) {
- moveCounter = 3;
- moveCounterDisplay.innerText = "BOOM";
- setTimeout(() => {
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- }, 1000);
- explodeBoard();
- }
- }
- 
- /**
- * Aumenta el nivel del juego, incrementando la dificultad.
- */
- function levelUp() {
- level++;
- levelDisplay.innerText = `Nivel: ${level}`;
- emojisCount += 1; // Incrementar el número de emojis normales para aumentar la dificultad
- moveCounter = 3; // Reiniciar el contador de movimientos
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- explodeBoard();
- }
- 
- /**
- * Anima el tablero y reinicia el nivel.
- */
- function explodeBoard() {
- squares.forEach(square => {
- square.classList.add('explode');
- });
- 
- setTimeout(() => {
- squares.forEach(square => {
- square.classList.remove('explode');
- square.innerHTML = '';
- });
- selectRandomEmojis(); // Seleccionar nuevos emojis con mayor dificultad
- setTimeout(() => {
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí, ya que removeMatches lo hará
- }, 500);
- }, 1000); // Duración del efecto
- }
- 
- /**
- * Rellena los espacios vacíos con nuevos emojis.
- */
- function fillEmptySquares() {
- for (let i = 0; i < width * width; i++) {
- if (squares[i].innerHTML === '') {
- let randomEmoji = Math.floor(Math.random() * emojis.length);
- squares[i].innerHTML = emojis[randomEmoji];
- }
- }
- // Después de llenar, verifica y remueve posibles combinaciones iniciales
- removeMatches();
- }
- 
- /**
- * Elimina combinaciones y actualiza el tablero.
- */
- function removeMatches(callback) {
- if (isRemoving) return; // Evita múltiples ejecuciones
- isRemoving = true;
- 
- let matches = checkRowForThree().concat(checkColumnForThree());
- if (matches.length > 0) {
- animateAndRemoveMatches(matches, false);
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- removeMatches(callback); // Llamada recursiva después de llenar
- }, 200);
- } else {
- isRemoving = false; // Resetear la bandera si no hay más matches
- if (callback) {
- callback();
- }
- checkForPossibleMoves(); // Llamar a checkForPossibleMoves aquí
- }
- }
- 
- /**
- * Eventos de tacto para dispositivos móviles.
- */
- function touchStart(e) {
- dragStartId = parseInt(e.target.closest('div').id);
- }
- 
- function touchMove(e) {
- e.preventDefault();
- const touch = e.touches[0];
- const endElement = document.elementFromPoint(touch.clientX, touch.clientY);
- dragEndId = endElement ? parseInt(endElement.closest('div').id) : null;
- }
- 
- function touchEnd(e) {
- if (dragEndId !== null) {
- let validMoves = [
- dragStartId - 1,
- dragStartId + 1,
- dragStartId - width,
- dragStartId + width
- ];
- let validMove = validMoves.includes(dragEndId);
- 
- if (dragEndId !== undefined && validMove) {
- swapEmojis(dragStartId, dragEndId);
- if (isMatch()) {
- setTimeout(() => {
- const matches = checkRowForThree().concat(checkColumnForThree());
- animateAndRemoveMatches(matches, true);
- if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
- playSpecialAudio();
- } else {
- playAudio();
- }
- checkAudioSequence();
- }, 200);
- dragEndId = null;
- } else {
- swapEmojis(dragStartId, dragEndId);
- }
- }
- }
- // No llamar a checkForPossibleMoves aquí
- }
- 
- /**
- * Verifica si hay movimientos posibles restantes.
- */
- function checkForPossibleMoves() {
- let possibleMoves = false;
- for (let i = 0; i < width * width; i++) {
- if (canSwap(i, i + 1) || canSwap(i, i - 1) || canSwap(i, i + width) || canSwap(i, i - width)) {
- possibleMoves = true;
- break;
- }
- }
- if (!possibleMoves) {
- gameOver();
- }
- }
- 
- /**
- * Verifica si un intercambio es válido.
- */
- function canSwap(index1, index2) {
- if (index2 < 0 || index2 >= width * width || squares[index1] === undefined || squares[index2] === undefined) {
- return false;
- }
- swapEmojis(index1, index2);
- const isValidMove = isMatch();
- swapEmojis(index1, index2);
- return isValidMove;
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Anima y elimina las combinaciones encontradas.
- */
- function animateAndRemoveMatches(matches, isPlayerMove) {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido en animateAndRemoveMatches: ${index}`);
- return;
- }
- console.log(`Animando y removiendo el índice: ${index}`);
- squares[index].classList.add('fade-out');
- });
- });
- 
- setTimeout(() => {
- matches.forEach(match => {
- match.forEach(index => {
- if (index >= squares.length || squares[index] === undefined) {
- console.error(`Índice inválido al intentar eliminar: ${index}`);
- return;
- }
- squares[index].classList.remove('fade-out');
- if (isPlayerMove) {
- if (squares[index].innerHTML.includes('fondo.png')) {
- score += 3; // 3 puntos por emoji especial
- } else {
- score += 1; // 1 punto por emoji normal
- }
- }
- squares[index].innerHTML = '';
- scoreDisplay.innerText = score;
- });
- });
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí
- }, 200);
- }, 500);
- }
- 
- /**
- * Mueve los emojis hacia abajo para llenar los espacios vacíos.
- */
- function moveIntoSquareBelow() {
- for (let i = (width * width) - 1; i >= 0; i--) {
- if (squares[i].innerHTML === '') {
- let aboveIndex = i - width;
- while (aboveIndex >= 0) {
- if (squares[aboveIndex].innerHTML !== '') {
- squares[i].innerHTML = squares[aboveIndex].innerHTML;
- squares[aboveIndex].innerHTML = '';
- break;
- }
- aboveIndex -= width;
- }
- if (aboveIndex < 0) {
- // Generar un nuevo emoji con mayor probabilidad de especial
- let newEmoji;
- if (Math.random() < 0.2) { // 20% de probabilidad de especial
- newEmoji = '<img src="fondo.png" class="emoji-img">';
- } else {
- newEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
- }
- squares[i].innerHTML = newEmoji;
- }
- }
- }
- }
- 
- /**
- * Verifica combinaciones en filas de tres.
- */
- function checkRowForThree() {
- const matches = [];
- const notValid = [
- 5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
- 47, 48
- ]; // Filas de 7 columnas
- 
- for (let i = 0; i < width * width - 2; i++) {
- if (notValid.includes(i)) continue;
- let rowOfThree = [i, i + 1, i + 2];
- // Validar que todos los índices estén dentro del arreglo
- if (rowOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en rowOfThree: ${rowOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(rowOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Verifica combinaciones en columnas de tres.
- */
- function checkColumnForThree() {
- const matches = [];
- for (let i = 0; i < width * (width - 2); i++) {
- let columnOfThree = [i, i + width, i + width * 2];
- // Validar que todos los índices estén dentro del arreglo
- if (columnOfThree.some(index => index >= squares.length)) {
- console.warn(`Índice fuera de rango en columnOfThree: ${columnOfThree}`);
- continue;
- }
- let decidedEmoji = squares[i].innerHTML;
- const isBlank = squares[i].innerHTML === '';
- 
- if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
- matches.push(columnOfThree);
- }
- }
- return matches;
- }
- 
- /**
- * Reproduce audioSpecial para combinaciones especiales y realiza la progresión de nivel.
- */
- function playSpecialAudio() {
- audioSpecial.play().catch(error => {
- console.error('Error al reproducir audioSpecial:', error);
- });
- audioSequence.push('special');
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Reproduce audio1 y audio2 alternadamente para combinaciones normales.
- */
- function playAudio() {
- if (currentAudio === 1) {
- audio1.play().catch(error => {
- console.error('Error al reproducir audio1:', error);
- });
- audioSequence.push('audio1');
- currentAudio = 2;
- } else {
- audio2.play().catch(error => {
- console.error('Error al reproducir audio2:', error);
- });
- audioSequence.push('audio2');
- currentAudio = 1;
- }
- updateMoveCounter();
- // No llamar a checkAudioSequence aquí, se hará después de remover matches
- }
- 
- /**
- * Verifica la secuencia de audios para detectar combinaciones especiales.
- */
- function checkAudioSequence() {
- const requiredSequence = ['audio1', 'audio2', 'special'];
- if (audioSequence.length >= requiredSequence.length) {
- const lastSequence = audioSequence.slice(-requiredSequence.length);
- if (lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- score += 1000; // Puntos por completar la secuencia
- scoreDisplay.innerText = score;
- levelUp();
- audioSequence = []; // Reiniciar la secuencia
- } else if (lastSequence.includes('special') && !lastSequence.every((audio, index) => audio === requiredSequence[index])) {
- audioSequence = []; // Reiniciar si hay un 'special' pero no la secuencia correcta
- }
- }
- }
- 
- /**
- * Actualiza el contador de movimientos y verifica si se ha agotado.
- */
- function updateMoveCounter() {
- moveCounter--;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- if (moveCounter === 0) {
- moveCounter = 3;
- moveCounterDisplay.innerText = "BOOM";
- setTimeout(() => {
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- }, 1000);
- explodeBoard();
- }
- }
- 
- /**
- * Aumenta el nivel del juego, incrementando la dificultad.
- */
- function levelUp() {
- level++;
- levelDisplay.innerText = `Nivel: ${level}`;
- emojisCount += 1; // Incrementar el número de emojis normales para aumentar la dificultad
- moveCounter = 3; // Reiniciar el contador de movimientos
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- explodeBoard();
- }
- 
- /**
- * Anima el tablero y reinicia el nivel.
- */
- function explodeBoard() {
- squares.forEach(square => {
- square.classList.add('explode');
- });
- 
- setTimeout(() => {
- squares.forEach(square => {
- square.classList.remove('explode');
- square.innerHTML = '';
- });
- selectRandomEmojis(); // Seleccionar nuevos emojis con mayor dificultad
- setTimeout(() => {
- fillEmptySquares();
- // No llamar a checkForPossibleMoves aquí, ya que removeMatches lo hará
- }, 500);
- }, 1000); // Duración del efecto
- }
- 
- /**
- * Rellena los espacios vacíos con nuevos emojis.
- */
- function fillEmptySquares() {
- for (let i = 0; i < width * width; i++) {
- if (squares[i].innerHTML === '') {
- let randomEmoji = Math.floor(Math.random() * emojis.length);
- squares[i].innerHTML = emojis[randomEmoji];
- }
- }
- // Después de llenar, verifica y remueve posibles combinaciones iniciales
- removeMatches();
- }
- 
- /**
- * Elimina combinaciones y actualiza el tablero.
- */
- function removeMatches(callback) {
- if (isRemoving) return; // Evita múltiples ejecuciones
- isRemoving = true;
- 
- let matches = checkRowForThree().concat(checkColumnForThree());
- if (matches.length > 0) {
- animateAndRemoveMatches(matches, false);
- setTimeout(() => {
- moveIntoSquareBelow();
- fillEmptySquares();
- removeMatches(callback); // Llamada recursiva después de llenar
- }, 200);
- } else {
- isRemoving = false; // Resetear la bandera si no hay más matches
- if (callback) {
- callback();
- }
- checkForPossibleMoves(); // Llamar a checkForPossibleMoves aquí
- }
- }
- 
- /**
- * Eventos de tacto para dispositivos móviles.
- */
- function touchStart(e) {
- dragStartId = parseInt(e.target.closest('div').id);
- }
- 
- function touchMove(e) {
- e.preventDefault();
- const touch = e.touches[0];
- const endElement = document.elementFromPoint(touch.clientX, touch.clientY);
- dragEndId = endElement ? parseInt(endElement.closest('div').id) : null;
- }
- 
- function touchEnd(e) {
- if (dragEndId !== null) {
- let validMoves = [
- dragStartId - 1,
- dragStartId + 1,
- dragStartId - width,
- dragStartId + width
- ];
- let validMove = validMoves.includes(dragEndId);
- 
- if (dragEndId !== undefined && validMove) {
- swapEmojis(dragStartId, dragEndId);
- if (isMatch()) {
- setTimeout(() => {
- const matches = checkRowForThree().concat(checkColumnForThree());
- animateAndRemoveMatches(matches, true);
- if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
- playSpecialAudio();
- } else {
- playAudio();
- }
- checkAudioSequence();
- }, 200);
- dragEndId = null;
- } else {
- swapEmojis(dragStartId, dragEndId);
- }
- }
- }
- // No llamar a checkForPossibleMoves aquí
- }
- 
- /**
- * Maneja el fin del juego.
- */
- function gameOver() {
- gameOverDisplay.style.display = 'block';
- gameOverDisplay.innerText = '¡Game Over!';
- gameOverDisplay.style.fontSize = '3rem';
- gameOverDisplay.style.color = '#FF0000';
- gameOverDisplay.style.textAlign = 'center';
- gameOverDisplay.style.animation = 'fadeIn 0.5s forwards';
- }
- 
- /**
- * Reinicia el juego al hacer clic en el botón de reinicio.
- */
- restartButton.addEventListener('click', () => {
- grid.innerHTML = '';
- squares.length = 0;
- score = 0;
- level = 1;
- emojisCount = 4; // Reiniciar el número de emojis normales
- moveCounter = 3; // Reiniciar el contador de movimientos
- scoreDisplay.innerText = score;
- moveCounterDisplay.innerText = `Movimientos: ${moveCounter}`;
- levelDisplay.innerText = `Nivel: ${level}`;
- gameOverDisplay.style.display = 'none';
- audioSequence = []; // Reiniciar la secuencia de audio
- currentAudio = 1; // Reiniciar el audio actual
- isRemoving = false; // Reiniciar la bandera de eliminación
- createBoard();
- });
- 
- /**
- * Inicia el juego
- */
- createBoard();
- });
- </script>
- </body>
- </html>
- 
+        /* Estilos de la Página */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('background.png'); /* Asegúrate de tener esta imagen */
+            background-size: cover;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            width: 600px;
+            max-width: 95%;
+            transition: transform 0.3s;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: #ff4081;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        .stat img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .stat .counter {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            background: #ff4081;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(7, 60px);
+            grid-template-rows: repeat(7, 60px);
+            gap: 8px;
+            justify-content: center;
+            margin: 0 auto 20px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .grid div {
+            width: 60px;
+            height: 60px;
+            background-color: #e0f7fa;
+            border: 2px solid #00838f;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 2rem;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid div:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 131, 143, 0.6);
+            background-color: #b2ebf2;
+        }
+
+        .emoji-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .controls button {
+            padding: 10px;
+            font-size: 2rem;
+            border: none;
+            border-radius: 50%;
+            background-color: #00838f;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .controls button:hover {
+            background-color: #006064;
+            transform: scale(1.1);
+        }
+
+        .game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            color: #d32f2f;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            z-index: 10;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(5deg); }
+            50% { transform: translate(-50%, -50%) rotate(-5deg); }
+            75% { transform: translate(-50%, -50%) rotate(5deg); }
+            100% { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        /* Animaciones */
+        .fade-out {
+            animation: fadeOut 0.3s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+        .explode {
+            animation: explode 0.7s forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* Indicadores de Nivel y Puntuación */
+        .level-indicator, .score-container, .high-score-container {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .game-container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            .grid {
+                grid-template-columns: repeat(7, 40px);
+                grid-template-rows: repeat(7, 40px);
+                gap: 5px;
+            }
+
+            .grid div {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .controls button {
+                padding: 8px;
+                font-size: 1.5rem;
+                width: 50px;
+                height: 50px;
+            }
+
+            .game-over {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🎉 Emoji Match 🎉</h1>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <img src="icons/move.png" alt="Movimientos">
+                <div class="counter" id="move-counter">3</div>
+            </div>
+            <div class="stat">
+                <img src="icons/level.png" alt="Nivel">
+                <div class="counter" id="level-indicator">1</div>
+            </div>
+            <div class="stat">
+                <img src="icons/high-score.png" alt="Puntuación Máxima">
+                <div class="counter" id="high-score-value">0</div>
+            </div>
+        </div>
+        <div class="grid"></div>
+        <div id="game-over" class="game-over">💥 ¡Game Over! 💥</div>
+        <div class="score-container">
+            <h2>Puntuación: <span id="score">0</span></h2>
+            <div class="controls">
+                <button id="restart" title="Reiniciar Juego">🔄</button>
+                <button id="pause" title="Pausar Juego">⏸️</button>
+                <button id="sound-toggle" title="Alternar Sonido">🔊</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elementos de audio con múltiples formatos y preload -->
+    <audio id="audio1" preload="auto">
+        <source src="audio/audio1.mp3" type="audio/mpeg">
+        <source src="audio/audio1.ogg" type="audio/ogg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="audio2" preload="auto">
+        <source src="audio/audio2.mp3" type="audio/mpeg">
+        <source src="audio/audio2.ogg" type="audio/ogg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="audioSpecial" preload="auto">
+        <source src="audio/audioSpecial.mp3" type="audio/mpeg">
+        <source src="audio/audioSpecial.ogg" type="audio/ogg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="audioWin" preload="auto">
+        <source src="audio/win.mp3" type="audio/mpeg">
+        <source src="audio/win.ogg" type="audio/ogg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="audioLose" preload="auto">
+        <source src="audio/lose.mp3" type="audio/mpeg">
+        <source src="audio/lose.ogg" type="audio/ogg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const grid = document.querySelector('.grid');
+        const width = 7;
+        const allEmojis = [
+            '😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊',
+            '😋', '😎', '😍', '😘', '😗', '😙', '😚', '🙂', '🤗', '🤔',
+            '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯',
+            '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🐣',
+            '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝',
+            '🐛', '🦋', '🐌', '🐞', '🐜', '🦗', '🕷️', '🦂', '🐢', '🐍',
+            '🦎', '🐙', '🦑', '🦞', '🦐', '🦀', '🐡', '🐠', '🐟', '🐬',
+            '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🦣',
+            '🦒', '🐘', '🦏', '🦛', '🐪', '🐫', '🦙', '🐃', '🐂', '🐄',
+            '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺',
+            '🐈', '🐈‍⬛', '🦜', '🦚', '🦢', '🦩', '🦨', '🦡', '🦦', '🦥',
+            '🐁', '🐀', '🐇', '🦝', '🦔', '🐾', '🐉', '🐲', '🌵', '🎄',
+            '🌲', '🌳', '🌴', '🌱', '🌿', '☘️', '🍀', '🎍', '🎋', '🍃',
+            '🍂', '🍁', '🍄', '🌾', '💐', '🌷', '🌹', '🌺', '🌸', '🌼',
+            '🌻', '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘',
+            '🌑', '🌒', '🌓', '🌔', '🌙', '🌎', '🌍', '🌏', '💫', '⭐',
+            '🌟', '✨', '⚡', '☄️', '💥', '🔥', '🌪️', '🌈', '☀️', '🌤️',
+            '⛅', '🌥️', '☁️', '🌦️', '🌧️', '⛈️', '🌩️', '🌨️', '❄️', '☃️',
+            '⛄', '🌬️', '💨', '💧', '💦', '☔', '☂️', '🌊', '🌫️'
+        ];
+
+        let emojis = [];
+        const squares = [];
+        let dragStartId, dragEndId;
+        let score = 0;
+        const audio1 = document.getElementById('audio1');
+        const audio2 = document.getElementById('audio2');
+        const audioSpecial = document.getElementById('audioSpecial');
+        const audioWin = document.getElementById('audioWin');
+        const audioLose = document.getElementById('audioLose');
+        let audioSequence = [];
+        let currentAudio = 1; // Para alternar entre audio1 y audio2
+        let emojisCount = 4; // Número de emojis normales
+        let moveCounter = 3; // Movimientos restantes
+        let level = 1; // Nivel actual
+        let isPaused = false; // Estado de pausa
+        let isSoundOn = true; // Estado de sonido
+
+        const moveCounterDisplay = document.getElementById('move-counter');
+        const gameOverDisplay = document.getElementById('game-over');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level-indicator');
+        const highScoreDisplay = document.getElementById('high-score-value');
+        const restartButton = document.getElementById('restart');
+        const pauseButton = document.getElementById('pause');
+        const soundToggleButton = document.getElementById('sound-toggle');
+
+        // Manejo de errores en los elementos de audio
+        const audiosList = ['audio1', 'audio2', 'audioSpecial', 'audioWin', 'audioLose'];
+        audiosList.forEach(id => {
+            const audio = document.getElementById(id);
+            audio.addEventListener('error', (e) => {
+                console.error(`Error cargando el audio ${id}:`, e);
+            });
+        });
+
+        /**
+         * Selecciona emojis aleatoriamente, incluyendo un emoji especial con mayor frecuencia.
+         */
+        function selectRandomEmojis() {
+            emojis = [];
+            // Aumentar la probabilidad de emojis especiales
+            const specialEmoji = '<img src="fondo.png" class="emoji-img" alt="Especial">'; // Asegúrate de tener 'fondo.png'
+            const specialProbability = 0.2; // 20% de probabilidad de ser especial
+
+            for (let i = 0; i < emojisCount; i++) {
+                if (Math.random() < specialProbability) {
+                    emojis.push(specialEmoji);
+                } else {
+                    const randomEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
+                    emojis.push(randomEmoji);
+                }
+            }
+        }
+
+        /**
+         * Crea el tablero de juego sin combinaciones iniciales.
+         */
+        function createBoard() {
+            selectRandomEmojis();
+            grid.style.visibility = 'hidden';
+            for (let i = 0; i < width * width; i++) {
+                const square = document.createElement('div');
+                square.setAttribute('draggable', true);
+                square.setAttribute('id', i);
+                let randomEmoji = Math.floor(Math.random() * emojis.length);
+                square.innerHTML = emojis[randomEmoji];
+                grid.appendChild(square);
+                squares.push(square);
+
+                // Eventos de arrastre y tacto
+                square.addEventListener('dragstart', dragStart);
+                square.addEventListener('dragover', dragOver);
+                square.addEventListener('dragenter', dragEnter);
+                square.addEventListener('dragleave', dragLeave);
+                square.addEventListener('drop', dragDrop);
+                square.addEventListener('dragend', dragEnd);
+
+                square.addEventListener('touchstart', touchStart, { passive: false });
+                square.addEventListener('touchmove', touchMove, { passive: false });
+                square.addEventListener('touchend', touchEnd);
+            }
+
+            stabilizeBoard();
+        }
+
+        /**
+         * Elimina combinaciones iniciales sin causar un ciclo infinito.
+         */
+        async function stabilizeBoard() {
+            let hasMatch = true;
+            while (hasMatch) {
+                let matches = checkRowForThree().concat(checkColumnForThree());
+                if (matches.length > 0) {
+                    hasMatch = true;
+                    await removeMatches(matches, false);
+                } else {
+                    hasMatch = false;
+                }
+            }
+            grid.style.visibility = 'visible';
+        }
+
+        /**
+         * Eventos de arrastre.
+         */
+        function dragStart(e) {
+            if (isPaused) return;
+            dragStartId = parseInt(this.id);
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function dragOver(e) {
+            if (isPaused) return;
+            e.preventDefault();
+        }
+
+        function dragEnter(e) {
+            if (isPaused) return;
+            e.preventDefault();
+        }
+
+        function dragLeave() {
+            // No se necesita acción específica
+        }
+
+        function dragDrop(e) {
+            if (isPaused) return;
+            dragEndId = parseInt(this.id);
+            e.preventDefault();
+        }
+
+        async function dragEnd() {
+            if (isPaused) return;
+            let validMoves = [
+                dragStartId - 1,
+                dragStartId + 1,
+                dragStartId - width,
+                dragStartId + width
+            ];
+            let validMove = validMoves.includes(dragEndId);
+
+            if (dragEndId && validMove) {
+                swapEmojis(dragStartId, dragEndId);
+                if (isMatch()) {
+                    setTimeout(async () => {
+                        const matches = checkRowForThree().concat(checkColumnForThree());
+                        await animateAndRemoveMatches(matches, true);
+                        if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
+                            playSpecialAudio();
+                        } else {
+                            playAudio();
+                        }
+                        checkAudioSequence();
+                    }, 200);
+                    dragEndId = null;
+                } else {
+                    swapEmojis(dragStartId, dragEndId);
+                }
+            }
+            checkForPossibleMoves();
+        }
+
+        /**
+         * Intercambia el contenido de dos emojis.
+         */
+        function swapEmojis(startId, endId) {
+            let temp = squares[startId].innerHTML;
+            squares[startId].innerHTML = squares[endId].innerHTML;
+            squares[endId].innerHTML = temp;
+        }
+
+        /**
+         * Verifica si hay alguna combinación.
+         */
+        function isMatch() {
+            return checkRowForThree().length > 0 || checkColumnForThree().length > 0;
+        }
+
+        /**
+         * Eventos de tacto para dispositivos móviles.
+         */
+        let touchStartId = null;
+        let touchEndId = null;
+
+        function touchStart(e) {
+            if (isPaused) return;
+            e.preventDefault();
+            touchStartId = parseInt(e.target.closest('div').id);
+        }
+
+        function touchMove(e) {
+            if (isPaused) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const endElement = document.elementFromPoint(touch.clientX, touch.clientY);
+            touchEndId = endElement ? parseInt(endElement.closest('div').id) : null;
+        }
+
+        async function touchEnd(e) {
+            if (isPaused) return;
+            if (touchEndId !== null) {
+                let validMoves = [
+                    touchStartId - 1,
+                    touchStartId + 1,
+                    touchStartId - width,
+                    touchStartId + width
+                ];
+                let validMove = validMoves.includes(touchEndId);
+
+                if (touchEndId && validMove) {
+                    swapEmojis(touchStartId, touchEndId);
+                    if (isMatch()) {
+                        setTimeout(async () => {
+                            const matches = checkRowForThree().concat(checkColumnForThree());
+                            await animateAndRemoveMatches(matches, true);
+                            if (matches.some(match => match.some(index => squares[index].innerHTML.includes('fondo.png')))) {
+                                playSpecialAudio();
+                            } else {
+                                playAudio();
+                            }
+                            checkAudioSequence();
+                        }, 200);
+                        touchEndId = null;
+                    } else {
+                        swapEmojis(touchStartId, touchEndId);
+                    }
+                }
+            }
+            checkForPossibleMoves();
+        }
+
+        /**
+         * Elimina combinaciones y actualiza el tablero.
+         */
+        function removeMatches(matches, isPlayerMove) {
+            return new Promise((resolve) => {
+                matches.forEach(match => {
+                    match.forEach(index => {
+                        squares[index].classList.add('fade-out');
+                    });
+                });
+
+                setTimeout(() => {
+                    matches.forEach(match => {
+                        match.forEach(index => {
+                            squares[index].classList.remove('fade-out');
+                            if (isPlayerMove) {
+                                if (squares[index].innerHTML.includes('fondo.png')) {
+                                    score += 3; // 3 puntos por emoji especial
+                                } else {
+                                    score += 1; // 1 punto por emoji normal
+                                }
+                            }
+                            squares[index].innerHTML = '';
+                            scoreDisplay.innerText = score;
+                        });
+                    });
+                    setTimeout(() => {
+                        moveIntoSquareBelow();
+                        fillEmptySquares();
+                        resolve();
+                    }, 200);
+                }, 300);
+            });
+        }
+
+        /**
+         * Anima y elimina las combinaciones encontradas.
+         */
+        async function animateAndRemoveMatches(matches, isPlayerMove) {
+            await removeMatches(matches, isPlayerMove);
+        }
+
+        /**
+         * Mueve los emojis hacia abajo para llenar los espacios vacíos.
+         */
+        function moveIntoSquareBelow() {
+            for (let i = 0; i < width * width; i++) {
+                const current = squares[i];
+                if (current.innerHTML === '') {
+                    let aboveIndex = i - width;
+                    while (aboveIndex >= 0) {
+                        if (squares[aboveIndex].innerHTML !== '') {
+                            squares[i].innerHTML = squares[aboveIndex].innerHTML;
+                            squares[aboveIndex].innerHTML = '';
+                            break;
+                        }
+                        aboveIndex -= width;
+                    }
+                    if (aboveIndex < 0) {
+                        squares[i].innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                    }
+                }
+            }
+        }
+
+        /**
+         * Verifica combinaciones en filas de tres.
+         */
+        function checkRowForThree() {
+            const matches = [];
+            const notValid = [
+                5, 6, 12, 13, 19, 20, 26, 27, 33, 34, 40, 41,
+                47, 48, 54, 55
+            ]; // Filas de 7 columnas
+
+            for (let i = 0; i < width * width - 2; i++) {
+                if (notValid.includes(i)) continue;
+                let rowOfThree = [i, i + 1, i + 2];
+                let decidedEmoji = squares[i].innerHTML;
+                const isBlank = squares[i].innerHTML === '';
+
+                if (rowOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
+                    matches.push(rowOfThree);
+                }
+            }
+            return matches;
+        }
+
+        /**
+         * Verifica combinaciones en columnas de tres.
+         */
+        function checkColumnForThree() {
+            const matches = [];
+            for (let i = 0; i < width * (width - 2); i++) {
+                let columnOfThree = [i, i + width, i + width * 2];
+                let decidedEmoji = squares[i].innerHTML;
+                const isBlank = squares[i].innerHTML === '';
+
+                if (columnOfThree.every(index => squares[index].innerHTML === decidedEmoji && !isBlank)) {
+                    matches.push(columnOfThree);
+                }
+            }
+            return matches;
+        }
+
+        /**
+         * Reproduce audio1 y audio2 alternadamente para combinaciones normales.
+         */
+        function playAudio() {
+            if (!isSoundOn) return;
+            if (currentAudio === 1) {
+                audio1.play().catch(error => {
+                    console.error('Error al reproducir audio1:', error);
+                });
+                audioSequence.push('audio1');
+                currentAudio = 2;
+            } else {
+                audio2.play().catch(error => {
+                    console.error('Error al reproducir audio2:', error);
+                });
+                audioSequence.push('audio2');
+                currentAudio = 1;
+            }
+            updateMoveCounter();
+        }
+
+        /**
+         * Reproduce audioSpecial para combinaciones especiales y realiza la progresión de nivel.
+         */
+        function playSpecialAudio() {
+            if (!isSoundOn) return;
+            audioSpecial.play().catch(error => {
+                console.error('Error al reproducir audioSpecial:', error);
+            });
+            audioSequence.push('special');
+            updateMoveCounter();
+        }
+
+        /**
+         * Verifica la secuencia de audios para detectar combinaciones especiales.
+         */
+        function checkAudioSequence() {
+            const requiredSequence = ['audio1', 'audio2', 'special'];
+            if (audioSequence.length >= requiredSequence.length) {
+                const lastSequence = audioSequence.slice(-requiredSequence.length);
+                if (lastSequence.every((audio, index) => audio === requiredSequence[index])) {
+                    score += 1000; // Puntos por completar la secuencia
+                    scoreDisplay.innerText = score;
+                    levelUp();
+                    if (isSoundOn) {
+                        audioWin.play().catch(error => {
+                            console.error('Error al reproducir audioWin:', error);
+                        });
+                    }
+                    audioSequence = []; // Reiniciar la secuencia
+                } else if (lastSequence.includes('special') && !lastSequence.every((audio, index) => audio === requiredSequence[index])) {
+                    audioSequence = []; // Reiniciar si hay un 'special' pero no la secuencia correcta
+                }
+            }
+        }
+
+        /**
+         * Actualiza el contador de movimientos y verifica si se ha agotado.
+         */
+        function updateMoveCounter() {
+            moveCounter--;
+            moveCounterDisplay.innerText = moveCounter;
+            if (moveCounter === 0) {
+                moveCounter = 3;
+                moveCounterDisplay.innerText = "💣 BOOM 💣";
+                setTimeout(() => {
+                    moveCounterDisplay.innerText = moveCounter;
+                }, 1000);
+                explodeBoard();
+            }
+        }
+
+        /**
+         * Aumenta el nivel del juego, incrementando la dificultad.
+         */
+        function levelUp() {
+            level++;
+            levelDisplay.innerText = level;
+            emojisCount += 1; // Incrementar el número de emojis normales para aumentar la dificultad
+            moveCounter = 3; // Reiniciar el contador de movimientos
+            moveCounterDisplay.innerText = moveCounter;
+            explodeBoard();
+        }
+
+        /**
+         * Anima el tablero y reinicia el nivel.
+         */
+        function explodeBoard() {
+            squares.forEach(square => {
+                square.classList.add('explode');
+            });
+
+            setTimeout(() => {
+                squares.forEach(square => {
+                    square.classList.remove('explode');
+                    square.innerHTML = '';
+                });
+                selectRandomEmojis(); // Seleccionar nuevos emojis con mayor dificultad
+                setTimeout(() => {
+                    fillEmptySquares();
+                }, 500);
+            }, 700); // Duración del efecto
+        }
+
+        /**
+         * Rellena los espacios vacíos con nuevos emojis.
+         */
+        function fillEmptySquares() {
+            for (let i = 0; i < width * width; i++) {
+                if (squares[i].innerHTML === '') {
+                    let randomEmoji = Math.floor(Math.random() * emojis.length);
+                    squares[i].innerHTML = emojis[randomEmoji];
+                }
+            }
+            checkForPossibleMoves();
+            updateHighScore();
+        }
+
+        /**
+         * Verifica si hay movimientos posibles restantes.
+         */
+        function checkForPossibleMoves() {
+            let possibleMoves = false;
+            for (let i = 0; i < width * width; i++) {
+                if (canSwap(i, i + 1) || canSwap(i, i - 1) || canSwap(i, i + width) || canSwap(i, i - width)) {
+                    possibleMoves = true;
+                    break;
+                }
+            }
+            if (!possibleMoves) {
+                gameOver();
+            }
+        }
+
+        /**
+         * Verifica si un intercambio es válido.
+         */
+        function canSwap(index1, index2) {
+            if (index2 < 0 || index2 >= width * width || squares[index1] === undefined || squares[index2] === undefined) {
+                return false;
+            }
+            swapEmojis(index1, index2);
+            const isValidMove = isMatch();
+            swapEmojis(index1, index2);
+            return isValidMove;
+        }
+
+        /**
+         * Maneja el fin del juego.
+         */
+        function gameOver() {
+            if (isSoundOn) {
+                audioLose.play().catch(error => {
+                    console.error('Error al reproducir audioLose:', error);
+                });
+            }
+            gameOverDisplay.style.display = 'block';
+            isPaused = true;
+        }
+
+        /**
+         * Reinicia el juego al hacer clic en el botón de reinicio.
+         */
+        restartButton.addEventListener('click', () => {
+            resetGame();
+        });
+
+        /**
+         * Pausa o reanuda el juego al hacer clic en el botón de pausa.
+         */
+        pauseButton.addEventListener('click', () => {
+            togglePause();
+        });
+
+        /**
+         * Alterna el sonido del juego.
+         */
+        soundToggleButton.addEventListener('click', () => {
+            toggleSound();
+        });
+
+        /**
+         * Reinicia todos los parámetros del juego.
+         */
+        function resetGame() {
+            grid.innerHTML = '';
+            squares.length = 0;
+            score = 0;
+            level = 1;
+            emojisCount = 4; // Reiniciar el número de emojis normales
+            moveCounter = 3; // Reiniciar el contador de movimientos
+            scoreDisplay.innerText = score;
+            moveCounterDisplay.innerText = moveCounter;
+            levelDisplay.innerText = level;
+            highScoreDisplay.innerText = localStorage.getItem('highScore') || 0;
+            gameOverDisplay.style.display = 'none';
+            audioSequence = []; // Reiniciar la secuencia de audio
+            currentAudio = 1; // Reiniciar el audio actual
+            isPaused = false;
+            createBoard();
+        }
+
+        /**
+         * Pausa o reanuda el juego.
+         */
+        function togglePause() {
+            isPaused = !isPaused;
+            pauseButton.innerHTML = isPaused ? '▶️' : '⏸️';
+            if (isPaused) {
+                grid.style.pointerEvents = 'none';
+            } else {
+                grid.style.pointerEvents = 'auto';
+            }
+        }
+
+        /**
+         * Alterna el sonido del juego.
+         */
+        function toggleSound() {
+            isSoundOn = !isSoundOn;
+            soundToggleButton.innerHTML = isSoundOn ? '🔊' : '🔇';
+            // Detener todos los audios si se desactiva el sonido
+            if (!isSoundOn) {
+                audiosList.forEach(id => {
+                    const audio = document.getElementById(id);
+                    audio.pause();
+                    audio.currentTime = 0;
+                });
+            }
+        }
+
+        /**
+         * Actualiza la puntuación máxima almacenada en localStorage.
+         */
+        function updateHighScore() {
+            let highScore = localStorage.getItem('highScore') || 0;
+            if (score > highScore) {
+                localStorage.setItem('highScore', score);
+                highScoreDisplay.innerText = score;
+            }
+        }
+
+        /**
+         * Carga la puntuación máxima desde localStorage.
+         */
+        function loadHighScore() {
+            let highScore = localStorage.getItem('highScore') || 0;
+            highScoreDisplay.innerText = highScore;
+        }
+
+        /**
+         * Inicializa el juego al cargar la página.
+         */
+        function initializeGame() {
+            loadHighScore();
+            resetGame();
+        }
+
+        initializeGame();
+
+        /**
+         * Maneja la verificación y eliminación de combinaciones continuamente.
+         */
+        // Utilizamos requestAnimationFrame para mejor rendimiento
+        function gameLoop() {
+            if (!isPaused) {
+                let matches = checkRowForThree().concat(checkColumnForThree());
+                if (matches.length > 0) {
+                    animateAndRemoveMatches(matches, false);
+                }
+            }
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+    });
+    </script>
+</body>
+</html>
