@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -20,18 +22,19 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             background-color: #f0f0f0; /* Color de fondo suave */
+            padding: 20px 0; /* Márgenes solo arriba y abajo */
         }
 
         /* Contenedor del Juego */
         .game-container {
             background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Gradiente coral a naranja */
-            padding: 20px;
+            padding: 20px 0; /* Eliminados los márgenes laterales */
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             text-align: center;
             position: relative;
-            width: 90vw; /* Ancho expandido al 90% del viewport */
-            max-width: 1200px; /* Máximo ancho para pantallas grandes */
+            width: 100%; /* Ancho expandido al 100% del contenedor padre */
+            max-width: none; /* Eliminado el límite de ancho */
             transition: transform 0.3s;
             display: flex;
             flex-direction: column;
@@ -44,21 +47,21 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 20px; /* Aumentado para mejor separación */
             width: 100%;
         }
 
         .stat {
-            font-size: 1.2rem;
+            font-size: 1.5rem; /* Aumentado para mejor visibilidad */
             color: #ffffff;
             position: relative;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px; /* Aumentado el espacio entre icono y texto */
         }
 
         .stat .counter {
-            font-size: 1.2rem;
+            font-size: 1.5rem; /* Aumentado para mejor visibilidad */
             font-weight: bold;
             color: #ff4081;
         }
@@ -66,52 +69,49 @@
         /* Cuadrícula de Juego */
         .grid {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 2px;
+            grid-template-columns: repeat(8, 1fr); /* Mantener 8 columnas */
+            gap: 4px; /* Aumentado para mayor separación */
             justify-content: center;
             align-content: start;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px;
+            background: rgba(255, 255, 255, 0.95); /* Aumentada la opacidad para mejor visibilidad */
+            padding: 10px; /* Aumentado el padding */
             border-radius: 10px;
             transition: all 0.3s ease-in-out;
             position: relative;
             overflow: hidden;
-            width: 100%;
-            max-width: 90vw; /* Aumentado de 600px a 90vw para hacer el área de juego más grande */
-            height: auto;
+            width: 90%; /* Ajustado para ocupar la mayor parte del contenedor */
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .grid div {
-            background-color: var(--bg-color, rgba(224, 247, 250, 0.9));
-            border: 1px solid #00838f;
-            border-radius: 8px;
+            background-color: var(--bg-color, rgba(224, 247, 250, 0.95)); /* Aumentado opacidad */
+            border: 2px solid #00838f; /* Aumentado el grosor del borde */
+            border-radius: 12px; /* Aumentado el radio de borde */
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            font-size: 2rem; /* Aumentado para mejorar la visibilidad */
+            font-size: 3rem; /* Aumentado para mejorar la visibilidad */
             transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 7px rgba(0,0,0,0.15); /* Aumentado el shadow */
             color: #fff;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
             width: 100%;
             aspect-ratio: 1 / 1;
         }
 
-.grid div img {
-    width: 98%; /* Ajustado para que la imagen sea un 10% más grande */
-    height: 98%;
-    object-fit: contain;
-}
-        
+        .grid div img {
+            width: 90%; /* Ajustado para que la imagen sea un 10% más grande */
+            height: 90%;
+            object-fit: contain;
+        }
 
         .grid div:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(0, 131, 143, 0.6);
-            background-color: var(--bg-color, rgba(178, 235, 242, 0.9));
+            transform: scale(1.1); /* Aumentado el efecto de escala */
+            box-shadow: 0 0 15px rgba(0, 131, 143, 0.8); /* Aumentado la sombra en hover */
+            background-color: var(--bg-color, rgba(178, 235, 242, 0.95)); /* Aumentado opacidad */
         }
 
         /* Fin del Juego */
@@ -121,7 +121,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 2.5rem;
+            font-size: 3rem; /* Aumentado para mayor impacto */
             color: #d32f2f;
             text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
             z-index: 10;
@@ -171,8 +171,8 @@
 
         .particle {
             position: absolute;
-            width: 5px;
-            height: 5px;
+            width: 8px; /* Aumentado el tamaño de las partículas */
+            height: 8px;
             background: #ff4081;
             border-radius: 50%;
             opacity: 0;
@@ -192,7 +192,7 @@
 
         /* Animación de Caída */
         .fall {
-            animation: fallAnimation 0.3s forwards;
+            animation: fallAnimation 0.4s forwards; /* Aumentado la duración */
         }
 
         @keyframes fallAnimation {
@@ -206,8 +206,8 @@
 
         /* Parpadeo para el Power-Up (Bomba) */
         .blinking {
-            animation: blink 0.8s infinite;
-            border: 2px solid gold;
+            animation: blink 1s infinite; /* Aumentado la duración del parpadeo */
+            border: 3px solid gold; /* Aumentado el grosor del borde */
             border-radius: 50%;
         }
 
@@ -243,7 +243,7 @@
         /* Popup de Puntuación */
         .score-popup {
             position: absolute;
-            font-size: 1rem;
+            font-size: 1.2rem; /* Aumentado el tamaño de fuente */
             color: #ffeb3b;
             animation: popUp 1s forwards;
             pointer-events: none;
@@ -268,9 +268,9 @@
         }
 
         .controls {
-            margin-top: 10px;
+            margin-top: 20px; /* Aumentado para mejor separación */
             display: flex;
-            gap: 10px;
+            gap: 15px; /* Aumentado el espacio entre botones */
             justify-content: center;
         }
 
@@ -278,13 +278,13 @@
             background-color: #ff4081;
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 15px 30px; /* Aumentado el padding */
             margin: 0 5px;
-            border-radius: 5px;
+            border-radius: 8px; /* Aumentado el radio de borde */
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 2rem; /* Aumentado para mejor visibilidad */
             transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.2); /* Aumentado el shadow */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -292,7 +292,7 @@
 
         .controls button:hover {
             background-color: #e91e63;
-            transform: translateY(-2px);
+            transform: translateY(-3px); /* Aumentado el desplazamiento en hover */
         }
 
         /* Ventana de Estadísticas */
@@ -301,45 +301,46 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95); /* Aumentado la opacidad */
             color: #fff;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 30px; /* Aumentado el padding */
+            border-radius: 15px; /* Aumentado el radio de borde */
             z-index: 1000;
-            max-width: 90%;
-            max-height: 80%;
+            max-width: 95%;
+            max-height: 85%;
             overflow-y: auto;
-            font-size: 0.9rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-size: 1rem; /* Aumentado el tamaño de fuente */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); /* Aumentado el shadow */
         }
 
         .stats-popup h2, .stats-popup h3 {
-            font-size: 1.2rem;
+            font-size: 1.5rem; /* Aumentado el tamaño de fuente */
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px; /* Aumentado la separación */
         }
 
         .stats-popup ul {
             list-style-type: none;
             padding: 0;
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
         }
 
         .stats-popup li {
-            margin: 5px 0;
+            margin: 8px 0;
             text-align: center;
+            font-size: 1.2rem; /* Aumentado el tamaño de fuente */
         }
 
         .stats-popup button {
-            margin-top: 20px;
-            padding: 8px 16px;
-            font-size: 1rem;
+            margin-top: 25px; /* Aumentado la separación superior */
+            padding: 10px 25px; /* Aumentado el padding */
+            font-size: 1.2rem; /* Aumentado el tamaño de fuente */
             cursor: pointer;
             background-color: #ff4081;
             border: none;
             color: #fff;
-            border-radius: 5px;
+            border-radius: 8px; /* Aumentado el radio de borde */
             transition: background-color 0.3s;
         }
 
@@ -348,31 +349,37 @@
         }
 
         /* Responsive Design */
+        @media (max-width: 800px) {
+            .grid {
+                width: 100%;
+            }
+        }
+
         @media (max-width: 600px) {
             .stats .stat {
                 font-size: 1.2rem;
             }
             .stats .counter {
-                font-size: 1rem;
-            }
-            .game-over {
-                font-size: 2rem;
-            }
-            .score-popup {
-                font-size: 0.8rem;
-            }
-            .controls button {
-                padding: 8px 16px;
                 font-size: 1.2rem;
             }
-            .stats-popup {
-                font-size: 0.8rem;
+            .game-over {
+                font-size: 2.5rem;
             }
-            .stats-popup h2, .stats-popup h3 {
+            .score-popup {
                 font-size: 1rem;
             }
+            .controls button {
+                padding: 10px 20px;
+                font-size: 1.5rem;
+            }
+            .stats-popup {
+                font-size: 0.9rem;
+            }
+            .stats-popup h2, .stats-popup h3 {
+                font-size: 1.2rem;
+            }
             .stats-popup p, .stats-popup ul, .stats-popup li {
-                font-size: 0.8rem;
+                font-size: 1rem;
             }
         }
     </style>
@@ -406,121 +413,121 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const grid = document.querySelector('.grid');
-            const width = 8; // Tamaño de la cuadrícula (8x8)
+            const width = 8; // Mantener el tamaño de la cuadrícula (8x8)
 
             // Lista reducida de emojis para simplificar
             const allEmojis = [
-'😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
-'🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
-'😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸',
-'🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️',
-'😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡',
-'🤬','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗',
-'🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯',
-'😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐',
-'🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈',
-'👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾',
-'🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿',
-'😾',
-// Personas y profesiones
-'🧑','👨','👩','👶','👧','👦','👩‍🦰','👨‍🦰','👱‍♀️','👱‍♂️',
-'👩‍🦱','👨‍🦱','👩‍🦳','👨‍🦳','👩‍🦲','👨‍🦲','🧓','👴','👵','👲',
-'👳‍♀️','👳‍♂️','👮‍♀️','👮‍♂️','🕵️‍♀️','🕵️‍♂️','💂‍♀️','💂‍♂️','👷‍♀️','👷‍♂️',
-'🤴','👸','👼','🤰','🤱','👩‍⚕️','👨‍⚕️','👩‍🎓','👨‍🎓','👩‍🏫',
-'👨‍🏫','👩‍⚖️','👨‍⚖️','👩‍🌾','👨‍🌾','👩‍🍳','👨‍🍳','👩‍🔧','👨‍🔧','👩‍🏭',
-'👨‍🏭','👩‍💼','👨‍💼','👩‍🔬','👨‍🔬','👩‍💻','👨‍💻','👩‍🎤','👨‍🎤','👩‍🎨',
-'👨‍🎨','👩‍✈️','👨‍✈️','👩‍🚀','👨‍🚀','👩‍🚒','👨‍🚒','🧑‍🚒',
-// Animales y naturaleza
-'🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
-'🦁','🐮','🐷','🐽','🐸','🐵','🙈','🙉','🙊','🐒',
-'🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇',
-'🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐚','🐞',
-'🐜','🕷️','🕸️','🦂','🐢','🐍','🦎','🐙','🦑','🦐',
-'🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅',
-'🐆','🦓','🦍','🦧','🐘','🦏','🐪','🐫','🦒','🐃',
-'🐂','🐄','🐎','🐖','🐏','🐑','🐐','🦌','🐕','🐩',
-'🐈','🐓','🦃','🕊️','🐇','🐁','🐀','🐿️','🦔',
-// Comida y bebidas
-'🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐',
-'🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑',
-'🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅',
-'🍄','🥜','🌰','🍞','🥐','🥖','🥨','🥯','🥞','🧇',
-'🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪',
-'🌮','🌯','🥙','🧆','🥚','🍳','🧈','🥘','🍲','🥣',
-'🥗','🍿','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜',
-'🍝','🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠',
-'🥡','🦪','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁',
-'🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🍵',
-'🍶','🍾','🍷','🍸','🍹','🥂','🍺','🍻','🥃','🥤',
-'🧋','🧃','🧉','🧊',
-// Actividades
-'⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🎱','🏓',
-'🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯','🪁',
-'🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤','🎧',
-'🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗','🎬',
-'🧩','🧸',
-// Viajes y lugares
-'🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐',
-'🚚','🚛','🚜','🛴','🚲','🛵','🏍️','🛺','🚨','🚔',
-'✈️','🛩️','🛫','🛬','🪂','💺','🚁','🛶','⛵','🚤',
-'🛥️','🚢','⚓','⛴️','🪝','🚧','🗺️','🧭','🏞️','🏕️',
-'🏖️','🏜️','🏝️','🏟️','🏛️','🏗️','🧱','🪨','🪵','🪴',
-'🌋','🗻','🏔️','⛰️',
-// Objetos
-'⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','💽',
-'💾','💿','📀','📼','📷','📸','📹','🎥','📽️','🎞️',
-'📞','☎️','📟','📠','🔋','🔌','💡','🔦','🕯️','🪔',
-'🧯','💰','🪙','💴','💵','💶','💷','💸','💳','🧾',
-'💎','⚖️','🔧','🔨','⚒️','🛠️','⛏️','🔩','⚙️','🗜️',
-'⚗️','🧪','🧫','🧬','🔬','🔭','📡','💉','🩸','💊',
-'🩹','🩺','🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪠',
-'🧴','🧷','🧹','🧺','🧻','🪣','🪤','🧼','🪒','🧽',
-'🛒','🚬','⚰️','⚱️','🗿','🪆','🛍️','🧳','👓',
-'🕶️','🥽','🥼','🦺','👔','👕','👖','🧣','🧤','🧥',
-'🧦','👗','👘','👙','👚','👛','👜','👝','🎒','🩴',
-'👞','👟','🥾','🥿','👠','👡','🩰','👢','👑','👒',
-'🎩','🎓','🧢','⛑️','📿','💄','💍','💎','🔇','🔈',
-'🔉','🔊','📢','📣','📯','🔔','🔕','🎼','🎵','🎶',
-'🏧','🚮','🚰','♿','🚹','🚺','🚻','🚼','🚾','🛂',
-'🛃','🛄','🛅','⚠️','🚸','⛔','🚫','🚳','🚭','❌',
-'⭕','✅','☑️','✔️','❎','➕','➖','➗','✖️','💱',
-'💲','⚕️','♻️','📛','🔰','🆗','🆙','🆒','🆕','🆓',
-'🆖','🅰️','🅱️','🆎','🆑','🅾️','🆘','🛑','‼️','⁉️',
-'❓','❔','❕','❗','🔅','🔆','🔱','⚜️',
-// Banderas
-'🏳️','🏴','🏁','🚩','🏳️‍🌈','🏳️‍⚧️','🇦🇫','🇦🇱','🇩🇿','🇦🇸',
-'🇦🇩','🇦🇴','🇦🇮','🇦🇶','🇦🇬','🇦🇷','🇦🇲','🇦🇼','🇦🇺','🇦🇹',
-'🇦🇿','🇧🇸','🇧🇭','🇧🇩','🇧🇧','🇧🇾','🇧🇪','🇧🇿','🇧🇯','🇧🇲',
-'🇧🇹','🇧🇴','🇧🇦','🇧🇼','🇧🇷','🇮🇴','🇻🇬','🇧🇳','🇧🇬','🇧🇫',
-'🇧🇮','🇨🇻','🇰🇭','🇨🇲','🇨🇦','🇮🇨','🇰🇾','🇨🇫','🇹🇩','🇨🇱',
-'🇨🇳','🇨🇽','🇨🇨','🇨🇴','🇰🇲','🇨🇬','🇨🇩','🇨🇰','🇨🇷','🇨🇮',
-'🇭🇷','🇨🇺','🇨🇾','🇨🇿','🇩🇰','🇩🇯','🇩🇲','🇩🇴','🇪🇨','🇪🇬',
-'🇸🇻','🇬🇶','🇪🇷','🇪🇪','🇪🇹','🇫🇯','🇫🇮','🇫🇷','🇬🇫','🇵🇫',
-'🇹🇫','🇬🇦','🇬🇲','🇬🇪','🇩🇪','🇬🇭','🇬🇮','🇬🇷','🇬🇱','🇬🇩',
-'🇬🇵','🇬🇺','🇬🇹','🇬🇬','🇬🇳','🇬🇼','🇬🇾','🇭🇹','🇭🇳','🇭🇰',
-'🇭🇺','🇮🇸','🇮🇳','🇮🇩','🇮🇷','🇮🇶','🇮🇪','🇮🇱','🇮🇹','🇯🇲',
-'🇯🇵','🇯🇪','🇯🇴','🇰🇿','🇰🇪','🇰🇮','🇽🇰','🇰🇼','🇰🇬','🇱🇦',
-'🇱🇻','🇱🇧','🇱🇸','🇱🇷','🇱🇾','🇱🇮','🇱🇹','🇱🇺','🇲🇴','🇲🇰',
-'🇲🇬','🇲🇼','🇲🇾','🇲🇻','🇲🇱','🇲🇹','🇲🇭','🇲🇶','🇲🇷','🇲🇺',
-'🇾🇹','🇲🇽','🇫🇲','🇲🇩','🇲🇨','🇲🇳','🇲🇪','🇲🇸','🇲🇦','🇲🇿',
-'🇲🇲','🇳🇦','🇳🇷','🇳🇵','🇳🇱','🇳🇨','🇳🇿','🇳🇮','🇳🇪','🇳🇬',
-'🇳🇺','🇳🇫','🇰🇵','🇳🇴','🇴🇲','🇵🇰','🇵🇼','🇵🇸','🇵🇦','🇵🇬',
-'🇵🇾','🇵🇪','🇵🇭','🇵🇱','🇵🇹','🇵🇷','🇶🇦','🇷🇴','🇷🇺','🇷🇼',
-'🇧🇱','🇸🇭','🇰🇳','🇱🇨','🇵🇲','🇻🇨','🇼🇸','🇸🇲','🇸🇹','🇸🇦',
-'🇸🇳','🇷🇸','🇸🇨','🇸🇱','🇸🇬','🇸🇰','🇸🇮','🇸🇧','🇸🇴','🇿🇦',
-'🇰🇷','🇸🇸','🇪🇸','🇱🇰','🇸🇩','🇸🇷','🇸🇿','🇸🇪','🇨🇭','🇸🇾',
-'🇹🇼','🇹🇯','🇹🇿','🇹🇭','🇹🇱','🇹🇬','🇹🇰','🇹🇴','🇹🇹','🇹🇳',
-'🇹🇷','🇹🇲','🇹🇨','🇺🇬','🇺🇦','🇦🇪','🇬🇧','🇺🇸','🇺🇾','🇺🇿',
-'🇻🇺','🇻🇦','🇻🇪','🇻🇳','🇼🇫','🇪🇭','🇾🇪','🇿🇲','🇿🇼',
-// Otros emojis populares
-'🎉','🎊','🎈','🎂','🍰','🍦','🍩','🍪','🍫','🍬',
-'🍭','🍮','🎁','🎀','🎗️','🎟️','🎫','🎖️','🏆','🥇',
-'🥈','🥉','⚽️','🏀','🏈','⚾️','🎾','🏐','🏉','🎱',
-'🏓','🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯',
-'🪁','🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤',
-'🎧','🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗',
-'🎬','🧩','🧸',
-];
+                '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
+                '🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
+                '😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸',
+                '🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️',
+                '😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡',
+                '🤬','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗',
+                '🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯',
+                '😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐',
+                '🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈',
+                '👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾',
+                '🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿',
+                '😾',
+                // Personas y profesiones
+                '🧑','👨','👩','👶','👧','👦','👩‍🦰','👨‍🦰','👱‍♀️','👱‍♂️',
+                '👩‍🦱','👨‍🦱','👩‍🦳','👨‍🦳','👩‍🦲','👨‍🦲','🧓','👴','👵','👲',
+                '👳‍♀️','👳‍♂️','👮‍♀️','👮‍♂️','🕵️‍♀️','🕵️‍♂️','💂‍♀️','💂‍♂️','👷‍♀️','👷‍♂️',
+                '🤴','👸','👼','🤰','🤱','👩‍⚕️','👨‍⚕️','👩‍🎓','👨‍🎓','👩‍🏫',
+                '👨‍🏫','👩‍⚖️','👨‍⚖️','👩‍🌾','👨‍🌾','👩‍🍳','👨‍🍳','👩‍🔧','👨‍🔧','👩‍🏭',
+                '👨‍🏭','👩‍💼','👨‍💼','👩‍🔬','👨‍🔬','👩‍💻','👨‍💻','👩‍🎤','👨‍🎤','👩‍🎨',
+                '👨‍🎨','👩‍✈️','👨‍✈️','👩‍🚀','👨‍🚀','👩‍🚒','👨‍🚒','🧑‍🚒',
+                // Animales y naturaleza
+                '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
+                '🦁','🐮','🐷','🐽','🐸','🐵','🙈','🙉','🙊','🐒',
+                '🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇',
+                '🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐚','🐞',
+                '🐜','🕷️','🕸️','🦂','🐢','🐍','🦎','🐙','🦑','🦐',
+                '🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅',
+                '🐆','🦓','🦍','🦧','🐘','🦏','🐪','🐫','🦒','🐃',
+                '🐂','🐄','🐎','🐖','🐏','🐑','🐐','🦌','🐕','🐩',
+                '🐈','🐓','🦃','🕊️','🐇','🐁','🐀','🐿️','🦔',
+                // Comida y bebidas
+                '🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐',
+                '🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑',
+                '🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅',
+                '🍄','🥜','🌰','🍞','🥐','🥖','🥨','🥯','🥞','🧇',
+                '🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪',
+                '🌮','🌯','🥙','🧆','🥚','🍳','🧈','🥘','🍲','🥣',
+                '🥗','🍿','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜',
+                '🍝','🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠',
+                '🥡','🦪','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁',
+                '🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🍵',
+                '🍶','🍾','🍷','🍸','🍹','🥂','🍺','🍻','🥃','🥤',
+                '🧋','🧃','🧉','🧊',
+                // Actividades
+                '⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🎱','🏓',
+                '🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯','🪁',
+                '🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤','🎧',
+                '🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗','🎬',
+                '🧩','🧸',
+                // Viajes y lugares
+                '🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐',
+                '🚚','🚛','🚜','🛴','🚲','🛵','🏍️','🛺','🚨','🚔',
+                '✈️','🛩️','🛫','🛬','🪂','💺','🚁','🛶','⛵','🚤',
+                '🛥️','🚢','⚓','⛴️','🪝','🚧','🗺️','🧭','🏞️','🏕️',
+                '🏖️','🏜️','🏝️','🏟️','🏛️','🏗️','🧱','🪨','🪵','🪴',
+                '🌋','🗻','🏔️','⛰️',
+                // Objetos
+                '⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','💽',
+                '💾','💿','📀','📼','📷','📸','📹','🎥','📽️','🎞️',
+                '📞','☎️','📟','📠','🔋','🔌','💡','🔦','🕯️','🪔',
+                '🧯','💰','🪙','💴','💵','💶','💷','💸','💳','🧾',
+                '💎','⚖️','🔧','🔨','⚒️','🛠️','⛏️','🔩','⚙️','🗜️',
+                '⚗️','🧪','🧫','🧬','🔬','🔭','📡','💉','🩸','💊',
+                '🩹','🩺','🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪠',
+                '🧴','🧷','🧹','🧺','🧻','🪣','🪤','🧼','🪒','🧽',
+                '🛒','🚬','⚰️','⚱️','🗿','🪆','🛍️','🧳','👓',
+                '🕶️','🥽','🥼','🦺','👔','👕','👖','🧣','🧤','🧥',
+                '🧦','👗','👘','👙','👚','👛','👜','👝','🎒','🩴',
+                '👞','👟','🥾','🥿','👠','👡','🩰','👢','👑','👒',
+                '🎩','🎓','🧢','⛑️','📿','💄','💍','💎','🔇','🔈',
+                '🔉','🔊','📢','📣','📯','🔔','🔕','🎼','🎵','🎶',
+                '🏧','🚮','🚰','♿','🚹','🚺','🚻','🚼','🚾','🛂',
+                '🛃','🛄','🛅','⚠️','🚸','⛔','🚫','🚳','🚭','❌',
+                '⭕','✅','☑️','✔️','❎','➕','➖','➗','✖️','💱',
+                '💲','⚕️','♻️','📛','🔰','🆗','🆙','🆒','🆕','🆓',
+                '🆖','🅰️','🅱️','🆎','🆑','🅾️','🆘','🛑','‼️','⁉️',
+                '❓','❔','❕','❗','🔅','🔆','🔱','⚜️',
+                // Banderas
+                '🏳️','🏴','🏁','🚩','🏳️‍🌈','🏳️‍⚧️','🇦🇫','🇦🇱','🇩🇿','🇦🇸',
+                '🇦🇩','🇦🇴','🇦🇮','🇦🇶','🇦🇬','🇦🇷','🇦🇲','🇦🇼','🇦🇺','🇦🇹',
+                '🇦🇿','🇧🇸','🇧🇭','🇧🇩','🇧🇧','🇧🇾','🇧🇪','🇧🇿','🇧🇯','🇧🇲',
+                '🇧🇹','🇧🇴','🇧🇦','🇧🇼','🇧🇷','🇮🇴','🇻🇬','🇧🇳','🇧🇬','🇧🇫',
+                '🇧🇮','🇨🇻','🇰🇭','🇨🇲','🇨🇦','🇮🇨','🇰🇾','🇨🇫','🇹🇩','🇨🇱',
+                '🇨🇳','🇨🇽','🇨🇨','🇨🇴','🇰🇲','🇨🇬','🇨🇩','🇨🇰','🇨🇷','🇨🇮',
+                '🇭🇷','🇨🇺','🇨🇾','🇨🇿','🇩🇰','🇩🇯','🇩🇲','🇩🇴','🇪🇨','🇪🇬',
+                '🇸🇻','🇬🇶','🇪🇷','🇪🇪','🇪🇹','🇫🇯','🇫🇮','🇫🇷','🇬🇫','🇵🇫',
+                '🇹🇫','🇬🇦','🇬🇲','🇬🇪','🇩🇪','🇬🇭','🇬🇮','🇬🇷','🇬🇱','🇬🇩',
+                '🇬🇵','🇬🇺','🇬🇹','🇬🇬','🇬🇳','🇬🇼','🇬🇾','🇭🇹','🇭🇳','🇭🇰',
+                '🇭🇺','🇮🇸','🇮🇳','🇮🇩','🇮🇷','🇮🇶','🇮🇪','🇮🇱','🇮🇹','🇯🇲',
+                '🇯🇵','🇯🇪','🇯🇴','🇰🇿','🇰🇪','🇰🇮','🇽🇰','🇰🇼','🇰🇬','🇱🇦',
+                '🇱🇻','🇱🇧','🇱🇸','🇱🇷','🇱🇾','🇱🇮','🇱🇹','🇱🇺','🇲🇴','🇲🇰',
+                '🇲🇬','🇲🇼','🇲🇾','🇲🇻','🇲🇱','🇲🇹','🇲🇭','🇲🇶','🇲🇷','🇲🇺',
+                '🇾🇹','🇲🇽','🇫🇲','🇲🇩','🇲🇨','🇲🇳','🇲🇪','🇲🇸','🇲🇦','🇲🇿',
+                '🇲🇲','🇳🇦','🇳🇷','🇳🇵','🇳🇱','🇳🇨','🇳🇿','🇳🇮','🇳🇪','🇳🇬',
+                '🇳🇺','🇳🇫','🇰🇵','🇳🇴','🇴🇲','🇵🇰','🇵🇼','🇵🇸','🇵🇦','🇵🇬',
+                '🇵🇾','🇵🇪','🇵🇭','🇵🇱','🇵🇹','🇵🇷','🇶🇦','🇷🇴','🇷🇺','🇷🇼',
+                '🇧🇱','🇸🇭','🇰🇳','🇱🇨','🇵🇲','🇻🇨','🇼🇸','🇸🇲','🇸🇹','🇸🇦',
+                '🇸🇳','🇷🇸','🇸🇨','🇸🇱','🇸🇬','🇸🇰','🇸🇮','🇸🇧','🇸🇴','🇿🇦',
+                '🇰🇷','🇸🇸','🇪🇸','🇱🇰','🇸🇩','🇸🇷','🇸🇿','🇸🇪','🇨🇭','🇸🇾',
+                '🇹🇼','🇹🇯','🇹🇿','🇹🇭','🇹🇱','🇹🇬','🇹🇰','🇹🇴','🇹🇹','🇹🇳',
+                '🇹🇷','🇹🇲','🇹🇨','🇺🇬','🇺🇦','🇦🇪','🇬🇧','🇺🇸','🇺🇾','🇺🇿',
+                '🇻🇺','🇻🇦','🇻🇪','🇻🇳','🇼🇫','🇪🇭','🇾🇪','🇿🇲','🇿🇼',
+                // Otros emojis populares
+                '🎉','🎊','🎈','🎂','🍰','🍦','🍩','🍪','🍫','🍬',
+                '🍭','🍮','🎁','🎀','🎗️','🎟️','🎫','🎖️','🏆','🥇',
+                '🥈','🥉','⚽️','🏀','🏈','⚾️','🎾','🏐','🏉','🎱',
+                '🏓','🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯',
+                '🪁','🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤',
+                '🎧','🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗',
+                '🎬','🧩','🧸',
+            ];
 
             const bombEmoji = '💣';
             const dogEmoji = 'dog'; // Cadena específica para identificar al perro
@@ -632,7 +639,7 @@
             // Configurar la lista actual de emojis basados en el nivel
             function setCurrentEmojis() {
                 if (level === 1) {
-                    currentEmojis = getRandomUniqueEmojis(allEmojis, 4); // Inicialmente 4 emojis
+                    currentEmojis = getRandomUniqueEmojis(allEmojis, 6); // Inicialmente 6 emojis
                     if (!currentEmojis.includes(dogEmoji)) {
                         currentEmojis.push(dogEmoji);
                     }
@@ -729,7 +736,7 @@
             // Establecer el contenido de una celda
             function setSquareContent(square, emoji) {
                 if (emoji === dogEmoji) {
-                    square.innerHTML = '<img src="Dog.png" alt="Dog">'; // Asegúrate de que Dog.png esté en la ruta correcta
+                    square.innerHTML = '<img src="Dog.png" alt="Dog" style="width: 100%; height: 100%;">'; // Asegúrate de que Dog.png esté en la ruta correcta
                 } else {
                     square.innerHTML = '';
                     square.textContent = emoji;
@@ -1009,7 +1016,7 @@
                             squares[newIdx].classList.add('fall');
                             setTimeout(() => {
                                 squares[newIdx].classList.remove('fall');
-                            }, 300);
+                            }, 400);
 
                             // Actualizar la posición del power-up si es necesario
                             if (powerUpActive && movingEmoji === bombEmoji) {
@@ -1030,7 +1037,7 @@
                         squares[idx].classList.add('fall');
                         setTimeout(() => {
                             squares[idx].classList.remove('fall');
-                        }, 300);
+                        }, 400);
 
                         // Actualizar la posición del power-up si es necesario
                         if (powerUpActive && newEmoji === bombEmoji) {
@@ -1053,7 +1060,7 @@
 
             // Verificar si se puede activar un power-up
             function checkPowerup() {
-                if (destroyedEmojisCount >= 10 && !powerUpActive) {
+                if (destroyedEmojisCount >= 20 && !powerUpActive) { // Aumentado el umbral
                     activatePowerup();
                 }
             }
@@ -1082,7 +1089,7 @@
                 const col = index % width;
                 const indicesToDestroy = [];
                 // Destruir en rango horizontal
-                for (let c = col - 2; c <= col + 2; c++) {
+                for (let c = col - 3; c <= col + 3; c++) { // Aumentado el rango
                     if (c >= 0 && c < width) {
                         const idx = row * width + c;
                         if (emojis[idx] !== '') {
@@ -1091,7 +1098,7 @@
                     }
                 }
                 // Destruir en rango vertical
-                for (let r = row - 2; r <= row + 2; r++) {
+                for (let r = row - 3; r <= row + 3; r++) { // Aumentado el rango
                     if (r >= 0 && r < width) {
                         const idx = r * width + col;
                         if (emojis[idx] !== '') {
@@ -1145,8 +1152,8 @@
                 popup.classList.add('score-popup');
                 const rect = squares[index].getBoundingClientRect();
                 const gameRect = gameContainer.getBoundingClientRect();
-                const left = rect.left - gameRect.left + rect.width / 2 - 10;
-                const top = rect.top - gameRect.top + rect.height / 2 - 10;
+                const left = rect.left - gameRect.left + rect.width / 2 - 15;
+                const top = rect.top - gameRect.top + rect.height / 2 - 15;
                 popup.style.left = `${left}px`;
                 popup.style.top = `${top}px`;
                 popup.textContent = text;
@@ -1321,38 +1328,13 @@
 
             // Inicializar el juego al cargar la página
             initializeGame();
-
-            // Explicación de la Aparición de Nuevos Emojis
-            /*
-                La mecánica de generación de nuevos emojis está manejada principalmente por la función `fillEmptySpaces()`. 
-                Aquí está cómo funciona:
-
-                1. **Detección de Espacios Vacíos**:
-                    - Después de que se detectan y eliminan los emojis que forman un match, algunos espacios en la cuadrícula quedan vacíos.
-                    - La función `fillEmptySpaces()` recorre cada columna de la cuadrícula.
-
-                2. **Caída de Emojis Existentes**:
-                    - Para cada columna, cuenta cuántos espacios vacíos (`emptySpots`) hay.
-                    - Luego, recorre la columna desde abajo hacia arriba. Si encuentra un emoji que no está vacío y hay espacios vacíos debajo, mueve ese emoji hacia abajo tantas posiciones como espacios vacíos existan.
-                    - Aplica una clase CSS `.fall` para animar la caída del emoji hacia su nueva posición.
-
-                3. **Inserción de Nuevos Emojis**:
-                    - Después de mover los emojis existentes hacia abajo, hay que llenar los espacios vacíos en la parte superior de la columna.
-                    - Para cada espacio vacío en la parte superior, genera un nuevo emoji aleatorio de la lista `currentEmojis`.
-                    - Asigna este nuevo emoji a la celda vacía correspondiente y aplica la clase `.fall` para animar su aparición desde la parte superior hacia abajo.
-
-                4. **Manejo del Power-Up durante la Caída**:
-                    - Si el emoji que se está moviendo es un power-up (bombEmoji), la función actualiza la variable `blinkingIndex` para reflejar su nueva posición.
-                    - Esto asegura que el power-up mantenga su funcionalidad y animación de parpadeo correctamente.
-
-                5. **Actualización y Verificación Continua**:
-                    - Una vez que los nuevos emojis se han insertado y las animaciones han finalizado, la función `checkMatches()` se llama nuevamente para detectar si hay nuevos matches formados por los emojis recién insertados.
-                    - Esto permite que el juego continúe de manera fluida, generando y desplazando nuevos emojis según el progreso del jugador.
-
-                **Resumen**:
-                La clave está en mover los emojis existentes hacia abajo para llenar los espacios vacíos y luego insertar nuevos emojis en la parte superior de cada columna, permitiendo que caigan naturalmente al llenar los huecos. Esta mecánica evita la sustitución masiva de emojis y mantiene la dinámica del juego fluida y visualmente atractiva.
-            */
         });
-    </script>
+
+            
+            
+          
+</script>
 </body>
 </html>
+
+
