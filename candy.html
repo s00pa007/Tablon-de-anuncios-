@@ -415,6 +415,7 @@
     </div>
 
     <script>
+
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid');
     const width = 8;
@@ -536,8 +537,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const dogEmoji = '🐶'; // Asegúrate de que el emoji del perro coincida con el de tu imagen
     let emojis = [];
     const squares = [];
-    let matchesMade = 0;
-    let targetMatches = 10;
+    let matchesMade = 0; // Puntuación total de matches
+    let levelMatches = 0; // Matches en el nivel actual
+    const targetMatches = 10; // Objetivo de matches por nivel
     let level = 1;
     let highScore = 0;
     let destroyedEmojis = {};
@@ -940,7 +942,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (matchLength >= 5) {
                     points = 3;
                 }
-                matchesMade += points;
+                matchesMade += points; // Incrementa la puntuación total
+                levelMatches += points; // Incrementa la puntuación del nivel
                 matchesDisplay.textContent = matchesMade;
                 updateHighScore();
 
@@ -954,7 +957,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gameRect = gameContainer.getBoundingClientRect();
                 createParticles(20, emojiColors[emojis[popupIndex]], rect.left - gameRect.left + rect.width / 2, rect.top - gameRect.top + rect.height / 2);
             });
-            if (matchesMade >= targetMatches) {
+            if (levelMatches >= targetMatches) {
                 levelUp();
             }
         }
@@ -1156,7 +1159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkLevelUp() {
-        if (matchesMade >= targetMatches) {
+        if (levelMatches >= targetMatches) {
             levelUp();
         }
     }
@@ -1164,11 +1167,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function levelUp() {
         level += 1;
         levelDisplay.textContent = level;
-        targetMatches += 10;
+        // targetMatches siempre es 10, no lo incrementamos
+        levelMatches = 0; // Reiniciar matches del nivel
         targetMatchesDisplay.textContent = targetMatches;
         setCurrentEmojis();
-        matchesMade = 0;
-        matchesDisplay.textContent = matchesMade;
         fillBoard();
     }
 
@@ -1176,8 +1178,8 @@ document.addEventListener('DOMContentLoaded', () => {
         totalGamesPlayed += 1;
         totalTimePlayed += Date.now() - gameStartTime;
         saveStatistics();
-        matchesMade = 0;
-        targetMatches = 10;
+        matchesMade = 0; // Reiniciar puntuación total
+        levelMatches = 0; // Reiniciar matches del nivel
         level = 1;
         destroyedEmojisCount = 0;
         powerUpActive = false;
@@ -1302,6 +1304,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializeGame();
 });
+
     </script>
 </body>
 </html>
