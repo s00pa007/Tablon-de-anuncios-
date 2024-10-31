@@ -90,7 +90,7 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            font-size: 2rem; /* Ajustado para que los emojis sean más visibles */
+            font-size: 1.8rem; /* Reducido para que los emojis encajen mejor */
             transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
             position: relative;
             overflow: hidden;
@@ -843,6 +843,7 @@
                 if (matches.length === 0) {
                     return;
                 }
+                destroyedEmojisCount += matches.reduce((sum, match) => sum + match.length, 0); // Mover fuera del bloque isUserAction
                 if (isUserAction) {
                     matches.forEach(match => {
                         let matchLength = match.length;
@@ -857,7 +858,6 @@
                         createScorePopup(match[0], `+${matchPoints}`);
                     });
                     updateHighScore();
-                    destroyedEmojisCount += matches.reduce((sum, match) => sum + match.length, 0);
                 }
                 matches.forEach(match => {
                     match.forEach(index => {
@@ -876,7 +876,7 @@
                 }, 500);
             }
             function checkPowerup() {
-                if (destroyedEmojisCount >= 20 && !powerUpActive) {
+                if (destroyedEmojisCount >= 10 && !powerUpActive) { // Cambiado a 10
                     activatePowerup();
                 }
             }
@@ -894,7 +894,7 @@
                 squares[blinkingIndex].style.setProperty('--bg-color', emojiColors[bombEmoji]);
                 squares[blinkingIndex].classList.add('blinking');
                 powerUpActive = true;
-                destroyedEmojisCount = 0;
+                destroyedEmojisCount = 0; // Reiniciar el contador
             }
             function triggerPowerUp(index) {
                 const row = Math.floor(index / width);
@@ -933,7 +933,7 @@
                     }, 0);
                 });
                 powerUpActive = false;
-                squares[blinkingIndex].classList.remove('blinking');
+                squares[index].classList.remove('blinking'); // Cambiar de blinkingIndex a index
                 blinkingIndex = null;
                 setTimeout(() => {
                     moveEmojisDown();
