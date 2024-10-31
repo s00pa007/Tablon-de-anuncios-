@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -70,10 +69,10 @@
         .grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr); /* Mantener 8 columnas */
-            gap: 4px; /* Aumentado para mayor separación */
+            gap: 2px; /* Reducido para menor separación */
             justify-content: center;
             align-content: start;
-            background: rgba(255, 255, 255, 0.95); /* Aumentada la opacidad para mejor visibilidad */
+            background: rgba(255, 255, 255, 0.95); /* Será reemplazado por JS con colores suaves */
             padding: 10px; /* Aumentado el padding */
             border-radius: 10px;
             transition: all 0.3s ease-in-out;
@@ -91,7 +90,7 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            font-size: 3rem; /* Aumentado para mejorar la visibilidad */
+            font-size: 2.1rem; /* Reducido en un 30% para mejor visibilidad */
             transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
             position: relative;
             overflow: hidden;
@@ -103,9 +102,14 @@
         }
 
         .grid div img {
-            width: 90%; /* Ajustado para que la imagen sea un 10% más grande */
-            height: 90%;
+            width: 70%; /* Reducido en un 30% */
+            height: 70%;
             object-fit: contain;
+        }
+
+        .grid div img.dog-image {
+            width: 100%; /* Mantiene el tamaño original para Dog.png */
+            height: 100%;
         }
 
         .grid div:hover {
@@ -584,8 +588,19 @@
 
             assignColorsToEmojis();
 
+            // Lista de colores suaves para el fondo del juego
+            const softColors = [
+                '#FFEBEE', '#F3E5F5', '#E3F2FD', '#E8F5E9', '#FFF3E0',
+                '#FBE9E7', '#FFFDE7', '#E0F7FA', '#F1F8E9', '#FFF8E1',
+                '#FCE4EC', '#F3E5F5', '#EDE7F6', '#FFF3E0'
+            ];
+
             // Inicializar el juego
             function initializeGame() {
+                // Asignar un color suave aleatorio al fondo del grid
+                const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
+                grid.style.backgroundColor = randomColor;
+
                 loadHighScore();
                 loadStatistics();
                 setCurrentEmojis();
@@ -736,7 +751,7 @@
             // Establecer el contenido de una celda
             function setSquareContent(square, emoji) {
                 if (emoji === dogEmoji) {
-                    square.innerHTML = '<img src="Dog.png" alt="Dog" style="width: 100%; height: 100%;">'; // Asegúrate de que Dog.png esté en la ruta correcta
+                    square.innerHTML = '<img src="Dog.png" alt="Dog" class="dog-image">'; // Asegúrate de que Dog.png esté en la ruta correcta
                 } else {
                     square.innerHTML = '';
                     square.textContent = emoji;
@@ -1207,6 +1222,9 @@
                 currentEmojis = [];
                 setCurrentEmojis();
                 gameStartTime = Date.now();
+                // Asignar un nuevo color suave al fondo del grid al reiniciar
+                const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
+                grid.style.backgroundColor = randomColor;
                 fillBoard();
                 // No volver a añadir event listeners aquí para evitar duplicados
             }
@@ -1329,12 +1347,7 @@
             // Inicializar el juego al cargar la página
             initializeGame();
         });
-
-            
-            
-          
-</script>
+    </script>
 </body>
 </html>
-
 

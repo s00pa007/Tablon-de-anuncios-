@@ -10,7 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-        /* Estilos CSS */
         :root {
             --background-color: #f0f0f0;
             --text-color: #333333;
@@ -81,15 +80,23 @@
             flex-wrap: nowrap;
         }
 
-        .pet-emoji img, .gallery-link img, .candy-game-link img {
-            width: 120px; /* Aumentado al 120% */
-            height: 120px; /* Aumentado al 120% */
+        .pet-status-container div {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .pet-status-container div img, .gallery-link img, .candy-game-link img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             border-radius: 10%;
             cursor: pointer;
             border: 4px solid var(--button-bg);
-
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: block;
         }
 
         .gallery-link img:hover, .pet-emoji img:hover, .candy-game-link img:hover {
@@ -295,42 +302,37 @@
             display: none;
         }
 
-        /* Estilos para la ventana modal de la galería */
-        #gallery-modal {
+        #gallery-modal, #pet-popup, #candy-popup {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1002;
-            align-items: center;
-            justify-content: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 95%;
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            z-index: 5001;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        #gallery-modal .close-gallery {
+        #gallery-modal .close-gallery, #pet-popup #close-popup, #candy-popup #close-candy-popup {
             position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 40px;
-            color: #fff;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
             cursor: pointer;
             background: none;
             border: none;
+            z-index: 1002;
         }
 
-        #gallery-modal .gallery-container {
-            width: 80%;
-            max-width: 800px;
-            height: 80%;
-            background-color: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        #gallery-modal .gallery-container, #candy-popup .candy-iframe, #pet-popup .pet-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         #gallery-modal .gallery-container img {
@@ -344,7 +346,6 @@
             display: block;
         }
 
-        /* Botones de navegación */
         .gallery-nav {
             position: absolute;
             top: 50%;
@@ -372,85 +373,19 @@
             background: rgba(255,255,255,1);
         }
 
-        /* Estilos para el popup de la mascota virtual */
-        #pet-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
-            background-color: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 5001;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        #close-popup {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            z-index: 1002;
-        }
-
-        #pet-iframe {
+        #pet-iframe, #candy-iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
 
-#candy-popup {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto; /* Centrado */
-    width: 100%;
-    height: 100%;
-    background-color: white;
-    border: 2px solid #333;
-    border-radius: 10px;
-    z-index: 5001;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Ajuste para el botón de cierre */
-#close-candy-popup {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    z-index: 1002;
-}
-
-/* Iframe ocupa todo el espacio */
-#candy-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-        /* Ajustes responsivos */
         @media (max-width: 1024px) {
             .pet-status-container {
                 gap: 30px;
             }
 
-            .pet-emoji img, .gallery-link img, .candy-game-link img {
-                width: 96px; /* Ajuste proporcional al aumento */
+            .pet-status-container div {
+                width: 96px;
                 height: 96px;
             }
         }
@@ -461,17 +396,12 @@
                 gap: 20px;
             }
 
-            .pet-emoji img, .gallery-link img, .candy-game-link img {
-                width: 84px; /* Ajuste proporcional al aumento */
+            .pet-status-container div {
+                width: 84px;
                 height: 84px;
             }
 
-            #gallery-modal .gallery-container {
-                width: 90%;
-                height: 70%;
-            }
-
-            #pet-popup, #candy-popup {
+            #gallery-modal, #pet-popup, #candy-popup {
                 width: 90%;
                 height: 90%;
             }
@@ -489,17 +419,14 @@
     </header>
 
     <div class="pet-status-container">
-        <!-- Enlace de la mascota virtual -->
         <div id="pet-emoji" class="pet-emoji" title="Ver mascota virtual">
             <img src="pet-icon.png" alt="Mascota Virtual">
         </div>
 
-        <!-- Enlace para la galería de imágenes -->
         <div id="gallery-link" class="gallery-link" title="Ver Galería">
             <img src="gallery-icon.png" alt="Galería de Imágenes">
         </div>
 
-        <!-- Enlace para el juego Candy -->
         <div id="candy-game-link" class="candy-game-link" title="Jugar Candy">
             <img src="Candy.png" alt="Candy Game">
         </div>
@@ -523,46 +450,37 @@
         </div>
     </div>
 
-    <!-- Ventana Modal para la Galería -->
     <div id="gallery-modal">
         <button class="close-gallery" id="close-gallery">&times;</button>
-        <div class="gallery-container" id="gallery-container">
-            <!-- Las imágenes se cargarán dinámicamente con JavaScript -->
-        </div>
+        <div class="gallery-container" id="gallery-container"></div>
         <button class="gallery-nav" id="prev-btn">&#10094;</button>
         <button class="gallery-nav" id="next-btn">&#10095;</button>
     </div>
 
-    <!-- Ventana Modal para el juego de la mascota virtual -->
     <div id="pet-popup">
         <button id="close-popup">&times;</button>
         <iframe id="pet-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
-    <!-- Ventana Modal para el juego Candy -->
     <div id="candy-popup">
         <button id="close-candy-popup">&times;</button>
         <iframe id="candy-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
-    <!-- Código JavaScript -->
     <script>
-        // Configuración de Firebase (Reemplaza con tus propias claves)
         const firebaseConfig = {
-apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
-authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
-projectId: "tablon-de-anuncios-d5dea",
-storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
-messagingSenderId: "67910184237",
-appId: "1:67910184237:web:e43d424657a948ae5d77a4",
-measurementId: "G-YL5W1VNM9Z"
+            apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
+            authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
+            projectId: "tablon-de-anuncios-d5dea",
+            storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
+            messagingSenderId: "67910184237",
+            appId: "1:67910184237:web:e43d424657a948ae5d77a4",
+            measurementId: "G-YL5W1VNM9Z"
         };
         
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Referencias a elementos del DOM
         const bulletinBoard = document.getElementById('bulletin-board');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
@@ -598,19 +516,17 @@ measurementId: "G-YL5W1VNM9Z"
             "El tablón de los valientes",
             "El diario secreto de la familia (versión pública)",
             "La página de la gente que no se peina",
-            "Escribe lo que quieras, que no hay consecuencias",
-            "Al final seguro que papi se enfada"
+            "Escribe lo que quieras, que no hay consecuencias"
         ];
-        const imageFolder = './'; // Directorio de las imágenes
-        const totalImages = 48; // Total de imágenes en la galería
+        const imageFolder = './';
+        const totalImages = 48;
 
         let lastVisibleMessage = null;
         const messagesPerPage = 10;
         let isLoading = false;
         let displayedMessageIds = new Set();
-        let petPopupOpen = false; // Variable para controlar si la ventana de la mascota está abierta
+        let petPopupOpen = false;
 
-        // Función para cargar mensajes
         function loadMessages(startAfter = null) {
             if (isLoading) return;
             isLoading = true;
@@ -649,7 +565,6 @@ measurementId: "G-YL5W1VNM9Z"
             });
         }
 
-        // Función para crear elementos de mensaje
         function createMessageElement(message) {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
@@ -922,19 +837,16 @@ measurementId: "G-YL5W1VNM9Z"
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = data;
 
-                    // Extraer y aplicar los estilos
                     const styleTag = tempDiv.querySelector('style');
                     if (styleTag) {
                         document.head.appendChild(styleTag);
                     }
 
-                    // Extraer y aplicar el HTML del teletipo
                     const teletipoContainer = tempDiv.querySelector('.teletipo-container');
                     if (teletipoContainer) {
                         document.getElementById('teletipo-container').appendChild(teletipoContainer);
                     }
 
-                    // Extraer y ejecutar el script
                     const scriptTag = tempDiv.querySelector('script');
                     if (scriptTag) {
                         const newScript = document.createElement('script');
@@ -942,7 +854,6 @@ measurementId: "G-YL5W1VNM9Z"
                         document.body.appendChild(newScript);
                     }
 
-                    // Inicializar el teletipo
                     if (typeof window.inicializarTeletipo === 'function') {
                         window.inicializarTeletipo();
                     } else {
@@ -958,7 +869,7 @@ measurementId: "G-YL5W1VNM9Z"
         closePopup.addEventListener('click', () => {
             petPopup.style.display = 'none';
             document.getElementById('pet-iframe').src = 'about:blank';
-            petPopupOpen = false; // Marcar como cerrada
+            petPopupOpen = false;
         });
 
         function adjustPetPopupSize() {
@@ -995,7 +906,6 @@ measurementId: "G-YL5W1VNM9Z"
             setInterval(changeSlogan, 10000);
         }
 
-        // Función para escuchar nuevos mensajes
         function listenForNewMessages() {
             db.collection("messages")
                 .orderBy("timestamp", "desc")
@@ -1015,7 +925,6 @@ measurementId: "G-YL5W1VNM9Z"
                 });
         }
 
-        // Galería de Imágenes
         const galleryLink = document.getElementById('gallery-link');
         const galleryModal = document.getElementById('gallery-modal');
         const closeGalleryBtn = document.getElementById('close-gallery');
@@ -1025,7 +934,6 @@ measurementId: "G-YL5W1VNM9Z"
 
         let currentImageIndex = 0;
 
-        // Función para barajar un array usando el algoritmo Fisher-Yates
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -1034,25 +942,23 @@ measurementId: "G-YL5W1VNM9Z"
             return array;
         }
 
-        // Función para cargar las imágenes de la galería en un orden aleatorio
         function loadGalleryImages() {
-            const indices = Array.from({ length: totalImages }, (_, i) => i + 1); // Crea un array de [1, 2, ..., totalImages]
-            const shuffledIndices = shuffleArray(indices); // Baraja los índices
+            const indices = Array.from({ length: totalImages }, (_, i) => i + 1);
+            const shuffledIndices = shuffleArray(indices);
 
             shuffledIndices.forEach((i, index) => {
-                const imgNumber = String(i).padStart(4, '0'); // 0001, 0002, ..., 0048
-                const imgPath = `${imageFolder}${imgNumber}.jpg`; // Ruta actualizada
+                const imgNumber = String(i).padStart(4, '0');
+                const imgPath = `${imageFolder}${imgNumber}.jpg`;
                 const imgElement = document.createElement('img');
                 imgElement.src = imgPath;
                 imgElement.alt = `Imagen ${imgNumber}`;
-                if (index === 0) { // Marca la primera imagen como activa
+                if (index === 0) {
                     imgElement.classList.add('active');
                 }
                 galleryContainer.appendChild(imgElement);
             });
         }
 
-        // Función para mostrar una imagen específica
         function showImage(index) {
             const images = galleryContainer.querySelectorAll('img');
             images.forEach((img, i) => {
@@ -1060,21 +966,18 @@ measurementId: "G-YL5W1VNM9Z"
             });
         }
 
-        // Función para mostrar la siguiente imagen
         function nextImage() {
             const images = galleryContainer.querySelectorAll('img');
             currentImageIndex = (currentImageIndex + 1) % images.length;
             showImage(currentImageIndex);
         }
 
-        // Función para mostrar la imagen anterior
         function prevImage() {
             const images = galleryContainer.querySelectorAll('img');
             currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
             showImage(currentImageIndex);
         }
 
-        // Evento para abrir la galería
         galleryLink.addEventListener('click', (e) => {
             e.preventDefault();
             galleryModal.style.display = 'flex';
@@ -1083,16 +986,13 @@ measurementId: "G-YL5W1VNM9Z"
             }
         });
 
-        // Evento para cerrar la galería
         closeGalleryBtn.addEventListener('click', () => {
             galleryModal.style.display = 'none';
         });
 
-        // Eventos para los botones de navegación
         nextBtn.addEventListener('click', nextImage);
         prevBtn.addEventListener('click', prevImage);
 
-        // Cerrar la galería al hacer clic fuera del contenedor
         window.addEventListener('click', (e) => {
             if (e.target === galleryModal) {
                 galleryModal.style.display = 'none';
@@ -1104,11 +1004,10 @@ measurementId: "G-YL5W1VNM9Z"
                 e.preventDefault();
                 petPopup.style.display = 'block';
                 document.getElementById('pet-iframe').src = 'pet.html';
-                petPopupOpen = true; // Marcar como abierta
+                petPopupOpen = true;
             }
         });
 
-        // Funcionalidad de Swipe para dispositivos móviles
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -1123,29 +1022,24 @@ measurementId: "G-YL5W1VNM9Z"
 
         function handleGesture() {
             if (touchEndX < touchStartX - 50) {
-                // Swipe izquierdo
                 nextImage();
             }
             if (touchEndX > touchStartX + 50) {
-                // Swipe derecho
                 prevImage();
             }
         }
 
-        // Función para obtener una imagen aleatoria de la galería
         function getRandomGalleryImage() {
             const randomIndex = Math.floor(Math.random() * totalImages) + 1;
             const imgNumber = String(randomIndex).padStart(4, '0');
-            return `${imageFolder}${imgNumber}.jpg`; // Ruta actualizada
+            return `${imageFolder}${imgNumber}.jpg`;
         }
 
-        // Establecer una imagen aleatoria como enlace de la galería al cargar la página
         function setRandomGalleryImage() {
             const galleryLinkImg = document.querySelector('#gallery-link img');
             galleryLinkImg.src = getRandomGalleryImage();
         }
 
-        // Código para el popup del juego Candy
         const candyGameLink = document.getElementById('candy-game-link');
         const candyPopup = document.getElementById('candy-popup');
         const closeCandyPopup = document.getElementById('close-candy-popup');
@@ -1155,9 +1049,9 @@ measurementId: "G-YL5W1VNM9Z"
             if (!candyPopupOpen) {
                 e.preventDefault();
                 candyPopup.style.display = 'block';
-                document.getElementById('candy-iframe').src = 'candy.html'; // Asegúrate de que el nombre del archivo sea en minúsculas
+                document.getElementById('candy-iframe').src = 'candy.html';
                 candyPopupOpen = true;
-                document.body.style.overflow = 'hidden'; // Deshabilitar el scroll
+                document.body.style.overflow = 'hidden';
             }
         });
 
@@ -1165,7 +1059,7 @@ measurementId: "G-YL5W1VNM9Z"
             candyPopup.style.display = 'none';
             document.getElementById('candy-iframe').src = 'about:blank';
             candyPopupOpen = false;
-            document.body.style.overflow = ''; // Restaurar el scroll
+            document.body.style.overflow = '';
         });
 
         function adjustCandyPopupSize() {
@@ -1174,7 +1068,6 @@ measurementId: "G-YL5W1VNM9Z"
 
         window.addEventListener('resize', adjustCandyPopupSize);
 
-        // Llamar a las funciones de ajuste de tamaño al iniciar
         window.addEventListener('load', () => {
             initApp();
             listenForNewMessages();
