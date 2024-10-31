@@ -4,28 +4,23 @@
     <meta charset="UTF-8">
     <title>Match3 🎉</title>
     <style>
-        /* Reset de Estilos */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
-        /* Estilos del Body con Imagen de Fondo */
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-image: url('background.png'); /* Asegúrate de que esta imagen exista o reemplázala */
+            background-image: url('background.png');
             background-size: cover;
             background-position: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             position: relative;
         }
-
-        /* Overlay para Mejorar la Visibilidad */
         body::before {
             content: "";
             position: absolute;
@@ -33,13 +28,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.3); /* Oscurece el fondo para resaltar el juego */
+            background: rgba(0, 0, 0, 0.3);
             z-index: -1;
         }
-
-        /* Contenedor del Juego */
         .game-container {
-            background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Gradiente coral a naranja */
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
             padding: 22px;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
@@ -52,8 +45,6 @@
             align-items: center;
             overflow: hidden;
         }
-
-        /* Estadísticas */
         .stats {
             display: flex;
             justify-content: space-around;
@@ -61,7 +52,6 @@
             margin-bottom: 15px;
             width: 100%;
         }
-
         .stat {
             font-size: 1.5rem;
             color: #ffffff;
@@ -70,18 +60,15 @@
             align-items: center;
             gap: 5px;
         }
-
         .stat .counter {
             font-size: 1.2rem;
             font-weight: bold;
             color: #ff4081;
         }
-
-        /* Cuadrícula de Juego */
         .grid {
             display: grid;
-            grid-template-columns: repeat(8, 55px);
-            grid-template-rows: repeat(8, 55px);
+            grid-template-columns: repeat(8, minmax(30px, 1fr));
+            grid-template-rows: repeat(8, minmax(30px, 1fr));
             gap: 5px;
             justify-content: center;
             align-content: start;
@@ -91,14 +78,13 @@
             transition: all 0.3s ease-in-out;
             position: relative;
             overflow: hidden;
-            width: calc(8 * 55px + 7 * 5px + 22px);
-            height: calc(8 * 55px + 7 * 5px + 22px);
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            max-height: 480px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-
         .grid div {
-            width: 55px;
-            height: 55px;
             background-color: var(--bg-color, rgba(224, 247, 250, 0.9));
             border: 2px solid #00838f;
             border-radius: 8px;
@@ -106,22 +92,25 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            font-size: 1.65rem;
+            font-size: 2vw;
             transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
             position: relative;
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             color: #fff;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            height: 100%;
         }
-
+        .grid div img {
+            width: 100%;
+            height: 100%;
+        }
         .grid div:hover {
             transform: scale(1.05);
             box-shadow: 0 0 10px rgba(0, 131, 143, 0.6);
             background-color: var(--bg-color, rgba(178, 235, 242, 0.9));
         }
-
-        /* Fin del Juego */
         .game-over {
             display: none;
             position: absolute;
@@ -134,7 +123,6 @@
             z-index: 10;
             animation: shake 0.5s;
         }
-
         @keyframes shake {
             0% { transform: translate(-50%, -50%) rotate(0deg); }
             25% { transform: translate(-50%, -50%) rotate(5deg); }
@@ -142,12 +130,9 @@
             75% { transform: translate(-50%, -50%) rotate(5deg); }
             100% { transform: translate(-50%, -50%) rotate(0deg); }
         }
-
-        /* Animaciones de Eliminación y Explosión */
         .match {
             animation: matchAnimation 0.5s forwards;
         }
-
         @keyframes matchAnimation {
             0% {
                 transform: scale(1);
@@ -162,8 +147,6 @@
                 opacity: 0;
             }
         }
-
-        /* Partículas */
         .particles {
             position: absolute;
             top: 0;
@@ -175,7 +158,6 @@
             border-radius: 15px;
             z-index: 2;
         }
-
         .particle {
             position: absolute;
             width: 5px;
@@ -185,7 +167,6 @@
             opacity: 0;
             animation: particle 1s forwards;
         }
-
         @keyframes particle {
             from {
                 opacity: 1;
@@ -196,12 +177,9 @@
                 transform: translate(var(--tx), var(--ty)) scale(2);
             }
         }
-
-        /* Animación de Caída */
         .fall {
             animation: fallAnimation 0.3s forwards;
         }
-
         @keyframes fallAnimation {
             0% {
                 transform: translateY(-100%);
@@ -210,24 +188,18 @@
                 transform: translateY(0);
             }
         }
-
-        /* Parpadeo para el Power-Up (Bomba) */
         .blinking {
             animation: blink 0.8s infinite;
             border: 2px solid gold;
             border-radius: 50%;
         }
-
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
-
-        /* Efecto de vibración en el Power-Up */
         .vibrate {
             animation: vibrate 0.5s;
         }
-
         @keyframes vibrate {
             0% { transform: translate(0); }
             20% { transform: translate(-2px, 2px); }
@@ -236,18 +208,13 @@
             80% { transform: translate(2px, -2px); }
             100% { transform: translate(0); }
         }
-
-        /* Parpadeo de posibles matches */
         .hint {
             animation: hintAnimation 1s infinite;
         }
-
         @keyframes hintAnimation {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
-
-        /* Popup de Puntuación */
         .score-popup {
             position: absolute;
             font-size: 1rem;
@@ -256,9 +223,8 @@
             pointer-events: none;
             font-weight: bold;
             text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
-            z-index: 5;
+            z-index: 15;
         }
-
         @keyframes popUp {
             0% {
                 opacity: 1;
@@ -273,15 +239,12 @@
                 transform: translateY(-50px) scale(2);
             }
         }
-
-        /* Controles */
         .controls {
             margin-top: 10px;
             display: flex;
             gap: 10px;
             justify-content: center;
         }
-
         .controls button {
             background-color: #ff4081;
             border: none;
@@ -297,13 +260,10 @@
             align-items: center;
             justify-content: center;
         }
-
         .controls button:hover {
             background-color: #e91e63;
             transform: translateY(-2px);
         }
-
-        /* Ventana de Estadísticas */
         .stats-popup {
             position: fixed;
             top: 50%;
@@ -320,15 +280,12 @@
             font-size: 0.9rem;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
         .stats-popup h2, .stats-popup h3 {
             font-size: 1.2rem;
         }
-
         .stats-popup p, .stats-popup ul, .stats-popup li {
             font-size: 0.9rem;
         }
-
         .stats-popup button {
             margin-top: 20px;
             padding: 8px 16px;
@@ -340,62 +297,32 @@
             border-radius: 5px;
             transition: background-color 0.3s;
         }
-
         .stats-popup button:hover {
             background-color: #e91e63;
         }
-
-        /* Responsive Design */
         @media (max-width: 600px) {
-            .game-container {
-                width: calc(8 * 42px + 7 * 2px + 17.6px);
-                padding: 16.5px;
-            }
-
-            .grid {
-                grid-template-columns: repeat(8, 42px);
-                grid-template-rows: repeat(8, 42px);
-                gap: 2px;
-                padding: 8.8px;
-                width: calc(8 * 42px + 7 * 2px + 17.6px);
-                height: calc(8 * 42px + 7 * 2px + 17.6px);
-            }
-
-            .grid div {
-                width: 42px;
-                height: 42px;
-                font-size: 1.32rem;
-            }
-
             .stats .stat {
                 font-size: 1.32rem;
             }
-
             .stats .counter {
                 font-size: 1.1rem;
             }
-
             .game-over {
                 font-size: 2.2rem;
             }
-
             .score-popup {
                 font-size: 0.88rem;
             }
-
             .controls button {
                 padding: 8.8px 17.6px;
                 font-size: 1.1rem;
             }
-
             .stats-popup {
                 font-size: 0.8rem;
             }
-
             .stats-popup h2, .stats-popup h3 {
                 font-size: 1rem;
             }
-
             .stats-popup p, .stats-popup ul, .stats-popup li {
                 font-size: 0.8rem;
             }
@@ -418,6 +345,7 @@
         </div>
         <div class="particles" id="particles"></div>
     </div>
+
     <script>
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid');
