@@ -82,12 +82,12 @@
         }
 
         .pet-emoji img, .gallery-link img, .candy-game-link img {
-            width: 100px;
-            height: 100px;
+            width: 120px; /* Aumentado al 120% */
+            height: 120px; /* Aumentado al 120% */
             border-radius: 10%;
             cursor: pointer;
             border: 4px solid var(--button-bg);
-            padding: 5px;
+            padding: 10px; /* Aumentado el padding */
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -413,13 +413,13 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
+            width: 95vmin; /* Ajuste para hacer el contenedor cuadrado */
+            height: 95vmin; /* Ajuste para hacer el contenedor cuadrado */
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
             z-index: 5001;
-            overflow: hidden;
+            overflow: hidden; /* Asegura que el contenido no se salga */
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
@@ -438,6 +438,7 @@
             width: 100%;
             height: 100%;
             border: none;
+            aspect-ratio: 1 / 1; /* Mantiene el iframe cuadrado */
         }
 
         /* Ajustes responsivos */
@@ -447,8 +448,8 @@
             }
 
             .pet-emoji img, .gallery-link img, .candy-game-link img {
-                width: 80px;
-                height: 80px;
+                width: 96px; /* Ajuste proporcional al aumento */
+                height: 96px;
             }
         }
 
@@ -459,8 +460,8 @@
             }
 
             .pet-emoji img, .gallery-link img, .candy-game-link img {
-                width: 70px;
-                height: 70px;
+                width: 84px; /* Ajuste proporcional al aumento */
+                height: 84px;
             }
 
             #gallery-modal .gallery-container {
@@ -1154,6 +1155,7 @@ measurementId: "G-YL5W1VNM9Z"
                 candyPopup.style.display = 'block';
                 document.getElementById('candy-iframe').src = 'candy.html'; // Asegúrate de que el nombre del archivo sea en minúsculas
                 candyPopupOpen = true;
+                document.body.style.overflow = 'hidden'; // Deshabilitar el scroll
             }
         });
 
@@ -1161,15 +1163,11 @@ measurementId: "G-YL5W1VNM9Z"
             candyPopup.style.display = 'none';
             document.getElementById('candy-iframe').src = 'about:blank';
             candyPopupOpen = false;
+            document.body.style.overflow = ''; // Restaurar el scroll
         });
 
         function adjustCandyPopupSize() {
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            const popupWidth = windowWidth * 0.95;
-            const popupHeight = windowHeight * 0.95;
-            candyPopup.style.width = `${popupWidth}px`;
-            candyPopup.style.height = `${popupHeight}px`;
+            // No es necesario ajustar el tamaño aquí ya que usamos vmin para mantener el cuadrado
         }
 
         window.addEventListener('resize', adjustCandyPopupSize);
@@ -1179,7 +1177,6 @@ measurementId: "G-YL5W1VNM9Z"
             initApp();
             listenForNewMessages();
             setRandomGalleryImage();
-            adjustCandyPopupSize();
             adjustPetPopupSize();
         });
     </script>
