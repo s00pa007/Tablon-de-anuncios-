@@ -89,7 +89,7 @@ header {
     flex-wrap: nowrap; /* Evita que los elementos se envuelvan */
 }
 
-.pet-emoji img, .gallery-link img {
+.pet-emoji img, .gallery-link img, .candy-game-link img {
     width: 100px; /* Aumentado en un 40% desde 65px */
     height: 100px; /* Aumentado en un 40% desde 65px */
     border-radius: 10%;
@@ -100,31 +100,9 @@ header {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.gallery-link img:hover, .pet-emoji img:hover {
+.gallery-link img:hover, .pet-emoji img:hover, .candy-game-link img:hover {
     transform: scale(1.1);
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
-}
-
-#theme-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100px; /* Aumentado para mayor tamaño */
-    height: 100px; /* Aumentado para mayor tamaño */
-    background-color: var(--button-bg);
-    color: var(--button-text);
-    border: none;
-    border-radius: 50%; /* Botón circular */
-    cursor: pointer;
-    font-size: 24px; /* Aumentado para icono más grande */
-    font-weight: bold;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-#theme-toggle:hover {
-    transform: scale(1.1);
-    background-color: var(--button-bg-hover, #45a049);
 }
 
 .main-container {
@@ -436,21 +414,49 @@ header {
     border: none;
 }
 
+/* Estilos para el popup del juego Candy */
+#candy-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    height: 85%;
+    background-color: white;
+    border: 2px solid #333;
+    border-radius: 10px;
+    z-index: 5001;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#close-candy-popup {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    z-index: 1002;
+}
+
+#candy-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
     .pet-status-container {
         gap: 30px; /* Reducir el espacio entre iconos en pantallas medianas */
     }
 
-    .pet-emoji img, .gallery-link img {
+    .pet-emoji img, .gallery-link img, .candy-game-link img {
         width: 80px;
         height: 80px;
-    }
-
-    #theme-toggle {
-        width: 80px;
-        height: 80px;
-        font-size: 20px;
     }
 }
 
@@ -460,15 +466,9 @@ header {
         gap: 20px; /* Espacio reducido entre iconos */
     }
 
-    .pet-emoji img, .gallery-link img {
+    .pet-emoji img, .gallery-link img, .candy-game-link img {
         width: 90px;
         height: 90px;
-    }
-
-    #theme-toggle {
-        width: 50px;
-        height: 50px;
-        font-size: 18px;
     }
 
     #gallery-modal .gallery-container {
@@ -476,7 +476,7 @@ header {
         height: 70%;
     }
 
-    #pet-popup {
+    #pet-popup, #candy-popup {
         width: 90%;
         height: 90%;
     }
@@ -504,11 +504,10 @@ header {
             <img src="gallery-icon.png" alt="Galería de Imágenes">
         </div>
 
-        <!-- Botón para cambiar el tema -->
-        <button id="theme-toggle" title="Cambiar Modo">
-            🌓
-
-        </button>
+        <!-- Enlace para el juego Candy -->
+        <div id="candy-game-link" class="candy-game-link" title="Jugar Candy">
+            <img src="Candy.png" alt="Candy Game">
+        </div>
     </div>
 
     <div class="main-container">
@@ -539,14 +538,18 @@ header {
         <button class="gallery-nav" id="next-btn">&#10095;</button>
     </div>
 
+    <!-- Ventana Modal para el juego Kakiwaki -->
     <div id="pet-popup">
         <button id="close-popup">&times;</button>
         <iframe id="pet-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
+    <!-- Ventana Modal para el juego Candy -->
+    <div id="candy-popup">
+        <button id="close-candy-popup">&times;</button>
+        <iframe id="candy-iframe" src="about:blank" frameborder="0"></iframe>
+    </div>
 
-
-</body>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
@@ -566,7 +569,6 @@ header {
         const messageInput = document.getElementById('message-input');
         const messagesPublished = document.getElementById('messages-published');
         const messagesDeleted = document.getElementById('messages-deleted');
-        const themeToggle = document.getElementById('theme-toggle');
         const daysOperating = document.getElementById('days-operating');
         const slogan = document.getElementById('slogan');
         const petEmoji = document.getElementById('pet-emoji');
@@ -607,8 +609,7 @@ header {
         let isLoading = false;
         let displayedMessageIds = new Set();
      
-        // **Actualización de la ruta de las imágenes**
-        const imageFolder = './'; // Cambiado de 'img/' a './' para la raíz
+        const imageFolder = './'; // Directorio de las imágenes
 
         function loadMessages(startAfter = null) {
             if (isLoading) return;
@@ -872,7 +873,7 @@ header {
         }
      
         function getContrastingTextColor(bgColor) {
-            const hsl = bgColor.match(/hsl(\d+),\s*(\d+)%,\s*(\d+)%/);
+            const hsl = bgColor.match(/hsl(\d+),\s*(\d+)%?,\s*(\d+)%?/);
             if (hsl) {
                 const l = parseInt(hsl[3]);
                 return l > 50 ? '#000000' : '#FFFFFF';
@@ -907,11 +908,6 @@ header {
         function changeSlogan() {
             slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
         }
-     
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌓';
-        });
      
         function cargarTeletipo() {
             fetch('teletipo.html')
@@ -1023,8 +1019,6 @@ header {
             listenForNewMessages(); // Iniciar la escucha de nuevos mensajes
         });
 
-        // **Corrección: Actualizar display a 'flex' cuando se abre el modal**
-        // **Corrección: Utilizar 'flex' en lugar de 'block' para mantener la alineación**
         // Galería de Imágenes
         const galleryLink = document.getElementById('gallery-link');
         const galleryModal = document.getElementById('gallery-modal');
@@ -1035,36 +1029,33 @@ header {
 
         let currentImageIndex = 0;
         const totalImages = 48; // Total de imágenes en la carpeta raíz
-        // **Ya actualizado a './'**
-        // const imageFolder = 'img/';
-     
-        // Función para cargar todas las imágenes en el contenedor de la galería
-// Función para barajar un array usando el algoritmo Fisher-Yates
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
 
-// Función para cargar las imágenes de la galería en un orden aleatorio
-function loadGalleryImages() {
-    const indices = Array.from({ length: totalImages }, (_, i) => i + 1); // Crea un array de [1, 2, ..., totalImages]
-    const shuffledIndices = shuffleArray(indices); // Baraja los índices
-
-    shuffledIndices.forEach((i, index) => {
-        const imgNumber = String(i).padStart(4, '0'); // 0001, 0002, ..., 0046
-        const imgPath = `${imageFolder}${imgNumber}.jpg`; // Ruta actualizada
-        const imgElement = document.createElement('img');
-        imgElement.src = imgPath;
-        imgElement.alt = `Imagen ${imgNumber}`;
-        if (index === 0) { // Marca la primera imagen como activa
-            imgElement.classList.add('active');
+        // Función para barajar un array usando el algoritmo Fisher-Yates
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
-        galleryContainer.appendChild(imgElement);
-    });
-}
+
+        // Función para cargar las imágenes de la galería en un orden aleatorio
+        function loadGalleryImages() {
+            const indices = Array.from({ length: totalImages }, (_, i) => i + 1); // Crea un array de [1, 2, ..., totalImages]
+            const shuffledIndices = shuffleArray(indices); // Baraja los índices
+
+            shuffledIndices.forEach((i, index) => {
+                const imgNumber = String(i).padStart(4, '0'); // 0001, 0002, ..., 0048
+                const imgPath = `${imageFolder}${imgNumber}.jpg`; // Ruta actualizada
+                const imgElement = document.createElement('img');
+                imgElement.src = imgPath;
+                imgElement.alt = `Imagen ${imgNumber}`;
+                if (index === 0) { // Marca la primera imagen como activa
+                    imgElement.classList.add('active');
+                }
+                galleryContainer.appendChild(imgElement);
+            });
+        }
 
         // Función para mostrar una imagen específica
         function showImage(index) {
@@ -1088,11 +1079,10 @@ function loadGalleryImages() {
             showImage(currentImageIndex);
         }
 
-        // **Actualización: Mostrar el modal como 'flex' en lugar de 'block'**
         // Evento para abrir la galería
         galleryLink.addEventListener('click', (e) => {
             e.preventDefault();
-            galleryModal.style.display = 'flex'; // Cambiado a 'flex'
+            galleryModal.style.display = 'flex';
             if (galleryContainer.children.length === 0) {
                 loadGalleryImages();
             }
@@ -1159,6 +1149,45 @@ function loadGalleryImages() {
         window.addEventListener('load', () => {
             const galleryLinkImg = document.querySelector('#gallery-link img');
             galleryLinkImg.src = getRandomGalleryImage();
+        });
+
+        // Código para el popup del juego Candy
+        const candyGameLink = document.getElementById('candy-game-link');
+        const candyPopup = document.getElementById('candy-popup');
+        const closeCandyPopup = document.getElementById('close-candy-popup');
+        let candyPopupOpen = false;
+
+        candyGameLink.addEventListener('click', (e) => {
+            if (!candyPopupOpen) {
+                e.preventDefault();
+                candyPopup.style.display = 'block';
+                document.getElementById('candy-iframe').src = 'Candy.html';
+                candyPopupOpen = true;
+            }
+        });
+
+        closeCandyPopup.addEventListener('click', () => {
+            candyPopup.style.display = 'none';
+            document.getElementById('candy-iframe').src = 'about:blank';
+            candyPopupOpen = false;
+        });
+
+        function adjustCandyPopupSize() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const popupWidth = windowWidth * 0.95;
+            const popupHeight = windowHeight * 0.95;
+            candyPopup.style.width = `${popupWidth}px`;
+            candyPopup.style.height = `${popupHeight}px`;
+        }
+
+        window.addEventListener('resize', adjustCandyPopupSize);
+
+        // Llamar a adjustCandyPopupSize al iniciar
+        window.addEventListener('load', () => {
+            initApp();
+            listenForNewMessages(); // Iniciar la escucha de nuevos mensajes
+            adjustCandyPopupSize(); // Ajustar tamaño del popup de Candy
         });
     </script>
 </body>
