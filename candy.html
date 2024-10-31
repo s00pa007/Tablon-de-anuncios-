@@ -929,33 +929,43 @@
 
             function fillEmptySpaces() {
                 let moved = false;
-                for (let i = 0; i < width * width; i++) {
-                    if (emojis[i] === '') {
-                        moved = true;
-                        if (i >= width) {
-                            emojis[i] = emojis[i - width];
-                            emojis[i - width] = '';
-                            setSquareContent(squares[i], emojis[i]);
-                            clearSquareContent(squares[i - width]);
-                            squares[i].style.setProperty('--bg-color', emojiColors[emojis[i]]);
-                            squares[i - width].style.removeProperty('--bg-color');
-                            squares[i].classList.add('fall');
-                            setTimeout(() => {
-                                squares[i].classList.remove('fall');
-                            }, 300);
+                for (let col = 0; col < width; col++) {
+                    for (let row = width - 1; row >= 0; row--) {
+                        const idx = row * width + col;
+                        if (emojis[idx] === '') {
+                            moved = true;
+                            // Buscar el siguiente emoji no vacío hacia arriba
+                            for (let k = row - 1; k >= 0; k--) {
+                                const aboveIdx = k * width + col;
+                                if (emojis[aboveIdx] !== '') {
+                                    emojis[idx] = emojis[aboveIdx];
+                                    emojis[aboveIdx] = '';
+                                    setSquareContent(squares[idx], emojis[idx]);
+                                    clearSquareContent(squares[aboveIdx]);
+                                    squares[idx].style.setProperty('--bg-color', emojiColors[emojis[idx]]);
+                                    squares[aboveIdx].style.removeProperty('--bg-color');
+                                    squares[idx].classList.add('fall');
+                                    setTimeout(() => {
+                                        squares[idx].classList.remove('fall');
+                                    }, 300);
 
-                            if (powerUpActive && i - width === blinkingIndex) {
-                                updatePowerUpPosition(i - width, i);
+                                    if (powerUpActive && aboveIdx === blinkingIndex) {
+                                        updatePowerUpPosition(aboveIdx, idx);
+                                    }
+                                    break;
+                                }
                             }
-                        } else {
-                            let newEmoji = getRandomEmoji();
-                            emojis[i] = newEmoji;
-                            setSquareContent(squares[i], newEmoji);
-                            squares[i].style.setProperty('--bg-color', emojiColors[newEmoji]);
-                            squares[i].classList.add('fall');
-                            setTimeout(() => {
-                                squares[i].classList.remove('fall');
-                            }, 300);
+                            // Si no se encontró ningún emoji no vacío arriba, generar uno nuevo
+                            if (emojis[idx] === '') {
+                                let newEmoji = getRandomEmoji();
+                                emojis[idx] = newEmoji;
+                                setSquareContent(squares[idx], newEmoji);
+                                squares[idx].style.setProperty('--bg-color', emojiColors[newEmoji]);
+                                squares[idx].classList.add('fall');
+                                setTimeout(() => {
+                                    squares[idx].classList.remove('fall');
+                                }, 300);
+                            }
                         }
                     }
                 }
