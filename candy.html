@@ -415,938 +415,893 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const grid = document.querySelector('.grid');
-            const width = 8; // Mantener el tamaño de la cuadrícula (8x8)
-
-            // Lista reducida de emojis para simplificar
-            const allEmojis = [
-                '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
-                '🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
-                '😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸',
-                '🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️',
-                '😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡',
-                '🤬','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗',
-                '🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯',
-                '😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐',
-                '🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈',
-                '👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾',
-                '🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿',
-                '😾',
-                // Personas y profesiones
-                '🧑','👨','👩','👶','👧','👦','👩‍🦰','👨‍🦰','👱‍♀️','👱‍♂️',
-                '👩‍🦱','👨‍🦱','👩‍🦳','👨‍🦳','👩‍🦲','👨‍🦲','🧓','👴','👵','👲',
-                '👳‍♀️','👳‍♂️','👮‍♀️','👮‍♂️','🕵️‍♀️','🕵️‍♂️','💂‍♀️','💂‍♂️','👷‍♀️','👷‍♂️',
-                '🤴','👸','👼','🤰','🤱','👩‍⚕️','👨‍⚕️','👩‍🎓','👨‍🎓','👩‍🏫',
-                '👨‍🏫','👩‍⚖️','👨‍⚖️','👩‍🌾','👨‍🌾','👩‍🍳','👨‍🍳','👩‍🔧','👨‍🔧','👩‍🏭',
-                '👨‍🏭','👩‍💼','👨‍💼','👩‍🔬','👨‍🔬','👩‍💻','👨‍💻','👩‍🎤','👨‍🎤','👩‍🎨',
-                '👨‍🎨','👩‍✈️','👨‍✈️','👩‍🚀','👨‍🚀','👩‍🚒','👨‍🚒','🧑‍🚒',
-                // Animales y naturaleza
-                '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
-                '🦁','🐮','🐷','🐽','🐸','🐵','🙈','🙉','🙊','🐒',
-                '🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇',
-                '🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐚','🐞',
-                '🐜','🕷️','🕸️','🦂','🐢','🐍','🦎','🐙','🦑','🦐',
-                '🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅',
-                '🐆','🦓','🦍','🦧','🐘','🦏','🐪','🐫','🦒','🐃',
-                '🐂','🐄','🐎','🐖','🐏','🐑','🐐','🦌','🐕','🐩',
-                '🐈','🐓','🦃','🕊️','🐇','🐁','🐀','🐿️','🦔',
-                // Comida y bebidas
-                '🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐',
-                '🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑',
-                '🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅',
-                '🍄','🥜','🌰','🍞','🥐','🥖','🥨','🥯','🥞','🧇',
-                '🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪',
-                '🌮','🌯','🥙','🧆','🥚','🍳','🧈','🥘','🍲','🥣',
-                '🥗','🍿','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜',
-                '🍝','🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠',
-                '🥡','🦪','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁',
-                '🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🍵',
-                '🍶','🍾','🍷','🍸','🍹','🥂','🍺','🍻','🥃','🥤',
-                '🧋','🧃','🧉','🧊',
-                // Actividades
-                '⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🎱','🏓',
-                '🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯','🪁',
-                '🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤','🎧',
-                '🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗','🎬',
-                '🧩','🧸',
-                // Viajes y lugares
-                '🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐',
-                '🚚','🚛','🚜','🛴','🚲','🛵','🏍️','🛺','🚨','🚔',
-                '✈️','🛩️','🛫','🛬','🪂','💺','🚁','🛶','⛵','🚤',
-                '🛥️','🚢','⚓','⛴️','🪝','🚧','🗺️','🧭','🏞️','🏕️',
-                '🏖️','🏜️','🏝️','🏟️','🏛️','🏗️','🧱','🪨','🪵','🪴',
-                '🌋','🗻','🏔️','⛰️',
-                // Objetos
-                '⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','💽',
-                '💾','💿','📀','📼','📷','📸','📹','🎥','📽️','🎞️',
-                '📞','☎️','📟','📠','🔋','🔌','💡','🔦','🕯️','🪔',
-                '🧯','💰','🪙','💴','💵','💶','💷','💸','💳','🧾',
-                '💎','⚖️','🔧','🔨','⚒️','🛠️','⛏️','🔩','⚙️','🗜️',
-                '⚗️','🧪','🧫','🧬','🔬','🔭','📡','💉','🩸','💊',
-                '🩹','🩺','🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪠',
-                '🧴','🧷','🧹','🧺','🧻','🪣','🪤','🧼','🪒','🧽',
-                '🛒','🚬','⚰️','⚱️','🗿','🪆','🛍️','🧳','👓',
-                '🕶️','🥽','🥼','🦺','👔','👕','👖','🧣','🧤','🧥',
-                '🧦','👗','👘','👙','👚','👛','👜','👝','🎒','🩴',
-                '👞','👟','🥾','🥿','👠','👡','🩰','👢','👑','👒',
-                '🎩','🎓','🧢','⛑️','📿','💄','💍','💎','🔇','🔈',
-                '🔉','🔊','📢','📣','📯','🔔','🔕','🎼','🎵','🎶',
-                '🏧','🚮','🚰','♿','🚹','🚺','🚻','🚼','🚾','🛂',
-                '🛃','🛄','🛅','⚠️','🚸','⛔','🚫','🚳','🚭','❌',
-                '⭕','✅','☑️','✔️','❎','➕','➖','➗','✖️','💱',
-                '💲','⚕️','♻️','📛','🔰','🆗','🆙','🆒','🆕','🆓',
-                '🆖','🅰️','🅱️','🆎','🆑','🅾️','🆘','🛑','‼️','⁉️',
-                '❓','❔','❕','❗','🔅','🔆','🔱','⚜️',
-                // Banderas
-                '🏳️','🏴','🏁','🚩','🏳️‍🌈','🏳️‍⚧️','🇦🇫','🇦🇱','🇩🇿','🇦🇸',
-                '🇦🇩','🇦🇴','🇦🇮','🇦🇶','🇦🇬','🇦🇷','🇦🇲','🇦🇼','🇦🇺','🇦🇹',
-                '🇦🇿','🇧🇸','🇧🇭','🇧🇩','🇧🇧','🇧🇾','🇧🇪','🇧🇿','🇧🇯','🇧🇲',
-                '🇧🇹','🇧🇴','🇧🇦','🇧🇼','🇧🇷','🇮🇴','🇻🇬','🇧🇳','🇧🇬','🇧🇫',
-                '🇧🇮','🇨🇻','🇰🇭','🇨🇲','🇨🇦','🇮🇨','🇰🇾','🇨🇫','🇹🇩','🇨🇱',
-                '🇨🇳','🇨🇽','🇨🇨','🇨🇴','🇰🇲','🇨🇬','🇨🇩','🇨🇰','🇨🇷','🇨🇮',
-                '🇭🇷','🇨🇺','🇨🇾','🇨🇿','🇩🇰','🇩🇯','🇩🇲','🇩🇴','🇪🇨','🇪🇬',
-                '🇸🇻','🇬🇶','🇪🇷','🇪🇪','🇪🇹','🇫🇯','🇫🇮','🇫🇷','🇬🇫','🇵🇫',
-                '🇹🇫','🇬🇦','🇬🇲','🇬🇪','🇩🇪','🇬🇭','🇬🇮','🇬🇷','🇬🇱','🇬🇩',
-                '🇬🇵','🇬🇺','🇬🇹','🇬🇬','🇬🇳','🇬🇼','🇬🇾','🇭🇹','🇭🇳','🇭🇰',
-                '🇭🇺','🇮🇸','🇮🇳','🇮🇩','🇮🇷','🇮🇶','🇮🇪','🇮🇱','🇮🇹','🇯🇲',
-                '🇯🇵','🇯🇪','🇯🇴','🇰🇿','🇰🇪','🇰🇮','🇽🇰','🇰🇼','🇰🇬','🇱🇦',
-                '🇱🇻','🇱🇧','🇱🇸','🇱🇷','🇱🇾','🇱🇮','🇱🇹','🇱🇺','🇲🇴','🇲🇰',
-                '🇲🇬','🇲🇼','🇲🇾','🇲🇻','🇲🇱','🇲🇹','🇲🇭','🇲🇶','🇲🇷','🇲🇺',
-                '🇾🇹','🇲🇽','🇫🇲','🇲🇩','🇲🇨','🇲🇳','🇲🇪','🇲🇸','🇲🇦','🇲🇿',
-                '🇲🇲','🇳🇦','🇳🇷','🇳🇵','🇳🇱','🇳🇨','🇳🇿','🇳🇮','🇳🇪','🇳🇬',
-                '🇳🇺','🇳🇫','🇰🇵','🇳🇴','🇴🇲','🇵🇰','🇵🇼','🇵🇸','🇵🇦','🇵🇬',
-                '🇵🇾','🇵🇪','🇵🇭','🇵🇱','🇵🇹','🇵🇷','🇶🇦','🇷🇴','🇷🇺','🇷🇼',
-                '🇧🇱','🇸🇭','🇰🇳','🇱🇨','🇵🇲','🇻🇨','🇼🇸','🇸🇲','🇸🇹','🇸🇦',
-                '🇸🇳','🇷🇸','🇸🇨','🇸🇱','🇸🇬','🇸🇰','🇸🇮','🇸🇧','🇸🇴','🇿🇦',
-                '🇰🇷','🇸🇸','🇪🇸','🇱🇰','🇸🇩','🇸🇷','🇸🇿','🇸🇪','🇨🇭','🇸🇾',
-                '🇹🇼','🇹🇯','🇹🇿','🇹🇭','🇹🇱','🇹🇬','🇹🇰','🇹🇴','🇹🇹','🇹🇳',
-                '🇹🇷','🇹🇲','🇹🇨','🇺🇬','🇺🇦','🇦🇪','🇬🇧','🇺🇸','🇺🇾','🇺🇿',
-                '🇻🇺','🇻🇦','🇻🇪','🇻🇳','🇼🇫','🇪🇭','🇾🇪','🇿🇲','🇿🇼',
-                // Otros emojis populares
-                '🎉','🎊','🎈','🎂','🍰','🍦','🍩','🍪','🍫','🍬',
-                '🍭','🍮','🎁','🎀','🎗️','🎟️','🎫','🎖️','🏆','🥇',
-                '🥈','🥉','⚽️','🏀','🏈','⚾️','🎾','🏐','🏉','🎱',
-                '🏓','🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯',
-                '🪁','🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤',
-                '🎧','🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗',
-                '🎬','🧩','🧸',
-            ];
-
-            const bombEmoji = '💣';
-            const dogEmoji = 'dog'; // Cadena específica para identificar al perro
-            let emojis = [];
-            const squares = [];
-            let matchesMade = 0;
-            let targetMatches = 5;
-            let level = 1;
-            let highScore = 0;
-            let destroyedEmojis = {};
-            let totalGamesPlayed = 0;
-            let totalTimePlayed = 0;
-            let gameStartTime;
-            let powerUpActive = false;
-            let destroyedEmojisCount = 0;
-            let blinkingIndex = null;
-            let lastUserActionTime = Date.now();
-
-            // Elementos del DOM
-            const gameOverDisplay = document.getElementById('game-over');
-            const matchesDisplay = document.getElementById('matches-made');
-            const levelDisplay = document.getElementById('level-indicator');
-            const highScoreDisplay = document.getElementById('high-score-value');
-            const targetMatchesDisplay = document.getElementById('target-matches');
-            const restartButton = document.getElementById('restart');
-            const infoButton = document.getElementById('info');
-            const particlesContainer = document.getElementById('particles');
-            const gameContainer = document.querySelector('.game-container');
-
-            let dragStartIndex;
-            let dragEndIndex;
-            let touchStartX = null;
-            let touchStartY = null;
-            let touchStartIdLocal = null;
-            let emojiColors = {};
-
-            // Asignar colores a los emojis para mejorar la visualización
-            function assignColorsToEmojis() {
-                const colors = [
-                    '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231',
-                    '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe',
-                    '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000',
-                    '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080',
-                    '#ffffff', '#000000'
-                ];
-                let colorIndex = 0;
-                allEmojis.forEach(emoji => {
-                    emojiColors[emoji] = colors[colorIndex % colors.length];
-                    colorIndex++;
-                });
-                emojiColors[bombEmoji] = '#000'; // Color especial para la bomba
-                emojiColors[dogEmoji] = '#ff9900'; // Color especial para el perro
-            }
-
-            assignColorsToEmojis();
-
-            // Lista de colores suaves para el fondo del juego
-            const softColors = [
-                '#FFEBEE', '#F3E5F5', '#E3F2FD', '#E8F5E9', '#FFF3E0',
-                '#FBE9E7', '#FFFDE7', '#E0F7FA', '#F1F8E9', '#FFF8E1',
-                '#FCE4EC', '#F3E5F5', '#EDE7F6', '#FFF3E0'
-            ];
-
-            // Inicializar el juego
-            function initializeGame() {
-                // Asignar un color suave aleatorio al fondo del grid
-                const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
-                grid.style.backgroundColor = randomColor;
-
-                loadHighScore();
-                loadStatistics();
-                setCurrentEmojis();
-                createBoard();
-                gameStartTime = Date.now();
-            }
-
-            // Cargar el puntaje más alto desde el almacenamiento local
-            function loadHighScore() {
-                const storedHighScore = localStorage.getItem('highMatches');
-                if (storedHighScore) {
-                    highScore = parseInt(storedHighScore);
-                    highScoreDisplay.textContent = highScore;
-                }
-            }
-
-            // Actualizar el puntaje más alto si es necesario
-            function updateHighScore() {
-                if (matchesMade > highScore) {
-                    highScore = matchesMade;
-                    highScoreDisplay.textContent = highScore;
-                    localStorage.setItem('highMatches', highScore);
-                }
-            }
-
-            // Cargar estadísticas desde el almacenamiento local
-            function loadStatistics() {
-                const storedGamesPlayed = localStorage.getItem('gamesPlayed');
-                if (storedGamesPlayed) {
-                    totalGamesPlayed = parseInt(storedGamesPlayed);
-                }
-                const storedTimePlayed = localStorage.getItem('timePlayed');
-                if (storedTimePlayed) {
-                    totalTimePlayed = parseInt(storedTimePlayed);
-                }
-                const storedDestroyedEmojis = localStorage.getItem('destroyedEmojis');
-                if (storedDestroyedEmojis) {
-                    destroyedEmojis = JSON.parse(storedDestroyedEmojis);
-                } else {
-                    destroyedEmojis = {};
-                }
-            }
-
-            // Guardar estadísticas en el almacenamiento local
-            function saveStatistics() {
-                localStorage.setItem('gamesPlayed', totalGamesPlayed);
-                localStorage.setItem('timePlayed', totalTimePlayed);
-                localStorage.setItem('destroyedEmojis', JSON.stringify(destroyedEmojis));
-            }
-
-            // Configurar la lista actual de emojis basados en el nivel
-            function setCurrentEmojis() {
-                if (level === 1) {
-                    currentEmojis = getRandomUniqueEmojis(allEmojis, 6); // Inicialmente 6 emojis
-                    if (!currentEmojis.includes(dogEmoji)) {
-                        currentEmojis.push(dogEmoji);
-                    }
-                } else {
-                    // Cada nivel añade un emoji nuevo
-                    const newEmoji = getNewEmoji();
-                    if (newEmoji) {
-                        currentEmojis.push(newEmoji);
-                    }
-
-                    // Cada dos niveles a partir del nivel 3, elimina un emoji antiguo (excepto el perro)
-                    if (level >= 3 && level % 2 === 1) {
-                        removeOldEmoji();
-                    }
-                }
-            }
-
-            // Obtener emojis únicos aleatorios
-            function getRandomUniqueEmojis(array, number) {
-                const filteredArray = array.filter(emoji => emoji !== bombEmoji && emoji !== dogEmoji);
-                const shuffled = filteredArray.slice().sort(() => 0.5 - Math.random());
-                return shuffled.slice(0, number);
-            }
-
-            // Obtener un nuevo emoji para agregar
-            function getNewEmoji() {
-                const availableEmojis = allEmojis.filter(emoji => !currentEmojis.includes(emoji) && emoji !== bombEmoji && emoji !== dogEmoji);
-                if (availableEmojis.length === 0) return null;
-                const randomIndex = Math.floor(Math.random() * availableEmojis.length);
-                return availableEmojis[randomIndex];
-            }
-
-            // Remover un emoji antiguo (excepto el perro)
-            function removeOldEmoji() {
-                const removableEmojis = currentEmojis.filter(emoji => emoji !== dogEmoji);
-                if (removableEmojis.length === 0) return;
-                const emojiToRemove = removableEmojis[Math.floor(Math.random() * removableEmojis.length)];
-                const removeIndex = currentEmojis.indexOf(emojiToRemove);
-                if (removeIndex !== -1) {
-                    currentEmojis.splice(removeIndex, 1);
-                }
-            }
-
-            // Crear el tablero de juego
-            function createBoard() {
-                grid.innerHTML = '';
-                squares.length = 0;
-                for (let i = 0; i < width * width; i++) {
-                    const square = document.createElement('div');
-                    square.setAttribute('draggable', true);
-                    square.setAttribute('id', i);
-                    grid.appendChild(square);
-                    squares.push(square);
-                }
-                fillBoard();
-                addEventListeners();
-            }
-
-            // Rellenar el tablero con emojis aleatorios y estabilizarlo
-            function fillBoard() {
-                for (let i = 0; i < squares.length; i++) {
-                    if (emojis[i] === undefined || emojis[i] === '') {
-                        let randomEmoji = getRandomEmoji();
-                        emojis[i] = randomEmoji;
-                        setSquareContent(squares[i], randomEmoji);
-                        squares[i].style.setProperty('--bg-color', emojiColors[randomEmoji]);
-                    }
-                }
-                stabilizeBoard();
-            }
-
-            // Asegurar que no haya matches al inicio
-            function stabilizeBoard() {
-                let matches = findAllMatches();
-                while (matches.length > 0) {
-                    matches.forEach(match => {
-                        match.forEach(index => {
-                            let newEmoji = getRandomEmoji();
-                            emojis[index] = newEmoji;
-                            setSquareContent(squares[index], newEmoji);
-                            squares[index].style.setProperty('--bg-color', emojiColors[newEmoji]);
-                        });
-                    });
-                    matches = findAllMatches();
-                }
-            }
-
-            // Obtener un emoji aleatorio de la lista actual
-            function getRandomEmoji() {
-                const rand = Math.floor(Math.random() * currentEmojis.length);
-                return currentEmojis[rand];
-            }
-
-            // Establecer el contenido de una celda
-            function setSquareContent(square, emoji) {
-                if (emoji === dogEmoji) {
-                    square.innerHTML = '<img src="Dog.png" alt="Dog" class="dog-image">'; // Asegúrate de que Dog.png esté en la ruta correcta
-                } else {
-                    square.innerHTML = '';
-                    square.textContent = emoji;
-                }
-            }
-
-            // Limpiar el contenido de una celda
-            function clearSquareContent(square) {
-                square.innerHTML = '';
-                square.textContent = '';
-            }
-
-            // Agregar eventos a las celdas y controles
-            function addEventListeners() {
-                squares.forEach(square => {
-                    square.addEventListener('dragstart', dragStart);
-                    square.addEventListener('dragover', dragOver);
-                    square.addEventListener('drop', dragDrop);
-                    square.addEventListener('dragend', dragEnd);
-                    square.addEventListener('click', handleSquareClick);
-                });
-                squares.forEach(square => {
-                    square.addEventListener('touchstart', handleTouchStart, { passive: true });
-                    square.addEventListener('touchend', handleTouchEnd, { passive: true });
-                });
-                restartButton.addEventListener('click', resetGame);
-                infoButton.addEventListener('click', showInfo);
-                document.addEventListener('mousedown', resetIdleTimer);
-                document.addEventListener('touchstart', resetIdleTimer);
-            }
-
-            // Manejo de eventos de arrastrar y soltar
-            function dragStart(e) {
-                dragStartIndex = parseInt(this.id);
-                this.classList.add('dragging');
-            }
-
-            function dragOver(e) {
-                e.preventDefault();
-            }
-
-            function dragDrop(e) {
-                dragEndIndex = parseInt(this.id);
-                if (isAdjacent(dragStartIndex, dragEndIndex)) {
-                    swapEmojis(dragStartIndex, dragEndIndex);
-                    if (findMatchesUserAction().length > 0) {
-                        checkMatches(true);
-                    } else {
-                        swapEmojis(dragEndIndex, dragStartIndex);
-                    }
-                }
-            }
-
-            function dragEnd() {
-                squares.forEach(square => square.classList.remove('dragging'));
-            }
-
-            // Manejo de eventos táctiles
-            function handleTouchStart(e) {
-                if (e.touches.length === 1) {
-                    touchStartX = e.touches[0].clientX;
-                    touchStartY = e.touches[0].clientY;
-                    touchStartIdLocal = parseInt(this.id);
-                }
-            }
-
-            function handleTouchEnd(e) {
-                if (touchStartX === null || touchStartY === null) return;
-                const touchEndX = e.changedTouches[0].clientX;
-                const touchEndY = e.changedTouches[0].clientY;
-                const deltaX = touchEndX - touchStartX;
-                const deltaY = touchEndY - touchStartY;
-                const threshold = 30;
-                let dragEndIndexLocal = touchStartIdLocal;
-                if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                    if (deltaX > threshold) {
-                        dragEndIndexLocal = touchStartIdLocal + 1;
-                    } else if (deltaX < -threshold) {
-                        dragEndIndexLocal = touchStartIdLocal - 1;
-                    }
-                } else {
-                    if (deltaY > threshold) {
-                        dragEndIndexLocal = touchStartIdLocal + width;
-                    } else if (deltaY < -threshold) {
-                        dragEndIndexLocal = touchStartIdLocal - width;
-                    }
-                }
-                if (isAdjacent(touchStartIdLocal, dragEndIndexLocal) && dragEndIndexLocal >= 0 && dragEndIndexLocal < width * width) {
-                    swapEmojis(touchStartIdLocal, dragEndIndexLocal);
-                    if (findMatchesUserAction().length > 0) {
-                        checkMatches(true);
-                    } else {
-                        swapEmojis(dragEndIndexLocal, touchStartIdLocal);
-                    }
-                }
-                touchStartX = null;
-                touchStartY = null;
-                touchStartIdLocal = null;
-            }
-
-            // Manejar clic en una celda (para activar power-ups)
-            function handleSquareClick(e) {
-                const index = parseInt(this.id);
-                if (powerUpActive && index === blinkingIndex && emojis[index] === bombEmoji) {
-                    triggerPowerUp(index);
-                }
-            }
-
-            // Verificar si dos índices son adyacentes
-            function isAdjacent(index1, index2) {
-                const row1 = Math.floor(index1 / width);
-                const col1 = index1 % width;
-                const row2 = Math.floor(index2 / width);
-                const col2 = index2 % width;
-                const rowDiff = Math.abs(row1 - row2);
-                const colDiff = Math.abs(col1 - col2);
-                return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
-            }
-
-            // Intercambiar emojis entre dos índices
-            function swapEmojis(index1, index2) {
-                const tempEmoji = emojis[index1];
-                emojis[index1] = emojis[index2];
-                emojis[index2] = tempEmoji;
-                setSquareContent(squares[index1], emojis[index1]);
-                setSquareContent(squares[index2], emojis[index2]);
-                squares[index1].style.setProperty('--bg-color', emojiColors[emojis[index1]]);
-                squares[index2].style.setProperty('--bg-color', emojiColors[emojis[index2]]);
-
-                updatePowerUpPosition(index1, index2);
-            }
-
-            // Actualizar la posición del power-up si está activo
-            function updatePowerUpPosition(oldIndex, newIndex) {
-                if (powerUpActive) {
-                    if (oldIndex === blinkingIndex) {
-                        squares[blinkingIndex].classList.remove('blinking');
-                        blinkingIndex = newIndex;
-                        squares[blinkingIndex].classList.add('blinking');
-                    } else if (newIndex === blinkingIndex) {
-                        squares[blinkingIndex].classList.remove('blinking');
-                        blinkingIndex = oldIndex;
-                        squares[blinkingIndex].classList.add('blinking');
-                    }
-                }
-            }
-
-            // Encontrar todos los matches en la cuadrícula
-            function findAllMatches() {
-                const matches = [];
-                // Horizontal Matches
-                for (let row = 0; row < width; row++) {
-                    for (let col = 0; col < width - 2; col++) {
-                        const idx = row * width + col;
-                        const first = emojis[idx];
-                        const second = emojis[idx + 1];
-                        const third = emojis[idx + 2];
-                        if (first === second && second === third && first !== '' && first !== bombEmoji) {
-                            let match = [idx, idx + 1, idx + 2];
-                            // Evitar matches que incluyan el power-up
-                            if (match.some(index => emojis[index] === bombEmoji)) continue;
-                            // Extender el match si hay más emojis iguales
-                            for (let k = col + 3; k < width; k++) {
-                                const nextIdx = row * width + k;
-                                if (emojis[nextIdx] === first && emojis[nextIdx] !== bombEmoji) {
-                                    match.push(nextIdx);
-                                } else {
-                                    break;
-                                }
-                            }
-                            matches.push(match);
-                            col += match.length - 1;
-                        }
-                    }
-                }
-                // Vertical Matches
-                for (let col = 0; col < width; col++) {
-                    for (let row = 0; row < width - 2; row++) {
-                        const idx = row * width + col;
-                        const first = emojis[idx];
-                        const second = emojis[idx + width];
-                        const third = emojis[idx + 2 * width];
-                        if (first === second && second === third && first !== '' && first !== bombEmoji) {
-                            let match = [idx, idx + width, idx + 2 * width];
-                            // Evitar matches que incluyan el power-up
-                            if (match.some(index => emojis[index] === bombEmoji)) continue;
-                            // Extender el match si hay más emojis iguales
-                            for (let k = row + 3; k < width; k++) {
-                                const nextIdx = k * width + col;
-                                if (emojis[nextIdx] === first && emojis[nextIdx] !== bombEmoji) {
-                                    match.push(nextIdx);
-                                } else {
-                                    break;
-                                }
-                            }
-                            matches.push(match);
-                            row += match.length - 1;
-                        }
-                    }
-                }
-                return matches;
-            }
-
-            // Encontrar matches como resultado de una acción del usuario
-            function findMatchesUserAction() {
-                return findAllMatches();
-            }
-
-            // Verificar y procesar matches
-            function checkMatches(isUserAction = false) {
-                let matches = findAllMatches();
-                if (matches.length === 0) {
-                    // Opcional: verificar si el juego ha terminado
-                    checkEndGame();
-                    return;
-                }
-                destroyedEmojisCount += matches.reduce((sum, match) => sum + match.length, 0);
-                if (isUserAction) {
-                    matches.forEach(match => {
-                        let matchLength = match.length;
-                        let matchPoints = 1;
-                        if (matchLength === 4) {
-                            matchPoints = 2;
-                        } else if (matchLength >= 5) {
-                            matchPoints = 3;
-                        }
-                        matchesMade += matchPoints;
-                        matchesDisplay.textContent = matchesMade;
-                        createScorePopup(match[0], `+${matchPoints}`);
-                    });
-                    updateHighScore();
-
-                    // Verificar si se ha alcanzado el objetivo de matches para subir de nivel
-                    if (matchesMade >= targetMatches) {
-                        levelUp();
-                    }
-                }
-                matches.forEach(match => {
-                    match.forEach(index => {
-                        let emoji = emojis[index];
-                        destroyedEmojis[emoji] = (destroyedEmojis[emoji] || 0) + 1;
-                        emojis[index] = '';
-                        clearSquareContent(squares[index]);
-                        squares[index].style.removeProperty('--bg-color');
-
-                        // Manejar la eliminación del power-up si está en este índice
-                        if (powerUpActive && index === blinkingIndex) {
-                            squares[index].classList.remove('blinking');
-                            powerUpActive = false;
-                            blinkingIndex = null;
-                        }
-                    });
-                });
-                checkPowerup();
-                setTimeout(() => {
-                    fillEmptySpaces();
-                }, 500);
-            }
-
-            // Rellenar espacios vacíos después de eliminar matches
-            function fillEmptySpaces() {
-                for (let col = 0; col < width; col++) {
-                    let emptySpots = 0;
-                    for (let row = width - 1; row >= 0; row--) {
-                        const idx = row * width + col;
-                        if (emojis[idx] === '' || emojis[idx] === undefined) {
-                            emptySpots++;
-                        } else if (emptySpots > 0) {
-                            const newIdx = (row + emptySpots) * width + col;
-                            const movingEmoji = emojis[idx];
-                            emojis[newIdx] = movingEmoji;
-                            setSquareContent(squares[newIdx], movingEmoji);
-                            squares[newIdx].style.setProperty('--bg-color', emojiColors[movingEmoji]);
-                            emojis[idx] = '';
-                            clearSquareContent(squares[idx]);
-                            squares[idx].style.removeProperty('--bg-color');
-                            squares[newIdx].classList.add('fall');
-                            setTimeout(() => {
-                                squares[newIdx].classList.remove('fall');
-                            }, 400);
-
-                            // Actualizar la posición del power-up si es necesario
-                            if (powerUpActive && movingEmoji === bombEmoji) {
-                                squares[blinkingIndex].classList.remove('blinking');
-                                blinkingIndex = newIdx;
-                                squares[blinkingIndex].classList.add('blinking');
-                            }
-                        }
-                    }
-
-                    // Insertar nuevos emojis en los espacios vacíos en la parte superior
-                    for (let row = 0; row < emptySpots; row++) {
-                        const idx = row * width + col;
-                        const newEmoji = getRandomEmoji();
-                        emojis[idx] = newEmoji;
-                        setSquareContent(squares[idx], newEmoji);
-                        squares[idx].style.setProperty('--bg-color', emojiColors[newEmoji]);
-                        squares[idx].classList.add('fall');
-                        setTimeout(() => {
-                            squares[idx].classList.remove('fall');
-                        }, 400);
-
-                        // Actualizar la posición del power-up si es necesario
-                        if (powerUpActive && newEmoji === bombEmoji) {
-                            if (blinkingIndex !== idx) {
-                                if (blinkingIndex !== null) {
-                                    squares[blinkingIndex].classList.remove('blinking');
-                                }
-                                blinkingIndex = idx;
-                                squares[blinkingIndex].classList.add('blinking');
-                            }
-                        }
-                    }
-                }
-
-                // Después de rellenar, verificar si hay nuevos matches
-                setTimeout(() => {
-                    checkMatches();
-                }, 500);
-            }
-
-            // Verificar si se puede activar un power-up
-            function checkPowerup() {
-                if (destroyedEmojisCount >= 20 && !powerUpActive) { // Aumentado el umbral
-                    activatePowerup();
-                }
-            }
-
-            // Activar un power-up (bomba)
-            function activatePowerup() {
-                const availableIndices = [];
-                for (let i = 0; i < width * width; i++) {
-                    if (emojis[i] !== '' && emojis[i] !== bombEmoji) {
-                        availableIndices.push(i);
-                    }
-                }
-                if (availableIndices.length === 0) return;
-                blinkingIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-                emojis[blinkingIndex] = bombEmoji;
-                setSquareContent(squares[blinkingIndex], bombEmoji);
-                squares[blinkingIndex].style.setProperty('--bg-color', emojiColors[bombEmoji]);
-                squares[blinkingIndex].classList.add('blinking');
-                powerUpActive = true;
-                destroyedEmojisCount = 0;
-            }
-
-            // Disparar el power-up (bomba) cuando se hace clic en ella
-            function triggerPowerUp(index) {
-                const row = Math.floor(index / width);
-                const col = index % width;
-                const indicesToDestroy = [];
-                // Destruir en rango horizontal
-                for (let c = col - 3; c <= col + 3; c++) { // Aumentado el rango
-                    if (c >= 0 && c < width) {
-                        const idx = row * width + c;
-                        if (emojis[idx] !== '') {
-                            indicesToDestroy.push(idx);
-                        }
-                    }
-                }
-                // Destruir en rango vertical
-                for (let r = row - 3; r <= row + 3; r++) { // Aumentado el rango
-                    if (r >= 0 && r < width) {
-                        const idx = r * width + col;
-                        if (emojis[idx] !== '') {
-                            indicesToDestroy.push(idx);
-                        }
-                    }
-                }
-                const uniqueIndices = [...new Set(indicesToDestroy)];
-                gameContainer.classList.add('vibrate');
-                setTimeout(() => {
-                    gameContainer.classList.remove('vibrate');
-                }, 500);
-                uniqueIndices.forEach(idx => {
-                    setTimeout(() => {
-                        let emoji = emojis[idx];
-                        destroyedEmojis[emoji] = (destroyedEmojis[emoji] || 0) + 1;
-                        emojis[idx] = '';
-                        clearSquareContent(squares[idx]);
-                        squares[idx].style.removeProperty('--bg-color');
-                    }, 0);
-                });
-                powerUpActive = false;
-                squares[index].classList.remove('blinking');
-                blinkingIndex = null;
-                setTimeout(() => {
-                    fillEmptySpaces();
-                }, 500);
-            }
-
-            // Crear partículas de animación (opcional)
-            function createParticles(count, color, x, y) {
-                for (let i = 0; i < count; i++) {
-                    const particle = document.createElement('div');
-                    particle.classList.add('particle');
-                    particle.style.backgroundColor = color;
-                    const rect = grid.getBoundingClientRect();
-                    particle.style.left = `${x - rect.left + 27.5}px`;
-                    particle.style.top = `${y - rect.top + 27.5}px`;
-                    particle.style.setProperty('--tx', `${Math.random() * 100 - 50}px`);
-                    particle.style.setProperty('--ty', `${Math.random() * 100 - 50}px`);
-                    particlesContainer.appendChild(particle);
-                    setTimeout(() => {
-                        particle.remove();
-                    }, 1000);
-                }
-            }
-
-            // Crear un popup de puntuación al hacer un match
-            function createScorePopup(index, text) {
-                const popup = document.createElement('div');
-                popup.classList.add('score-popup');
-                const rect = squares[index].getBoundingClientRect();
-                const gameRect = gameContainer.getBoundingClientRect();
-                const left = rect.left - gameRect.left + rect.width / 2 - 15;
-                const top = rect.top - gameRect.top + rect.height / 2 - 15;
-                popup.style.left = `${left}px`;
-                popup.style.top = `${top}px`;
-                popup.textContent = text;
-                popup.style.zIndex = '10';
-                gameContainer.appendChild(popup);
-                setTimeout(() => {
-                    popup.remove();
-                }, 1000);
-            }
-
-            // Verificar si es hora de subir de nivel
-            function checkLevelUp() {
-                if (matchesMade >= targetMatches) {
-                    levelUp();
-                }
-            }
-
-            // Subir de nivel y actualizar la lista de emojis
-            function levelUp() {
-                level += 1;
-                levelDisplay.textContent = level;
-                targetMatches += 5;
-                targetMatchesDisplay.textContent = targetMatches;
-                setCurrentEmojis();
-                matchesMade = 0; // Resetear contador de matches al subir de nivel
-                matchesDisplay.textContent = matchesMade;
-                fillBoard(); // Rellenar el tablero para incluir nuevos emojis
-            }
-
-            // Reiniciar el juego
-            function resetGame() {
-                totalGamesPlayed += 1;
-                totalTimePlayed += Date.now() - gameStartTime;
-                saveStatistics();
-                matchesMade = 0;
-                targetMatches = 5;
-                level = 1;
-                destroyedEmojisCount = 0;
-                powerUpActive = false;
-                blinkingIndex = null;
-                matchesDisplay.textContent = matchesMade;
-                targetMatchesDisplay.textContent = targetMatches;
-                levelDisplay.textContent = level;
-                gameOverDisplay.style.display = 'none';
-                squares.forEach(square => {
-                    square.classList.remove('blinking', 'match', 'fall', 'hint');
-                    emojis[square.id] = '';
-                    clearSquareContent(square);
-                    square.style.removeProperty('--bg-color');
-                });
-                currentEmojis = [];
-                setCurrentEmojis();
-                gameStartTime = Date.now();
-                // Asignar un nuevo color suave al fondo del grid al reiniciar
-                const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
-                grid.style.backgroundColor = randomColor;
-                fillBoard();
-                // No volver a añadir event listeners aquí para evitar duplicados
-            }
-
-            // Mostrar información y estadísticas del juego
-            function showInfo() {
-                // Verificar si ya existe un popup para evitar duplicados
-                if (document.querySelector('.stats-popup')) return;
-
-                const infoContainer = document.createElement('div');
-                infoContainer.classList.add('stats-popup');
-
-                const title = document.createElement('h2');
-                title.textContent = 'Estadísticas';
-                infoContainer.appendChild(title);
-
-                const gamesPlayed = document.createElement('p');
-                gamesPlayed.textContent = `Partidas jugadas: ${totalGamesPlayed}`;
-                infoContainer.appendChild(gamesPlayed);
-
-                const timePlayed = document.createElement('p');
-                const totalMinutes = Math.floor(totalTimePlayed / 60000);
-                timePlayed.textContent = `Tiempo total jugado: ${totalMinutes} minutos`;
-                infoContainer.appendChild(timePlayed);
-
-                const emojiStatsTitle = document.createElement('h3');
-                emojiStatsTitle.textContent = 'Top 10 emojis destruidos:';
-                infoContainer.appendChild(emojiStatsTitle);
-
-                const sortedEmojis = Object.entries(destroyedEmojis).sort((a, b) => b[1] - a[1]).slice(0, 10);
-                const emojiList = document.createElement('ul');
-                sortedEmojis.forEach(([emoji, count]) => {
-                    const listItem = document.createElement('li');
-                    if (emoji === dogEmoji) {
-                        listItem.innerHTML = `<img src="Dog.png" alt="Dog" style="width: 20px; height: 20px; vertical-align: middle;"> - ${count}`;
-                    } else {
-                        listItem.textContent = `${emoji} - ${count}`;
-                    }
-                    emojiList.appendChild(listItem);
-                });
-                infoContainer.appendChild(emojiList);
-
-                const closeButton = document.createElement('button');
-                closeButton.textContent = 'Cerrar';
-                closeButton.addEventListener('click', () => {
-                    infoContainer.remove();
-                });
-                infoContainer.appendChild(closeButton);
-
-                document.body.appendChild(infoContainer);
-            }
-
-            // Resetear el temporizador de inactividad
-            function resetIdleTimer() {
-                lastUserActionTime = Date.now();
-            }
-
-            // Mostrar una pista de posibles movimientos
-            function hintPossibleMatch() {
-                const possibleMoves = findPossibleMoves();
-                if (possibleMoves.length > 0) {
-                    const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-                    randomMove.forEach(index => {
-                        squares[index].classList.add('hint');
-                        setTimeout(() => {
-                            squares[index].classList.remove('hint');
-                        }, 1000);
-                    });
-                }
-            }
-
-            // Mostrar una pista después de 6 segundos de inactividad
-            setInterval(() => {
-                if (Date.now() - lastUserActionTime >= 6000) {
-                    hintPossibleMatch();
-                }
-            }, 1000);
-
-            // Verificar si el juego ha terminado
-            function checkEndGame() {
-                const possibleMoves = findPossibleMoves();
-                if (possibleMoves.length === 0) {
-                    gameOverDisplay.style.display = 'block';
-                    squares.forEach(square => {
-                        square.removeEventListener('dragstart', dragStart);
-                        square.removeEventListener('dragover', dragOver);
-                        square.removeEventListener('drop', dragDrop);
-                        square.removeEventListener('dragend', dragEnd);
-                        square.removeEventListener('click', handleSquareClick);
-                        square.removeEventListener('touchstart', handleTouchStart);
-                        square.removeEventListener('touchend', handleTouchEnd);
-                    });
-                }
-            }
-
-            // Encontrar posibles movimientos que crean matches
-            function findPossibleMoves() {
-                let possibleMoves = [];
-                for (let i = 0; i < width * width; i++) {
-                    const row = Math.floor(i / width);
-                    const col = i % width;
-                    if (col < width - 1) {
-                        swapEmojis(i, i + 1);
-                        if (findAllMatches().length > 0) {
-                            possibleMoves.push([i, i + 1]);
-                        }
-                        swapEmojis(i, i + 1);
-                    }
-                    if (row < width - 1) {
-                        swapEmojis(i, i + width);
-                        if (findAllMatches().length > 0) {
-                            possibleMoves.push([i, i + width]);
-                        }
-                        swapEmojis(i, i + width);
-                    }
-                }
-                return possibleMoves;
-            }
-
-            // Inicializar el juego al cargar la página
-            initializeGame();
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.querySelector('.grid');
+    const width = 8;
+
+    const allEmojis = [
+'😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
+'🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
+'😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸',
+'🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️',
+'😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡',
+'🤬','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗',
+'🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯',
+'😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐',
+'🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈',
+'👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾',
+'🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿',
+'😾',
+// Personas y profesiones
+'🧑','👨','👩','👶','👧','👦','👩‍🦰','👨‍🦰','👱‍♀️','👱‍♂️',
+'👩‍🦱','👨‍🦱','👩‍🦳','👨‍🦳','👩‍🦲','👨‍🦲','🧓','👴','👵','👲',
+'👳‍♀️','👳‍♂️','👮‍♀️','👮‍♂️','🕵️‍♀️','🕵️‍♂️','💂‍♀️','💂‍♂️','👷‍♀️','👷‍♂️',
+'🤴','👸','👼','🤰','🤱','👩‍⚕️','👨‍⚕️','👩‍🎓','👨‍🎓','👩‍🏫',
+'👨‍🏫','👩‍⚖️','👨‍⚖️','👩‍🌾','👨‍🌾','👩‍🍳','👨‍🍳','👩‍🔧','👨‍🔧','👩‍🏭',
+'👨‍🏭','👩‍💼','👨‍💼','👩‍🔬','👨‍🔬','👩‍💻','👨‍💻','👩‍🎤','👨‍🎤','👩‍🎨',
+'👨‍🎨','👩‍✈️','👨‍✈️','👩‍🚀','👨‍🚀','👩‍🚒','👨‍🚒','🧑‍🚒',
+// Animales y naturaleza
+'🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
+'🦁','🐮','🐷','🐽','🐸','🐵','🙈','🙉','🙊','🐒',
+'🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇',
+'🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐚','🐞',
+'🐜','🕷️','🕸️','🦂','🐢','🐍','🦎','🐙','🦑','🦐',
+'🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅',
+'🐆','🦓','🦍','🦧','🐘','🦏','🐪','🐫','🦒','🐃',
+'🐂','🐄','🐎','🐖','🐏','🐑','🐐','🦌','🐕','🐩',
+'🐈','🐓','🦃','🕊️','🐇','🐁','🐀','🐿️','🦔',
+// Comida y bebidas
+'🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐',
+'🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑',
+'🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅',
+'🍄','🥜','🌰','🍞','🥐','🥖','🥨','🥯','🥞','🧇',
+'🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪',
+'🌮','🌯','🥙','🧆','🥚','🍳','🧈','🥘','🍲','🥣',
+'🥗','🍿','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜',
+'🍝','🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠',
+'🥡','🦪','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁',
+'🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🍵',
+'🍶','🍾','🍷','🍸','🍹','🥂','🍺','🍻','🥃','🥤',
+'🧋','🧃','🧉','🧊',
+// Actividades
+'⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🎱','🏓',
+'🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯','🪁',
+'🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤','🎧',
+'🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗','🎬',
+'🧩','🧸',
+// Viajes y lugares
+'🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐',
+'🚚','🚛','🚜','🛴','🚲','🛵','🏍️','🛺','🚨','🚔',
+'✈️','🛩️','🛫','🛬','🪂','💺','🚁','🛶','⛵','🚤',
+'🛥️','🚢','⚓','⛴️','🪝','🚧','🗺️','🧭','🏞️','🏕️',
+'🏖️','🏜️','🏝️','🏟️','🏛️','🏗️','🧱','🪨','🪵','🪴',
+'🌋','🗻','🏔️','⛰️',
+// Objetos
+'⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','💽',
+'💾','💿','📀','📼','📷','📸','📹','🎥','📽️','🎞️',
+'📞','☎️','📟','📠','🔋','🔌','💡','🔦','🕯️','🪔',
+'🧯','💰','🪙','💴','💵','💶','💷','💸','💳','🧾',
+'💎','⚖️','🔧','🔨','⚒️','🛠️','⛏️','🔩','⚙️','🗜️',
+'⚗️','🧪','🧫','🧬','🔬','🔭','📡','💉','🩸','💊',
+'🩹','🩺','🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪠',
+'🧴','🧷','🧹','🧺','🧻','🪣','🪤','🧼','🪒','🧽',
+'🛒','🚬','⚰️','⚱️','🗿','🪆','🛍️','🧳','👓',
+'🕶️','🥽','🥼','🦺','👔','👕','👖','🧣','🧤','🧥',
+'🧦','👗','👘','👙','👚','👛','👜','👝','🎒','🩴',
+'👞','👟','🥾','🥿','👠','👡','🩰','👢','👑','👒',
+'🎩','🎓','🧢','⛑️','📿','💄','💍','💎','🔇','🔈',
+'🔉','🔊','📢','📣','📯','🔔','🔕','🎼','🎵','🎶',
+'🏧','🚮','🚰','♿','🚹','🚺','🚻','🚼','🚾','🛂',
+'🛃','🛄','🛅','⚠️','🚸','⛔','🚫','🚳','🚭','❌',
+'⭕','✅','☑️','✔️','❎','➕','➖','➗','✖️','💱',
+'💲','⚕️','♻️','📛','🔰','🆗','🆙','🆒','🆕','🆓',
+'🆖','🅰️','🅱️','🆎','🆑','🅾️','🆘','🛑','‼️','⁉️',
+'❓','❔','❕','❗','🔅','🔆','🔱','⚜️',
+// Banderas
+'🏳️','🏴','🏁','🚩','🏳️‍🌈','🏳️‍⚧️','🇦🇫','🇦🇱','🇩🇿','🇦🇸',
+'🇦🇩','🇦🇴','🇦🇮','🇦🇶','🇦🇬','🇦🇷','🇦🇲','🇦🇼','🇦🇺','🇦🇹',
+'🇦🇿','🇧🇸','🇧🇭','🇧🇩','🇧🇧','🇧🇾','🇧🇪','🇧🇿','🇧🇯','🇧🇲',
+'🇧🇹','🇧🇴','🇧🇦','🇧🇼','🇧🇷','🇮🇴','🇻🇬','🇧🇳','🇧🇬','🇧🇫',
+'🇧🇮','🇨🇻','🇰🇭','🇨🇲','🇨🇦','🇮🇨','🇰🇾','🇨🇫','🇹🇩','🇨🇱',
+'🇨🇳','🇨🇽','🇨🇨','🇨🇴','🇰🇲','🇨🇬','🇨🇩','🇨🇰','🇨🇷','🇨🇮',
+'🇭🇷','🇨🇺','🇨🇾','🇨🇿','🇩🇰','🇩🇯','🇩🇲','🇩🇴','🇪🇨','🇪🇬',
+'🇸🇻','🇬🇶','🇪🇷','🇪🇪','🇪🇹','🇫🇯','🇫🇮','🇫🇷','🇬🇫','🇵🇫',
+'🇹🇫','🇬🇦','🇬🇲','🇬🇪','🇩🇪','🇬🇭','🇬🇮','🇬🇷','🇬🇱','🇬🇩',
+'🇬🇵','🇬🇺','🇬🇹','🇬🇬','🇬🇳','🇬🇼','🇬🇾','🇭🇹','🇭🇳','🇭🇰',
+'🇭🇺','🇮🇸','🇮🇳','🇮🇩','🇮🇷','🇮🇶','🇮🇪','🇮🇱','🇮🇹','🇯🇲',
+'🇯🇵','🇯🇪','🇯🇴','🇰🇿','🇰🇪','🇰🇮','🇽🇰','🇰🇼','🇰🇬','🇱🇦',
+'🇱🇻','🇱🇧','🇱🇸','🇱🇷','🇱🇾','🇱🇮','🇱🇹','🇱🇺','🇲🇴','🇲🇰',
+'🇲🇬','🇲🇼','🇲🇾','🇲🇻','🇲🇱','🇲🇹','🇲🇭','🇲🇶','🇲🇷','🇲🇺',
+'🇾🇹','🇲🇽','🇫🇲','🇲🇩','🇲🇨','🇲🇳','🇲🇪','🇲🇸','🇲🇦','🇲🇿',
+'🇲🇲','🇳🇦','🇳🇷','🇳🇵','🇳🇱','🇳🇨','🇳🇿','🇳🇮','🇳🇪','🇳🇬',
+'🇳🇺','🇳🇫','🇰🇵','🇳🇴','🇴🇲','🇵🇰','🇵🇼','🇵🇸','🇵🇦','🇵🇬',
+'🇵🇾','🇵🇪','🇵🇭','🇵🇱','🇵🇹','🇵🇷','🇶🇦','🇷🇴','🇷🇺','🇷🇼',
+'🇧🇱','🇸🇭','🇰🇳','🇱🇨','🇵🇲','🇻🇨','🇼🇸','🇸🇲','🇸🇹','🇸🇦',
+'🇸🇳','🇷🇸','🇸🇨','🇸🇱','🇸🇬','🇸🇰','🇸🇮','🇸🇧','🇸🇴','🇿🇦',
+'🇰🇷','🇸🇸','🇪🇸','🇱🇰','🇸🇩','🇸🇷','🇸🇿','🇸🇪','🇨🇭','🇸🇾',
+'🇹🇼','🇹🇯','🇹🇿','🇹🇭','🇹🇱','🇹🇬','🇹🇰','🇹🇴','🇹🇹','🇹🇳',
+'🇹🇷','🇹🇲','🇹🇨','🇺🇬','🇺🇦','🇦🇪','🇬🇧','🇺🇸','🇺🇾','🇺🇿',
+'🇻🇺','🇻🇦','🇻🇪','🇻🇳','🇼🇫','🇪🇭','🇾🇪','🇿🇲','🇿🇼',
+// Otros emojis populares
+'🎉','🎊','🎈','🎂','🍰','🍦','🍩','🍪','🍫','🍬',
+'🍭','🍮','🎁','🎀','🎗️','🎟️','🎫','🎖️','🏆','🥇',
+'🥈','🥉','⚽️','🏀','🏈','⚾️','🎾','🏐','🏉','🎱',
+'🏓','🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯',
+'🪁','🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤',
+'🎧','🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗',
+'🎬','🧩','🧸',
+];
+
+    const bombEmoji = '💣';
+    const dogEmoji = '🐶'; // Asegúrate de que el emoji del perro coincida con el de tu imagen
+    let emojis = [];
+    const squares = [];
+    let matchesMade = 0;
+    let targetMatches = 10;
+    let level = 1;
+    let highScore = 0;
+    let destroyedEmojis = {};
+    let totalGamesPlayed = 0;
+    let totalTimePlayed = 0;
+    let gameStartTime;
+    let powerUpActive = false;
+    let destroyedEmojisCount = 0;
+    let blinkingIndex = null;
+    let lastUserActionTime = Date.now();
+    let currentEmojis = [];
+
+    const gameOverDisplay = document.getElementById('game-over');
+    const matchesDisplay = document.getElementById('matches-made');
+    const levelDisplay = document.getElementById('level-indicator');
+    const highScoreDisplay = document.getElementById('high-score-value');
+    const targetMatchesDisplay = document.getElementById('target-matches');
+    const restartButton = document.getElementById('restart');
+    const infoButton = document.getElementById('info');
+    const particlesContainer = document.getElementById('particles');
+    const gameContainer = document.querySelector('.game-container');
+
+    let dragStartIndex;
+    let dragEndIndex;
+    let touchStartX = null;
+    let touchStartY = null;
+    let touchStartIdLocal = null;
+    let emojiColors = {};
+
+    function assignColorsToEmojis() {
+        const colors = [
+            '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231',
+            '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe',
+            '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000',
+            '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080',
+            '#ffffff', '#000000'
+        ];
+        let colorIndex = 0;
+        allEmojis.forEach(emoji => {
+            emojiColors[emoji] = colors[colorIndex % colors.length];
+            colorIndex++;
         });
+        emojiColors[bombEmoji] = '#000'; // Color negro para la bomba
+        emojiColors[dogEmoji] = '#ff9900'; // Color naranja para el perro
+    }
+
+    assignColorsToEmojis();
+
+    const softColors = [
+        '#FFEBEE', '#F3E5F5', '#E3F2FD', '#E8F5E9', '#FFF3E0',
+        '#FBE9E7', '#FFFDE7', '#E0F7FA', '#F1F8E9', '#FFF8E1',
+        '#FCE4EC', '#F3E5F5', '#EDE7F6', '#FFF3E0'
+    ];
+
+    function initializeGame() {
+        const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
+        grid.style.backgroundColor = randomColor;
+
+        loadHighScore();
+        loadStatistics();
+        setCurrentEmojis();
+        createBoard();
+        gameStartTime = Date.now();
+    }
+
+    function loadHighScore() {
+        const storedHighScore = localStorage.getItem('highMatches');
+        if (storedHighScore) {
+            highScore = parseInt(storedHighScore);
+            highScoreDisplay.textContent = highScore;
+        }
+    }
+
+    function updateHighScore() {
+        if (matchesMade > highScore) {
+            highScore = matchesMade;
+            highScoreDisplay.textContent = highScore;
+            localStorage.setItem('highMatches', highScore);
+        }
+    }
+
+    function loadStatistics() {
+        const storedGamesPlayed = localStorage.getItem('gamesPlayed');
+        if (storedGamesPlayed) {
+            totalGamesPlayed = parseInt(storedGamesPlayed);
+        }
+        const storedTimePlayed = localStorage.getItem('timePlayed');
+        if (storedTimePlayed) {
+            totalTimePlayed = parseInt(storedTimePlayed);
+        }
+        const storedDestroyedEmojis = localStorage.getItem('destroyedEmojis');
+        if (storedDestroyedEmojis) {
+            destroyedEmojis = JSON.parse(storedDestroyedEmojis);
+        } else {
+            destroyedEmojis = {};
+        }
+    }
+
+    function saveStatistics() {
+        localStorage.setItem('gamesPlayed', totalGamesPlayed);
+        localStorage.setItem('timePlayed', totalTimePlayed);
+        localStorage.setItem('destroyedEmojis', JSON.stringify(destroyedEmojis));
+    }
+
+    function setCurrentEmojis() {
+        if (level === 1) {
+            currentEmojis = getRandomUniqueEmojis(allEmojis, 3);
+            if (!currentEmojis.includes(dogEmoji)) {
+                currentEmojis.push(dogEmoji);
+            }
+        } else {
+            const newEmoji = getNewEmoji();
+            if (newEmoji) {
+                currentEmojis.push(newEmoji);
+            }
+            if (level >= 3 && level % 2 === 1) {
+                removeOldEmoji();
+            }
+        }
+    }
+
+    function getRandomUniqueEmojis(array, number) {
+        const filteredArray = array.filter(emoji => emoji !== bombEmoji && emoji !== dogEmoji);
+        const shuffled = filteredArray.slice().sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, number);
+    }
+
+    function getNewEmoji() {
+        const availableEmojis = allEmojis.filter(emoji => !currentEmojis.includes(emoji) && emoji !== bombEmoji && emoji !== dogEmoji);
+        if (availableEmojis.length === 0) return null;
+        const randomIndex = Math.floor(Math.random() * availableEmojis.length);
+        return availableEmojis[randomIndex];
+    }
+
+    function removeOldEmoji() {
+        const removableEmojis = currentEmojis.filter(emoji => emoji !== dogEmoji);
+        if (removableEmojis.length === 0) return;
+        const emojiToRemove = removableEmojis[Math.floor(Math.random() * removableEmojis.length)];
+        const removeIndex = currentEmojis.indexOf(emojiToRemove);
+        if (removeIndex !== -1) {
+            currentEmojis.splice(removeIndex, 1);
+        }
+    }
+
+    function createBoard() {
+        grid.innerHTML = '';
+        squares.length = 0;
+        for (let i = 0; i < width * width; i++) {
+            const square = document.createElement('div');
+            square.setAttribute('draggable', true);
+            square.setAttribute('id', i);
+            grid.appendChild(square);
+            squares.push(square);
+        }
+        fillBoard();
+        addEventListeners();
+    }
+
+    function fillBoard() {
+        for (let i = 0; i < squares.length; i++) {
+            if (emojis[i] === undefined || emojis[i] === '') {
+                let randomEmoji = getRandomEmoji();
+                emojis[i] = randomEmoji;
+                setSquareContent(squares[i], randomEmoji);
+                squares[i].style.setProperty('--bg-color', emojiColors[randomEmoji]);
+            }
+        }
+        stabilizeBoard();
+    }
+
+    function stabilizeBoard() {
+        let matches = findAllMatches();
+        while (matches.length > 0) {
+            matches.forEach(match => {
+                match.forEach(index => {
+                    let newEmoji = getRandomEmoji();
+                    emojis[index] = newEmoji;
+                    setSquareContent(squares[index], newEmoji);
+                    squares[index].style.setProperty('--bg-color', emojiColors[newEmoji]);
+                });
+            });
+            matches = findAllMatches();
+        }
+    }
+
+    function getRandomEmoji() {
+        const rand = Math.floor(Math.random() * currentEmojis.length);
+        return currentEmojis[rand];
+    }
+
+    function setSquareContent(square, emoji) {
+        if (emoji === dogEmoji) {
+            square.innerHTML = '<img src="dog.png" alt="Dog" class="dog-image">';
+        } else {
+            square.innerHTML = '';
+            square.textContent = emoji;
+        }
+    }
+
+    function clearSquareContent(square) {
+        square.innerHTML = '';
+        square.textContent = '';
+    }
+
+    function addEventListeners() {
+        squares.forEach(square => {
+            square.addEventListener('dragstart', dragStart);
+            square.addEventListener('dragover', dragOver);
+            square.addEventListener('drop', dragDrop);
+            square.addEventListener('dragend', dragEnd);
+            square.addEventListener('click', handleSquareClick);
+        });
+        squares.forEach(square => {
+            square.addEventListener('touchstart', handleTouchStart, { passive: true });
+            square.addEventListener('touchend', handleTouchEnd, { passive: true });
+        });
+        restartButton.addEventListener('click', resetGame);
+        infoButton.addEventListener('click', showInfo);
+        document.addEventListener('mousedown', resetIdleTimer);
+        document.addEventListener('touchstart', resetIdleTimer);
+    }
+
+    function dragStart(e) {
+        dragStartIndex = parseInt(this.id);
+        this.classList.add('dragging');
+    }
+
+    function dragOver(e) {
+        e.preventDefault();
+    }
+
+    function dragDrop(e) {
+        dragEndIndex = parseInt(this.id);
+        if (isAdjacent(dragStartIndex, dragEndIndex)) {
+            swapEmojis(dragStartIndex, dragEndIndex);
+            if (findMatchesUserAction().length > 0) {
+                checkMatches(true);
+            } else {
+                swapEmojis(dragEndIndex, dragStartIndex);
+            }
+        }
+    }
+
+    function dragEnd() {
+        squares.forEach(square => square.classList.remove('dragging'));
+    }
+
+    function handleTouchStart(e) {
+        if (e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchStartIdLocal = parseInt(this.id);
+        }
+    }
+
+    function handleTouchEnd(e) {
+        if (touchStartX === null || touchStartY === null) return;
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        const threshold = 30;
+        let dragEndIndexLocal = touchStartIdLocal;
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (deltaX > threshold) {
+                dragEndIndexLocal = touchStartIdLocal + 1;
+            } else if (deltaX < -threshold) {
+                dragEndIndexLocal = touchStartIdLocal - 1;
+            }
+        } else {
+            if (deltaY > threshold) {
+                dragEndIndexLocal = touchStartIdLocal + width;
+            } else if (deltaY < -threshold) {
+                dragEndIndexLocal = touchStartIdLocal - width;
+            }
+        }
+        if (isAdjacent(touchStartIdLocal, dragEndIndexLocal) && dragEndIndexLocal >= 0 && dragEndIndexLocal < width * width) {
+            swapEmojis(touchStartIdLocal, dragEndIndexLocal);
+            if (findMatchesUserAction().length > 0) {
+                checkMatches(true);
+            } else {
+                swapEmojis(dragEndIndexLocal, touchStartIdLocal);
+            }
+        }
+        touchStartX = null;
+        touchStartY = null;
+        touchStartIdLocal = null;
+    }
+
+    function handleSquareClick(e) {
+        const index = parseInt(this.id);
+        if (powerUpActive && index === blinkingIndex && emojis[index] === bombEmoji) {
+            triggerPowerUp(index);
+        }
+    }
+
+    function isAdjacent(index1, index2) {
+        const row1 = Math.floor(index1 / width);
+        const col1 = index1 % width;
+        const row2 = Math.floor(index2 / width);
+        const col2 = index2 % width;
+        const rowDiff = Math.abs(row1 - row2);
+        const colDiff = Math.abs(col1 - col2);
+        return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+    }
+
+    function swapEmojis(index1, index2) {
+        const tempEmoji = emojis[index1];
+        emojis[index1] = emojis[index2];
+        emojis[index2] = tempEmoji;
+        setSquareContent(squares[index1], emojis[index1]);
+        setSquareContent(squares[index2], emojis[index2]);
+        squares[index1].style.setProperty('--bg-color', emojiColors[emojis[index1]]);
+        squares[index2].style.setProperty('--bg-color', emojiColors[emojis[index2]]);
+        updatePowerUpPosition(index1, index2);
+    }
+
+    function updatePowerUpPosition(oldIndex, newIndex) {
+        if (powerUpActive) {
+            if (oldIndex === blinkingIndex) {
+                squares[blinkingIndex].classList.remove('blinking');
+                blinkingIndex = newIndex;
+                squares[blinkingIndex].classList.add('blinking');
+            } else if (newIndex === blinkingIndex) {
+                squares[blinkingIndex].classList.remove('blinking');
+                blinkingIndex = oldIndex;
+                squares[blinkingIndex].classList.add('blinking');
+            }
+        }
+    }
+
+    function findAllMatches() {
+        const matches = [];
+        // Buscar matches horizontales
+        for (let row = 0; row < width; row++) {
+            for (let col = 0; col < width - 2; col++) {
+                const idx = row * width + col;
+                const first = emojis[idx];
+                const second = emojis[idx + 1];
+                const third = emojis[idx + 2];
+                if (first === second && second === third && first !== '' && first !== bombEmoji) {
+                    let match = [idx, idx + 1, idx + 2];
+                    // Verificar si hay más emojis en la fila
+                    for (let k = col + 3; k < width; k++) {
+                        const nextIdx = row * width + k;
+                        if (emojis[nextIdx] === first && emojis[nextIdx] !== bombEmoji) {
+                            match.push(nextIdx);
+                        } else {
+                            break;
+                        }
+                    }
+                    matches.push(match);
+                    col += match.length - 1;
+                }
+            }
+        }
+
+        // Buscar matches verticales
+        for (let col = 0; col < width; col++) {
+            for (let row = 0; row < width - 2; row++) {
+                const idx = row * width + col;
+                const first = emojis[idx];
+                const second = emojis[idx + width];
+                const third = emojis[idx + 2 * width];
+                if (first === second && second === third && first !== '' && first !== bombEmoji) {
+                    let match = [idx, idx + width, idx + 2 * width];
+                    // Verificar si hay más emojis en la columna
+                    for (let k = row + 3; k < width; k++) {
+                        const nextIdx = k * width + col;
+                        if (emojis[nextIdx] === first && emojis[nextIdx] !== bombEmoji) {
+                            match.push(nextIdx);
+                        } else {
+                            break;
+                        }
+                    }
+                    matches.push(match);
+                    row += match.length - 1;
+                }
+            }
+        }
+        return matches;
+    }
+
+    function findMatchesUserAction() {
+        return findAllMatches();
+    }
+
+    function checkMatches(isUserAction = false) {
+        let matches = findAllMatches();
+        if (matches.length === 0) {
+            checkEndGame();
+            return;
+        }
+        if (isUserAction) {
+            matches.forEach(match => {
+                let matchLength = match.length;
+                let points = 1;
+                if (matchLength === 4) {
+                    points = 2;
+                } else if (matchLength >= 5) {
+                    points = 3;
+                }
+                matchesMade += points;
+                matchesDisplay.textContent = matchesMade;
+                updateHighScore();
+
+                // Crear Score Popup
+                const popupIndex = match[Math.floor(match.length / 2)];
+                createScorePopup(popupIndex, `+${points}`);
+
+                // Crear Partículas Explosivas
+                const square = squares[popupIndex];
+                const rect = square.getBoundingClientRect();
+                const gameRect = gameContainer.getBoundingClientRect();
+                createParticles(20, emojiColors[emojis[popupIndex]], rect.left - gameRect.left + rect.width / 2, rect.top - gameRect.top + rect.height / 2);
+            });
+            if (matchesMade >= targetMatches) {
+                levelUp();
+            }
+        }
+        matches.forEach(match => {
+            match.forEach(index => {
+                let emoji = emojis[index];
+                destroyedEmojis[emoji] = (destroyedEmojis[emoji] || 0) + 1;
+                emojis[index] = '';
+                clearSquareContent(squares[index]);
+                squares[index].style.removeProperty('--bg-color');
+                if (powerUpActive && index === blinkingIndex) {
+                    squares[index].classList.remove('blinking');
+                    powerUpActive = false;
+                    blinkingIndex = null;
+                }
+            });
+        });
+        destroyedEmojisCount += matches.reduce((sum, match) => sum + match.length, 0);
+        checkPowerup();
+        setTimeout(() => {
+            fillEmptySpaces();
+        }, 500);
+    }
+
+    function fillEmptySpaces() {
+        for (let col = 0; col < width; col++) {
+            let emptySpots = 0;
+            for (let row = width - 1; row >= 0; row--) {
+                const idx = row * width + col;
+                if (emojis[idx] === '' || emojis[idx] === undefined) {
+                    emptySpots++;
+                } else if (emptySpots > 0) {
+                    const newIdx = (row + emptySpots) * width + col;
+                    const movingEmoji = emojis[idx];
+                    emojis[newIdx] = movingEmoji;
+                    setSquareContent(squares[newIdx], movingEmoji);
+                    squares[newIdx].style.setProperty('--bg-color', emojiColors[movingEmoji]);
+                    emojis[idx] = '';
+                    clearSquareContent(squares[idx]);
+                    squares[newIdx].classList.add('fall');
+                    setTimeout(() => {
+                        squares[newIdx].classList.remove('fall');
+                    }, 400);
+                    if (powerUpActive && movingEmoji === bombEmoji) {
+                        squares[blinkingIndex].classList.remove('blinking');
+                        blinkingIndex = newIdx;
+                        squares[blinkingIndex].classList.add('blinking');
+                    }
+                }
+            }
+            for (let row = 0; row < emptySpots; row++) {
+                const idx = row * width + col;
+                const newEmoji = getRandomEmoji();
+                emojis[idx] = newEmoji;
+                setSquareContent(squares[idx], newEmoji);
+                squares[idx].style.setProperty('--bg-color', emojiColors[newEmoji]);
+                squares[idx].classList.add('fall');
+                setTimeout(() => {
+                    squares[idx].classList.remove('fall');
+                }, 400);
+                if (powerUpActive && newEmoji === bombEmoji) {
+                    if (blinkingIndex !== idx) {
+                        if (blinkingIndex !== null) {
+                            squares[blinkingIndex].classList.remove('blinking');
+                        }
+                        blinkingIndex = idx;
+                        squares[blinkingIndex].classList.add('blinking');
+                    }
+                }
+            }
+        }
+        setTimeout(() => {
+            checkMatches();
+        }, 500);
+    }
+
+    function checkPowerup() {
+        if (destroyedEmojisCount >= 20 && !powerUpActive) {
+            activatePowerup();
+        }
+    }
+
+    function activatePowerup() {
+        const availableIndices = [];
+        for (let i = 0; i < width * width; i++) {
+            if (emojis[i] !== '' && emojis[i] !== bombEmoji) {
+                availableIndices.push(i);
+            }
+        }
+        if (availableIndices.length === 0) return;
+        blinkingIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+        emojis[blinkingIndex] = bombEmoji;
+        setSquareContent(squares[blinkingIndex], bombEmoji);
+        squares[blinkingIndex].style.setProperty('--bg-color', emojiColors[bombEmoji]);
+        squares[blinkingIndex].classList.add('blinking');
+        powerUpActive = true;
+        destroyedEmojisCount = 0;
+    }
+
+    function triggerPowerUp(index) {
+        const row = Math.floor(index / width);
+        const col = index % width;
+        const indicesToDestroy = [];
+
+        // Obtener índices adyacentes (arriba, abajo, izquierda, derecha)
+        const directions = [
+            { r: -1, c: 0 }, // Arriba
+            { r: 1, c: 0 },  // Abajo
+            { r: 0, c: -1 }, // Izquierda
+            { r: 0, c: 1 }   // Derecha
+        ];
+
+        directions.forEach(dir => {
+            const newRow = row + dir.r;
+            const newCol = col + dir.c;
+            if (newRow >= 0 && newRow < width && newCol >= 0 && newCol < width) {
+                const idx = newRow * width + newCol;
+                if (emojis[idx] !== '') {
+                    indicesToDestroy.push(idx);
+                }
+            }
+        });
+
+        // Añadir el índice de la bomba
+        indicesToDestroy.push(index);
+
+        // Crear animación secuencial de explosión
+        animateExplosion(index, indicesToDestroy);
+
+        gameContainer.classList.add('vibrate');
+        setTimeout(() => {
+            gameContainer.classList.remove('vibrate');
+        }, 500);
+    }
+
+    function animateExplosion(centerIdx, indices) {
+        // Ordenar las destrucciones para que sean secuenciales
+        indices.forEach((idx, i) => {
+            setTimeout(() => {
+                if (emojis[idx] !== '') {
+                    let emoji = emojis[idx];
+                    destroyedEmojis[emoji] = (destroyedEmojis[emoji] || 0) + 1;
+                    emojis[idx] = '';
+                    clearSquareContent(squares[idx]);
+                    squares[idx].style.removeProperty('--bg-color');
+
+                    // Crear partículas explosivas
+                    const square = squares[idx];
+                    const rect = square.getBoundingClientRect();
+                    const gameRect = gameContainer.getBoundingClientRect();
+                    createParticles(15, emojiColors[emoji], rect.left - gameRect.left + rect.width / 2, rect.top - gameRect.top + rect.height / 2);
+                }
+            }, i * 100); // Intervalo de 100ms entre explosiones
+        });
+
+        // Eliminar la bomba después de la explosión
+        setTimeout(() => {
+            emojis[centerIdx] = '';
+            clearSquareContent(squares[centerIdx]);
+            squares[centerIdx].style.removeProperty('--bg-color');
+            squares[centerIdx].classList.remove('blinking');
+            powerUpActive = false;
+            blinkingIndex = null;
+            fillEmptySpaces();
+        }, indices.length * 100);
+    }
+
+    function createParticles(count, color, x, y) {
+        for (let i = 0; i < count; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.backgroundColor = color;
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            particle.style.setProperty('--tx', `${Math.random() * 100 - 50}px`);
+            particle.style.setProperty('--ty', `${Math.random() * 100 - 50}px`);
+            particlesContainer.appendChild(particle);
+            setTimeout(() => {
+                particle.remove();
+            }, 1000);
+        }
+    }
+
+    function createScorePopup(index, text) {
+        const popup = document.createElement('div');
+        popup.classList.add('score-popup');
+        const rect = squares[index].getBoundingClientRect();
+        const gameRect = gameContainer.getBoundingClientRect();
+        const left = rect.left - gameRect.left + rect.width / 2 - 15;
+        const top = rect.top - gameRect.top + rect.height / 2 - 15;
+        popup.style.left = `${left}px`;
+        popup.style.top = `${top}px`;
+        popup.textContent = text;
+        popup.style.zIndex = '10';
+        gameContainer.appendChild(popup);
+        setTimeout(() => {
+            popup.remove();
+        }, 1000);
+    }
+
+    function checkLevelUp() {
+        if (matchesMade >= targetMatches) {
+            levelUp();
+        }
+    }
+
+    function levelUp() {
+        level += 1;
+        levelDisplay.textContent = level;
+        targetMatches += 10;
+        targetMatchesDisplay.textContent = targetMatches;
+        setCurrentEmojis();
+        matchesMade = 0;
+        matchesDisplay.textContent = matchesMade;
+        fillBoard();
+    }
+
+    function resetGame() {
+        totalGamesPlayed += 1;
+        totalTimePlayed += Date.now() - gameStartTime;
+        saveStatistics();
+        matchesMade = 0;
+        targetMatches = 10;
+        level = 1;
+        destroyedEmojisCount = 0;
+        powerUpActive = false;
+        blinkingIndex = null;
+        matchesDisplay.textContent = matchesMade;
+        targetMatchesDisplay.textContent = targetMatches;
+        levelDisplay.textContent = level;
+        gameOverDisplay.style.display = 'none';
+        squares.forEach(square => {
+            square.classList.remove('blinking', 'match', 'fall', 'hint');
+            emojis[square.id] = '';
+            clearSquareContent(square);
+            square.style.removeProperty('--bg-color');
+        });
+        currentEmojis = [];
+        setCurrentEmojis();
+        gameStartTime = Date.now();
+        const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
+        grid.style.backgroundColor = randomColor;
+        fillBoard();
+    }
+
+    function showInfo() {
+        if (document.querySelector('.stats-popup')) return;
+        const infoContainer = document.createElement('div');
+        infoContainer.classList.add('stats-popup');
+        const title = document.createElement('h2');
+        title.textContent = 'Estadísticas';
+        infoContainer.appendChild(title);
+        const gamesPlayed = document.createElement('p');
+        gamesPlayed.textContent = `Partidas jugadas: ${totalGamesPlayed}`;
+        infoContainer.appendChild(gamesPlayed);
+        const timePlayed = document.createElement('p');
+        const totalMinutes = Math.floor(totalTimePlayed / 60000);
+        timePlayed.textContent = `Tiempo total jugado: ${totalMinutes} minutos`;
+        infoContainer.appendChild(timePlayed);
+        const emojiStatsTitle = document.createElement('h3');
+        emojiStatsTitle.textContent = 'Top 10 emojis destruidos:';
+        infoContainer.appendChild(emojiStatsTitle);
+        const sortedEmojis = Object.entries(destroyedEmojis).sort((a, b) => b[1] - a[1]).slice(0, 10);
+        const emojiList = document.createElement('ul');
+        sortedEmojis.forEach(([emoji, count]) => {
+            const listItem = document.createElement('li');
+            if (emoji === dogEmoji) {
+                listItem.innerHTML = `<img src="dog.png" alt="Dog" style="width: 20px; height: 20px; vertical-align: middle;"> - ${count}`;
+            } else {
+                listItem.textContent = `${emoji} - ${count}`;
+            }
+            emojiList.appendChild(listItem);
+        });
+        infoContainer.appendChild(emojiList);
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Cerrar';
+        closeButton.addEventListener('click', () => {
+            infoContainer.remove();
+        });
+        infoContainer.appendChild(closeButton);
+        document.body.appendChild(infoContainer);
+    }
+
+    function resetIdleTimer() {
+        lastUserActionTime = Date.now();
+    }
+
+    function hintPossibleMatch() {
+        const possibleMoves = findPossibleMoves();
+        if (possibleMoves.length > 0) {
+            const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+            randomMove.forEach(index => {
+                squares[index].classList.add('hint');
+                setTimeout(() => {
+                    squares[index].classList.remove('hint');
+                }, 1000);
+            });
+        }
+    }
+
+    setInterval(() => {
+        if (Date.now() - lastUserActionTime >= 6000) {
+            hintPossibleMatch();
+        }
+    }, 1000);
+
+    function checkEndGame() {
+        const possibleMoves = findPossibleMoves();
+        if (possibleMoves.length === 0) {
+            gameOverDisplay.style.display = 'block';
+            squares.forEach(square => {
+                square.removeEventListener('dragstart', dragStart);
+                square.removeEventListener('dragover', dragOver);
+                square.removeEventListener('drop', dragDrop);
+                square.removeEventListener('dragend', dragEnd);
+                square.removeEventListener('click', handleSquareClick);
+                square.removeEventListener('touchstart', handleTouchStart);
+                square.removeEventListener('touchend', handleTouchEnd);
+            });
+        }
+    }
+
+    function findPossibleMoves() {
+        let possibleMoves = [];
+        for (let i = 0; i < width * width; i++) {
+            const row = Math.floor(i / width);
+            const col = i % width;
+            if (col < width - 1) {
+                swapEmojis(i, i + 1);
+                if (findAllMatches().length > 0) {
+                    possibleMoves.push([i, i + 1]);
+                }
+                swapEmojis(i, i + 1);
+            }
+            if (row < width - 1) {
+                swapEmojis(i, i + width);
+                if (findAllMatches().length > 0) {
+                    possibleMoves.push([i, i + width]);
+                }
+                swapEmojis(i, i + width);
+            }
+        }
+        return possibleMoves;
+    }
+
+    initializeGame();
+});
     </script>
 </body>
 </html>
