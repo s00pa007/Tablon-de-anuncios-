@@ -3,369 +3,369 @@
 <head>
     <meta charset="UTF-8">
     <title>Match3 🎉</title>
-    <style>
-        /* Estilos CSS */
-        /* Reset de Estilos */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+    /* Estilos CSS */
+    /* Reset de Estilos */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-        /* Estilos del Body */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            background-color: #f0f0f0; /* Color de fondo suave */
-        }
+    /* Estilos del Body */
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+        background-color: #f0f0f0; /* Color de fondo suave */
+    }
 
-        /* Contenedor del Juego */
-        .game-container {
-            background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Gradiente coral a naranja */
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            position: relative;
-            max-width: 95%;
-            transition: transform 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
-        }
+    /* Contenedor del Juego */
+    .game-container {
+        background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Gradiente coral a naranja */
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        position: relative;
+        max-width: 95%;
+        transition: transform 0.3s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow: hidden;
+    }
 
-        /* Estadísticas */
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            margin-bottom: 10px;
-            width: 100%;
-        }
+    /* Estadísticas */
+    .stats {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin-bottom: 10px;
+        width: 100%;
+    }
 
-        .stat {
-            font-size: 1.2rem;
-            color: #ffffff;
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+    .stat {
+        font-size: 1.2rem;
+        color: #ffffff;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
 
-        .stat .counter {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #ff4081;
-        }
+    .stat .counter {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #ff4081;
+    }
 
-        /* Cuadrícula de Juego */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 2px;
-            justify-content: center;
-            align-content: start;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px;
-            border-radius: 10px;
-            transition: all 0.3s ease-in-out;
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            max-width: 600px; /* Aumentado para hacer el área de juego más grande */
-            height: auto;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
+    /* Cuadrícula de Juego */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 2px;
+        justify-content: center;
+        align-content: start;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 5px;
+        border-radius: 10px;
+        transition: all 0.3s ease-in-out;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        max-width: 600px; /* Aumentado para hacer el área de juego más grande */
+        height: auto;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
 
-        .grid div {
-            background-color: var(--bg-color, rgba(224, 247, 250, 0.9));
-            border: 1px solid #00838f;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: 1.8rem; /* Reducido para que los emojis encajen mejor */
-            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            aspect-ratio: 1 / 1;
-        }
+    .grid div {
+        background-color: var(--bg-color, rgba(224, 247, 250, 0.9));
+        border: 1px solid #00838f;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 1.8rem; /* Reducido para que los emojis encajen mejor */
+        transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        aspect-ratio: 1 / 1;
+    }
 
-        .grid div img {
-            width: 100%; /* Ajustado para que la imagen del perro sea más grande */
-            height: 100%;
-            object-fit: contain;
-        }
+    .grid div img {
+        width: 100%; /* Ajustado para que la imagen del perro sea más grande */
+        height: 100%;
+        object-fit: contain;
+    }
 
-        .grid div:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(0, 131, 143, 0.6);
-            background-color: var(--bg-color, rgba(178, 235, 242, 0.9));
-        }
+    .grid div:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 10px rgba(0, 131, 143, 0.6);
+        background-color: var(--bg-color, rgba(178, 235, 242, 0.9));
+    }
 
-        /* Fin del Juego */
-        .game-over {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2.5rem;
-            color: #d32f2f;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-            z-index: 10;
-            animation: shake 0.5s;
-        }
+    /* Fin del Juego */
+    .game-over {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2.5rem;
+        color: #d32f2f;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        z-index: 10;
+        animation: shake 0.5s;
+    }
 
-        @keyframes shake {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            25% { transform: translate(-50%, -50%) rotate(5deg); }
-            50% { transform: translate(-50%, -50%) rotate(-5deg); }
-            75% { transform: translate(-50%, -50%) rotate(5deg); }
-            100% { transform: translate(-50%, -50%) rotate(0deg); }
-        }
+    @keyframes shake {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        25% { transform: translate(-50%, -50%) rotate(5deg); }
+        50% { transform: translate(-50%, -50%) rotate(-5deg); }
+        75% { transform: translate(-50%, -50%) rotate(5deg); }
+        100% { transform: translate(-50%, -50%) rotate(0deg); }
+    }
 
-        /* Animaciones de Eliminación y Explosión */
-        .match {
-            animation: matchAnimation 0.5s forwards;
-        }
+    /* Animaciones de Eliminación y Explosión */
+    .match {
+        animation: matchAnimation 0.5s forwards;
+    }
 
-        @keyframes matchAnimation {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.5);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(0);
-                opacity: 0;
-            }
+    @keyframes matchAnimation {
+        0% {
+            transform: scale(1);
+            opacity: 1;
         }
-
-        /* Partículas */
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            border-radius: 15px;
-            z-index: 2;
+        50% {
+            transform: scale(1.5);
+            opacity: 1;
         }
-
-        .particle {
-            position: absolute;
-            width: 5px;
-            height: 5px;
-            background: #ff4081;
-            border-radius: 50%;
+        100% {
+            transform: scale(0);
             opacity: 0;
-            animation: particle 1s forwards;
         }
+    }
 
-        @keyframes particle {
-            from {
-                opacity: 1;
-                transform: translate(0, 0) scale(1);
-            }
-            to {
-                opacity: 0;
-                transform: translate(var(--tx), var(--ty)) scale(2);
-            }
+    /* Partículas */
+    .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+        border-radius: 15px;
+        z-index: 2;
+    }
+
+    .particle {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background: #ff4081;
+        border-radius: 50%;
+        opacity: 0;
+        animation: particle 1s forwards;
+    }
+
+    @keyframes particle {
+        from {
+            opacity: 1;
+            transform: translate(0, 0) scale(1);
         }
-
-        /* Animación de Caída */
-        .fall {
-            animation: fallAnimation 0.3s forwards;
+        to {
+            opacity: 0;
+            transform: translate(var(--tx), var(--ty)) scale(2);
         }
+    }
 
-        @keyframes fallAnimation {
-            0% {
-                transform: translateY(-100%);
-            }
-            100% {
-                transform: translateY(0);
-            }
+    /* Animación de Caída */
+    .fall {
+        animation: fallAnimation 0.3s forwards;
+    }
+
+    @keyframes fallAnimation {
+        0% {
+            transform: translateY(-100%);
         }
-
-        /* Parpadeo para el Power-Up (Bomba) */
-        .blinking {
-            animation: blink 0.8s infinite;
-            border: 2px solid gold;
-            border-radius: 50%;
+        100% {
+            transform: translateY(0);
         }
+    }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+    /* Parpadeo para el Power-Up (Bomba) */
+    .blinking {
+        animation: blink 0.8s infinite;
+        border: 2px solid gold;
+        border-radius: 50%;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+    /* Efecto de vibración en el Power-Up */
+    .vibrate {
+        animation: vibrate 0.5s;
+    }
+
+    @keyframes vibrate {
+        0% { transform: translate(0); }
+        20% { transform: translate(-2px, 2px); }
+        40% { transform: translate(-2px, -2px); }
+        60% { transform: translate(2px, 2px); }
+        80% { transform: translate(2px, -2px); }
+        100% { transform: translate(0); }
+    }
+
+    /* Parpadeo de posibles matches */
+    .hint {
+        animation: hintAnimation 1s infinite;
+    }
+
+    @keyframes hintAnimation {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+    /* Popup de Puntuación */
+    .score-popup {
+        position: absolute;
+        font-size: 1rem;
+        color: #ffeb3b;
+        animation: popUp 1s forwards;
+        pointer-events: none;
+        font-weight: bold;
+        text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+        z-index: 15;
+    }
+
+    @keyframes popUp {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
-
-        /* Efecto de vibración en el Power-Up */
-        .vibrate {
-            animation: vibrate 0.5s;
+        50% {
+            opacity: 1;
+            transform: translateY(-20px) scale(1.5);
         }
-
-        @keyframes vibrate {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
+        100% {
+            opacity: 0;
+            transform: translateY(-50px) scale(2);
         }
+    }
 
-        /* Parpadeo de posibles matches */
-        .hint {
-            animation: hintAnimation 1s infinite;
-        }
+    /* Controles */
+    .controls {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
 
-        @keyframes hintAnimation {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
+    .controls button {
+        background-color: #ff4081;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        margin: 0 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.5rem;
+        transition: background-color 0.3s, transform 0.2s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-        /* Popup de Puntuación */
-        .score-popup {
-            position: absolute;
-            font-size: 1rem;
-            color: #ffeb3b;
-            animation: popUp 1s forwards;
-            pointer-events: none;
-            font-weight: bold;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
-            z-index: 15;
-        }
+    .controls button:hover {
+        background-color: #e91e63;
+        transform: translateY(-2px);
+    }
 
-        @keyframes popUp {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-20px) scale(1.5);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-50px) scale(2);
-            }
-        }
+    /* Ventana de Estadísticas */
+    .stats-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 1000;
+        max-width: 90%;
+        max-height: 80%;
+        overflow-y: auto;
+        font-size: 0.9rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
 
-        /* Controles */
-        .controls {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
+    .stats-popup h2, .stats-popup h3 {
+        font-size: 1.2rem;
+    }
 
-        .controls button {
-            background-color: #ff4081;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            margin: 0 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .stats-popup p, .stats-popup ul, .stats-popup li {
+        font-size: 0.9rem;
+    }
 
-        .controls button:hover {
-            background-color: #e91e63;
-            transform: translateY(-2px);
-        }
+    .stats-popup button {
+        margin-top: 20px;
+        padding: 8px 16px;
+        font-size: 1rem;
+        cursor: pointer;
+        background-color: #ff4081;
+        border: none;
+        color: #fff;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
 
-        /* Ventana de Estadísticas */
-        .stats-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            z-index: 1000;
-            max-width: 90%;
-            max-height: 80%;
-            overflow-y: auto;
-            font-size: 0.9rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+    .stats-popup button:hover {
+        background-color: #e91e63;
+    }
 
-        .stats-popup h2, .stats-popup h3 {
+    /* Responsive Design */
+    @media (max-width: 600px) {
+        .stats .stat {
             font-size: 1.2rem;
         }
-
-        .stats-popup p, .stats-popup ul, .stats-popup li {
-            font-size: 0.9rem;
-        }
-
-        .stats-popup button {
-            margin-top: 20px;
-            padding: 8px 16px;
+        .stats .counter {
             font-size: 1rem;
-            cursor: pointer;
-            background-color: #ff4081;
-            border: none;
-            color: #fff;
-            border-radius: 5px;
-            transition: background-color 0.3s;
         }
-
-        .stats-popup button:hover {
-            background-color: #e91e63;
+        .game-over {
+            font-size: 2rem;
         }
-
-        /* Responsive Design */
-        @media (max-width: 600px) {
-            .stats .stat {
-                font-size: 1.2rem;
-            }
-            .stats .counter {
-                font-size: 1rem;
-            }
-            .game-over {
-                font-size: 2rem;
-            }
-            .score-popup {
-                font-size: 0.8rem;
-            }
-            .controls button {
-                padding: 8px 16px;
-                font-size: 1.2rem;
-            }
-            .stats-popup {
-                font-size: 0.8rem;
-            }
-            .stats-popup h2, .stats-popup h3 {
-                font-size: 1rem;
-            }
-            .stats-popup p, .stats-popup ul, .stats-popup li {
-                font-size: 0.8rem;
-            }
+        .score-popup {
+            font-size: 0.8rem;
         }
-    </style>
+        .controls button {
+            padding: 8px 16px;
+            font-size: 1.2rem;
+        }
+        .stats-popup {
+            font-size: 0.8rem;
+        }
+        .stats-popup h2, .stats-popup h3 {
+            font-size: 1rem;
+        }
+        .stats-popup p, .stats-popup ul, .stats-popup li {
+            font-size: 0.8rem;
+        }
+    }
+</style>
 </head>
 <body>
     <div class="game-container">
@@ -384,7 +384,7 @@
         <div class="particles" id="particles"></div>
     </div>
     <script>
-        // Código JavaScript completo
+        // Código JavaScript actualizado
 
         document.addEventListener('DOMContentLoaded', () => {
             const grid = document.querySelector('.grid');
@@ -541,6 +541,7 @@
             let touchStartY = null;
             let touchStartIdLocal = null;
             let emojiColors = {};
+
             function assignColorsToEmojis() {
                 const colors = [
                     '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231',
@@ -557,7 +558,9 @@
                 emojiColors[bombEmoji] = '#000';
                 emojiColors[dogEmoji] = '#ff9900';
             }
+
             assignColorsToEmojis();
+
             function initializeGame() {
                 loadHighScore();
                 loadStatistics();
@@ -565,6 +568,7 @@
                 createBoard();
                 gameStartTime = Date.now();
             }
+
             function loadHighScore() {
                 const storedHighScore = localStorage.getItem('highMatches');
                 if (storedHighScore) {
@@ -572,6 +576,7 @@
                     highScoreDisplay.textContent = highScore;
                 }
             }
+
             function updateHighScore() {
                 if (matchesMade > highScore) {
                     highScore = matchesMade;
@@ -579,6 +584,7 @@
                     localStorage.setItem('highMatches', highScore);
                 }
             }
+
             function loadStatistics() {
                 const storedGamesPlayed = localStorage.getItem('gamesPlayed');
                 if (storedGamesPlayed) {
@@ -595,11 +601,13 @@
                     destroyedEmojis = {};
                 }
             }
+
             function saveStatistics() {
                 localStorage.setItem('gamesPlayed', totalGamesPlayed);
                 localStorage.setItem('timePlayed', totalTimePlayed);
                 localStorage.setItem('destroyedEmojis', JSON.stringify(destroyedEmojis));
             }
+
             function setCurrentEmojis() {
                 if (level === 1) {
                     currentEmojis = getRandomUniqueEmojis(allEmojis, 4);
@@ -622,17 +630,20 @@
                     }
                 }
             }
+
             function getRandomUniqueEmojis(array, number) {
                 const filteredArray = array.filter(emoji => emoji !== bombEmoji);
                 const shuffled = filteredArray.slice().sort(() => 0.5 - Math.random());
                 return shuffled.slice(0, number);
             }
+
             function getNewEmoji() {
                 const availableEmojis = allEmojis.filter(emoji => !currentEmojis.includes(emoji) && emoji !== bombEmoji);
                 if (availableEmojis.length === 0) return null;
                 const randomIndex = Math.floor(Math.random() * availableEmojis.length);
                 return availableEmojis[randomIndex];
             }
+
             function createBoard() {
                 grid.innerHTML = '';
                 squares.length = 0;
@@ -646,6 +657,7 @@
                 fillBoard();
                 addEventListeners();
             }
+
             function fillBoard() {
                 for (let i = 0; i < squares.length; i++) {
                     let randomEmoji = getRandomEmoji();
@@ -655,6 +667,7 @@
                 }
                 stabilizeBoard();
             }
+
             function stabilizeBoard() {
                 let matches = findAllMatches();
                 while (matches.length > 0) {
@@ -669,10 +682,12 @@
                     matches = findAllMatches();
                 }
             }
+
             function getRandomEmoji() {
                 const rand = Math.floor(Math.random() * currentEmojis.length);
                 return currentEmojis[rand];
             }
+
             function setSquareContent(square, emoji) {
                 if (emoji === dogEmoji) {
                     square.innerHTML = '<img src="Dog.png" alt="Dog">';
@@ -681,10 +696,12 @@
                     square.textContent = emoji;
                 }
             }
+
             function clearSquareContent(square) {
                 square.innerHTML = '';
                 square.textContent = '';
             }
+
             function addEventListeners() {
                 squares.forEach(square => {
                     square.addEventListener('dragstart', dragStart);
@@ -702,13 +719,16 @@
                 document.addEventListener('mousedown', resetIdleTimer);
                 document.addEventListener('touchstart', resetIdleTimer);
             }
+
             function dragStart(e) {
                 dragStartIndex = parseInt(this.id);
                 this.classList.add('dragging');
             }
+
             function dragOver(e) {
                 e.preventDefault();
             }
+
             function dragDrop(e) {
                 dragEndIndex = parseInt(this.id);
                 if (isAdjacent(dragStartIndex, dragEndIndex)) {
@@ -720,9 +740,11 @@
                     }
                 }
             }
+
             function dragEnd() {
                 squares.forEach(square => square.classList.remove('dragging'));
             }
+
             function handleTouchStart(e) {
                 if (e.touches.length === 1) {
                     touchStartX = e.touches[0].clientX;
@@ -730,6 +752,7 @@
                     touchStartIdLocal = parseInt(this.id);
                 }
             }
+
             function handleTouchEnd(e) {
                 if (touchStartX === null || touchStartY === null) return;
                 const touchEndX = e.changedTouches[0].clientX;
@@ -763,12 +786,14 @@
                 touchStartY = null;
                 touchStartIdLocal = null;
             }
+
             function handleSquareClick(e) {
                 const index = parseInt(this.id);
                 if (powerUpActive && index === blinkingIndex && emojis[index] === bombEmoji) {
                     triggerPowerUp(index);
                 }
             }
+
             function isAdjacent(index1, index2) {
                 const row1 = Math.floor(index1 / width);
                 const col1 = index1 % width;
@@ -778,6 +803,7 @@
                 const colDiff = Math.abs(col1 - col2);
                 return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
             }
+
             function swapEmojis(index1, index2) {
                 const tempEmoji = emojis[index1];
                 emojis[index1] = emojis[index2];
@@ -786,7 +812,17 @@
                 setSquareContent(squares[index2], emojis[index2]);
                 squares[index1].style.setProperty('--bg-color', emojiColors[emojis[index1]]);
                 squares[index2].style.setProperty('--bg-color', emojiColors[emojis[index2]]);
+
+                // Si alguno de los índices es el blinkingIndex, actualizarlo
+                if (powerUpActive) {
+                    if (index1 === blinkingIndex) {
+                        blinkingIndex = index2;
+                    } else if (index2 === blinkingIndex) {
+                        blinkingIndex = index1;
+                    }
+                }
             }
+
             function findAllMatches() {
                 const matches = [];
                 for (let row = 0; row < width; row++) {
@@ -835,15 +871,17 @@
                 }
                 return matches;
             }
+
             function findMatchesUserAction() {
                 return findAllMatches();
             }
+
             function checkMatches(isUserAction = false) {
                 let matches = findAllMatches();
                 if (matches.length === 0) {
                     return;
                 }
-                destroyedEmojisCount += matches.reduce((sum, match) => sum + match.length, 0); // Mover fuera del bloque isUserAction
+                destroyedEmojisCount += matches.reduce((sum, match) => sum + match.length, 0);
                 if (isUserAction) {
                     matches.forEach(match => {
                         let matchLength = match.length;
@@ -868,6 +906,13 @@
                         emojis[index] = '';
                         clearSquareContent(squares[index]);
                         squares[index].style.removeProperty('--bg-color');
+
+                        // Si el índice eliminado es el blinkingIndex, remover la clase y desactivar el power-up
+                        if (powerUpActive && index === blinkingIndex) {
+                            squares[index].classList.remove('blinking');
+                            powerUpActive = false;
+                            blinkingIndex = null;
+                        }
                     });
                 });
                 checkPowerup();
@@ -875,11 +920,13 @@
                     moveEmojisDown();
                 }, 500);
             }
+
             function checkPowerup() {
-                if (destroyedEmojisCount >= 10 && !powerUpActive) { // Cambiado a 10
+                if (destroyedEmojisCount >= 10 && !powerUpActive) {
                     activatePowerup();
                 }
             }
+
             function activatePowerup() {
                 const availableIndices = [];
                 for (let i = 0; i < width * width; i++) {
@@ -894,8 +941,9 @@
                 squares[blinkingIndex].style.setProperty('--bg-color', emojiColors[bombEmoji]);
                 squares[blinkingIndex].classList.add('blinking');
                 powerUpActive = true;
-                destroyedEmojisCount = 0; // Reiniciar el contador
+                destroyedEmojisCount = 0;
             }
+
             function triggerPowerUp(index) {
                 const row = Math.floor(index / width);
                 const col = index % width;
@@ -933,12 +981,13 @@
                     }, 0);
                 });
                 powerUpActive = false;
-                squares[index].classList.remove('blinking'); // Cambiar de blinkingIndex a index
+                squares[index].classList.remove('blinking');
                 blinkingIndex = null;
                 setTimeout(() => {
                     moveEmojisDown();
                 }, 500);
             }
+
             function moveEmojisDown() {
                 for (let col = 0; col < width; col++) {
                     for (let row = width - 1; row >= 0; row--) {
@@ -954,6 +1003,14 @@
                                     squares[idx].classList.add('fall');
                                     squares[idx].style.setProperty('--bg-color', emojiColors[emojis[idx]]);
                                     squares[aboveIdx].style.removeProperty('--bg-color');
+
+                                    // Si el emoji que cae es la bomba, actualizar blinkingIndex y mover la clase 'blinking'
+                                    if (powerUpActive && aboveIdx === blinkingIndex) {
+                                        squares[blinkingIndex].classList.remove('blinking');
+                                        blinkingIndex = idx;
+                                        squares[blinkingIndex].classList.add('blinking');
+                                    }
+
                                     setTimeout(() => {
                                         squares[idx].classList.remove('fall');
                                     }, 300);
@@ -985,6 +1042,7 @@
                     checkEndGame();
                 }, 500);
             }
+
             function createParticles(count, color, x, y) {
                 for (let i = 0; i < count; i++) {
                     const particle = document.createElement('div');
@@ -1001,6 +1059,7 @@
                     }, 1000);
                 }
             }
+
             function createScorePopup(index, text) {
                 const popup = document.createElement('div');
                 popup.classList.add('score-popup');
@@ -1017,11 +1076,13 @@
                     popup.remove();
                 }, 1000);
             }
+
             function checkLevelUp() {
                 if (matchesMade >= targetMatches) {
                     levelUp();
                 }
             }
+
             function levelUp() {
                 level += 1;
                 levelDisplay.textContent = level;
@@ -1029,6 +1090,7 @@
                 targetMatchesDisplay.textContent = targetMatches;
                 setCurrentEmojis();
             }
+
             function resetGame() {
                 totalGamesPlayed += 1;
                 totalTimePlayed += Date.now() - gameStartTime;
@@ -1055,6 +1117,7 @@
                 fillBoard();
                 addEventListeners(); // Reagregar los event listeners al reiniciar
             }
+
             function showInfo() {
                 const infoContainer = document.createElement('div');
                 infoContainer.classList.add('stats-popup');
@@ -1088,9 +1151,11 @@
                 infoContainer.appendChild(closeButton);
                 document.body.appendChild(infoContainer);
             }
+
             function resetIdleTimer() {
                 lastUserActionTime = Date.now();
             }
+
             function hintPossibleMatch() {
                 const possibleMoves = findPossibleMoves();
                 if (possibleMoves.length > 0) {
@@ -1103,11 +1168,13 @@
                     });
                 }
             }
+
             setInterval(() => {
                 if (Date.now() - lastUserActionTime >= 6000) {
                     hintPossibleMatch();
                 }
             }, 1000);
+
             function checkEndGame() {
                 const possibleMoves = findPossibleMoves();
                 if (possibleMoves.length === 0) {
@@ -1123,6 +1190,7 @@
                     });
                 }
             }
+
             function findPossibleMoves() {
                 let possibleMoves = [];
                 for (let i = 0; i < width * width; i++) {
@@ -1145,6 +1213,7 @@
                 }
                 return possibleMoves;
             }
+
             initializeGame();
         });
     </script>
