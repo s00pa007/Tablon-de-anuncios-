@@ -813,12 +813,19 @@
                 squares[index1].style.setProperty('--bg-color', emojiColors[emojis[index1]]);
                 squares[index2].style.setProperty('--bg-color', emojiColors[emojis[index2]]);
 
-                // Si alguno de los índices es el blinkingIndex, actualizarlo
+                updatePowerUpPosition(index1, index2);
+            }
+
+            function updatePowerUpPosition(oldIndex, newIndex) {
                 if (powerUpActive) {
-                    if (index1 === blinkingIndex) {
-                        blinkingIndex = index2;
-                    } else if (index2 === blinkingIndex) {
-                        blinkingIndex = index1;
+                    if (oldIndex === blinkingIndex) {
+                        squares[blinkingIndex].classList.remove('blinking');
+                        blinkingIndex = newIndex;
+                        squares[blinkingIndex].classList.add('blinking');
+                    } else if (newIndex === blinkingIndex) {
+                        squares[blinkingIndex].classList.remove('blinking');
+                        blinkingIndex = oldIndex;
+                        squares[blinkingIndex].classList.add('blinking');
                     }
                 }
             }
@@ -907,7 +914,6 @@
                         clearSquareContent(squares[index]);
                         squares[index].style.removeProperty('--bg-color');
 
-                        // Si el índice eliminado es el blinkingIndex, remover la clase y desactivar el power-up
                         if (powerUpActive && index === blinkingIndex) {
                             squares[index].classList.remove('blinking');
                             powerUpActive = false;
@@ -917,8 +923,50 @@
                 });
                 checkPowerup();
                 setTimeout(() => {
-                    moveEmojisDown();
+                    fillEmptySpaces();
                 }, 500);
+            }
+
+            function fillEmptySpaces() {
+                let moved = false;
+                for (let i = 0; i < width * width; i++) {
+                    if (emojis[i] === '') {
+                        moved = true;
+                        if (i >= width) {
+                            emojis[i] = emojis[i - width];
+                            emojis[i - width] = '';
+                            setSquareContent(squares[i], emojis[i]);
+                            clearSquareContent(squares[i - width]);
+                            squares[i].style.setProperty('--bg-color', emojiColors[emojis[i]]);
+                            squares[i - width].style.removeProperty('--bg-color');
+                            squares[i].classList.add('fall');
+                            setTimeout(() => {
+                                squares[i].classList.remove('fall');
+                            }, 300);
+
+                            if (powerUpActive && i - width === blinkingIndex) {
+                                updatePowerUpPosition(i - width, i);
+                            }
+                        } else {
+                            let newEmoji = getRandomEmoji();
+                            emojis[i] = newEmoji;
+                            setSquareContent(squares[i], newEmoji);
+                            squares[i].style.setProperty('--bg-color', emojiColors[newEmoji]);
+                            squares[i].classList.add('fall');
+                            setTimeout(() => {
+                                squares[i].classList.remove('fall');
+                            }, 300);
+                        }
+                    }
+                }
+                if (moved) {
+                    setTimeout(() => {
+                        checkMatches();
+                    }, 500);
+                } else {
+                    checkLevelUp();
+                    checkEndGame();
+                }
             }
 
             function checkPowerup() {
@@ -984,62 +1032,7 @@
                 squares[index].classList.remove('blinking');
                 blinkingIndex = null;
                 setTimeout(() => {
-                    moveEmojisDown();
-                }, 500);
-            }
-
-            function moveEmojisDown() {
-                for (let col = 0; col < width; col++) {
-                    for (let row = width - 1; row >= 0; row--) {
-                        const idx = row * width + col;
-                        if (emojis[idx] === '') {
-                            for (let k = row - 1; k >= 0; k--) {
-                                const aboveIdx = k * width + col;
-                                if (emojis[aboveIdx] !== '') {
-                                    emojis[idx] = emojis[aboveIdx];
-                                    emojis[aboveIdx] = '';
-                                    setSquareContent(squares[idx], emojis[idx]);
-                                    clearSquareContent(squares[aboveIdx]);
-                                    squares[idx].classList.add('fall');
-                                    squares[idx].style.setProperty('--bg-color', emojiColors[emojis[idx]]);
-                                    squares[aboveIdx].style.removeProperty('--bg-color');
-
-                                    // Si el emoji que cae es la bomba, actualizar blinkingIndex y mover la clase 'blinking'
-                                    if (powerUpActive && aboveIdx === blinkingIndex) {
-                                        squares[blinkingIndex].classList.remove('blinking');
-                                        blinkingIndex = idx;
-                                        squares[blinkingIndex].classList.add('blinking');
-                                    }
-
-                                    setTimeout(() => {
-                                        squares[idx].classList.remove('fall');
-                                    }, 300);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    for (let row = 0; row < width; row++) {
-                        const idx = row * width + col;
-                        if (emojis[idx] === '') {
-                            const newEmoji = getRandomEmoji();
-                            if (newEmoji) {
-                                emojis[idx] = newEmoji;
-                                setSquareContent(squares[idx], newEmoji);
-                                squares[idx].classList.add('fall');
-                                squares[idx].style.setProperty('--bg-color', emojiColors[newEmoji]);
-                                setTimeout(() => {
-                                    squares[idx].classList.remove('fall');
-                                }, 300);
-                            }
-                        }
-                    }
-                }
-                setTimeout(() => {
-                    squares.forEach(square => square.classList.remove('match'));
-                    checkMatches();
-                    checkLevelUp();
-                    checkEndGame();
+                    fillEmptySpaces();
                 }, 500);
             }
 
