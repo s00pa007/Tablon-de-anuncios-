@@ -463,6 +463,12 @@
             border-radius: 50%;
             user-select: none;
             transition: background 0.3s, color 0.3s;
+            z-index: 1000;
+        }
+
+        body.dark-mode .gallery-nav {
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(0, 0, 0, 0.7);
         }
 
         #prev-btn {
@@ -476,6 +482,11 @@
         .gallery-nav:hover {
             color: rgba(0,0,0,0.9);
             background: rgba(255,255,255,1);
+        }
+
+        body.dark-mode .gallery-nav:hover {
+            color: rgba(255,255,255,0.9);
+            background: rgba(0,0,0,1);
         }
 
         #gallery-modal .close-gallery, 
@@ -549,7 +560,7 @@
         }
 
         body.dark-mode #candy-popup {
-            background-color: #1f1f1f;
+            background-color: #000000;
             border: 2px solid var(--button-bg-dark);
         }
 
