@@ -1009,9 +1009,7 @@
                         checkMatches(isUserAction);
                     }, 400);
                 } else {
-                    if (isUserAction) {
-                        checkEndGame();
-                    }
+                    checkEndGame();
                 }
             }
 
@@ -1176,7 +1174,7 @@
             function showLevelUpMessage() {
                 const message = document.createElement('div');
                 message.classList.add('level-up-message');
-                message.textContent = `🚀 Fase ${level} Completada! 🚀`;
+                message.textContent = `🚀 Nivel ${level} 🚀`;
                 document.body.appendChild(message);
                 setTimeout(() => {
                     message.remove();
@@ -1189,8 +1187,8 @@
                 destroyAllEmojisWithParticles();
                 previousEmojis = currentEmojis.filter(emoji => emoji !== dogEmoji);
                 setTimeout(() => {
-                    showLevelUpMessage();
                     levelUp();
+                    showLevelUpMessage();
                     isLevelUpInProgress = false;
                 }, 300);
             }
