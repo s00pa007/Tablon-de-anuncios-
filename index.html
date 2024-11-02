@@ -10,6 +10,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
+        /* Aplicar box-sizing globalmente */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         :root {
             /* Variables para Modo Claro */
             --background-color: #f0f0f0;
@@ -29,12 +34,6 @@
         }
 
         /* Estilos Generales */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
             background-color: var(--background-color);
             color: var(--text-color);
@@ -127,18 +126,20 @@
             height: 120px;
             position: relative;
             flex-shrink: 0;
-            overflow: hidden; /* Asegura que no haya márgenes visibles */
-            border-radius: 10%; /* Aplica bordes redondeados */
+            overflow: hidden; /* Elimina márgenes internos */
+            border-radius: 10%; /* Bordes redondeados */
             border: 4px solid var(--button-bg); /* Marco verde */
+            padding: 0; /* Elimina padding interno */
+            margin: 0; /* Elimina margen interno */
         }
 
         /* Imágenes dentro de los botones */
         .pet-status-container div img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Asegura que la imagen cubra todo el contenedor */
-            display: block; /* Elimina cualquier espacio adicional */
-            border: none; /* Elimina cualquier borde por defecto */
+            object-fit: cover; /* La imagen cubre todo el contenedor */
+            display: block; /* Elimina espacios adicionales */
+            border: none; /* Sin bordes internos */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -459,6 +460,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
 
         #gallery-modal .gallery-container img {
@@ -755,7 +757,7 @@
             "La página de la gente que no se peina",
             "Escribe lo que quieras, que no hay consecuencias"
         ];
-        const imageFolder = './';
+        const imageFolder = './'; // Asegúrate de que las imágenes estén en la misma carpeta
         const totalImages = 48;
 
         let lastVisibleMessage = null;
@@ -1211,7 +1213,7 @@
             candyPopup.style.display = 'flex';
             addScrollLock();
             if (!candyPopupOpen) {
-                document.getElementById('candy-iframe').src = 'candy.html';
+                document.getElementById('candy-iframe').src = 'candy.html'; // Asegúrate de que 'candy.html' exista
                 candyPopupOpen = true;
             }
         }
