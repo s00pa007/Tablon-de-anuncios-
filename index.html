@@ -765,7 +765,7 @@
         let petPopupOpen = false;
         let candyPopupOpen = false;
 
-        let currentImageIndex = 0; // Mover fuera de funciones para mantener el estado global
+        let currentImageIndex = 0; // Índice actual de imagen en la galería
 
         // Cargar Mensajes
         function loadMessages(startAfter = null) {
@@ -898,6 +898,9 @@
             if (targetMessage) {
                 targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 targetMessage.style.animation = 'highlight 2s';
+                setTimeout(() => {
+                    targetMessage.style.animation = '';
+                }, 2000);
             }
         }
 
@@ -1188,7 +1191,9 @@
             if (galleryContainer.children.length === 0) {
                 loadGalleryImages();
             }
-            showImage(currentImageIndex); // Mostrar la primera imagen
+            setTimeout(() => { // Esperar a que las imágenes se carguen
+                showImage(currentImageIndex); // Mostrar la primera imagen
+            }, 100); // 100ms de retraso
         }
 
         // Función para Abrir Popup de Mascota
