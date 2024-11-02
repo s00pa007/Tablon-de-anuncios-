@@ -11,14 +11,24 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
         :root {
+            /* Variables para Modo Claro */
             --background-color: #f0f0f0;
             --text-color: #333333;
             --header-bg: #ffffff;
             --counter-bg: #e0e0e0;
             --button-bg: #4caf50;
             --button-text: #ffffff;
+
+            /* Variables para Modo Oscuro */
+            --background-color-dark: #121212;
+            --text-color-dark: #e0e0e0;
+            --header-bg-dark: #1f1f1f;
+            --counter-bg-dark: #2c2c2c;
+            --button-bg-dark: #bb86fc;
+            --button-text-dark: #000000;
         }
 
+        /* Estilos Generales */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -33,13 +43,36 @@
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
 
+        /* Modo Oscuro */
+        body.dark-mode {
+            background-color: var(--background-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        body.dark-mode header {
+            background-color: var(--header-bg-dark);
+        }
+
+        body.dark-mode .statistics {
+            background-color: var(--counter-bg-dark);
+        }
+
+        body.dark-mode .pet-status-container {
+            background-color: var(--header-bg-dark);
+            border: 2px solid var(--button-bg-dark);
+        }
+
+        /* Header */
         header {
             background-color: var(--header-bg);
             padding: 10px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             width: 100%;
+            cursor: pointer; /* Indica que es clickeable para modo oscuro */
+            transition: background-color 0.3s;
         }
 
         #header-image {
@@ -47,8 +80,10 @@
             height: auto;
             display: block;
             margin: 0 auto;
+            transition: filter 0.3s;
         }
 
+        /* Slogan */
         #slogan {
             background-color: #ffff00;
             color: #000000;
@@ -64,6 +99,7 @@
             height: 60px;
         }
 
+        /* Contenedor de Mascota, Galería y Candy */
         .pet-status-container {
             display: flex;
             justify-content: center;
@@ -78,6 +114,12 @@
             z-index: 1000;
             gap: 40px;
             flex-wrap: nowrap;
+            transition: background-color 0.3s, border 0.3s;
+        }
+
+        body.dark-mode .pet-status-container {
+            background-color: var(--header-bg-dark);
+            border: 2px solid var(--button-bg-dark);
         }
 
         .pet-status-container div {
@@ -95,8 +137,14 @@
             cursor: pointer;
             border: 4px solid var(--button-bg);
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
             display: block;
+        }
+
+        body.dark-mode .pet-status-container div img, 
+        body.dark-mode .gallery-link img, 
+        body.dark-mode .candy-game-link img {
+            border: 4px solid var(--button-bg-dark);
         }
 
         .gallery-link img:hover, .pet-emoji img:hover, .candy-game-link img:hover {
@@ -104,6 +152,7 @@
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
         }
 
+        /* Contenedor Principal */
         .main-container {
             display: flex;
             flex: 1;
@@ -116,12 +165,18 @@
             padding-right: 20px;
         }
 
+        /* Formulario de Mensaje */
         #message-form {
             background-color: var(--header-bg);
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        body.dark-mode #message-form {
+            background-color: var(--header-bg-dark);
         }
 
         #message-form textarea {
@@ -133,6 +188,13 @@
             resize: vertical;
             font-size: 16px;
             font-family: 'Comfortaa', cursive;
+            transition: background-color 0.3s, color 0.3s, border 0.3s;
+        }
+
+        body.dark-mode #message-form textarea {
+            background-color: #2c2c2c;
+            color: var(--text-color-dark);
+            border: 1px solid #555;
         }
 
         #message-form button {
@@ -147,8 +209,15 @@
             font-size: 18px;
             font-family: 'Comfortaa', cursive;
             font-weight: bold;
+            transition: background-color 0.3s;
         }
 
+        body.dark-mode #message-form button {
+            background-color: var(--button-bg-dark);
+            color: var(--button-text-dark);
+        }
+
+        /* Tablero de Anuncios */
         #bulletin-board {
             display: flex;
             flex-direction: column;
@@ -164,6 +233,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border: 1px solid #333;
             margin-bottom: 15px;
+            transition: background-color 0.3s, color 0.3s, border 0.3s;
         }
 
         .message-content {
@@ -201,20 +271,28 @@
             border: none;
             cursor: pointer;
             font-size: 18px;
+            transition: color 0.3s;
         }
 
+        .like-btn:hover, .dislike-btn:hover, .reply-btn:hover, .delete-btn:hover {
+            color: var(--button-bg);
+        }
+
+        /* Mensajes Citados */
         .quoted-message {
             font-size: 12px;
             padding: 5px;
             border-left: 3px solid #ccc;
             margin-bottom: 10px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
         .quoted-message:hover {
             background-color: rgba(0, 0, 0, 0.05);
         }
 
+        /* Formulario de Respuesta */
         .reply-form {
             margin-top: 10px;
         }
@@ -223,24 +301,51 @@
             width: 100%;
             padding: 5px;
             margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s, border 0.3s;
+        }
+
+        body.dark-mode .reply-form textarea {
+            background-color: #2c2c2c;
+            color: var(--text-color-dark);
+            border: 1px solid #555;
         }
 
         .reply-form button {
             padding: 5px 10px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
 
+        body.dark-mode .reply-form button {
+            background-color: var(--button-bg-dark);
+            color: var(--button-text-dark);
+        }
+
+        /* Estadísticas */
         .statistics {
             background-color: var(--counter-bg);
             padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
             font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        body.dark-mode .statistics {
+            background-color: var(--counter-bg-dark);
         }
 
         .statistics div {
             margin-bottom: 5px;
         }
 
+        /* Animación de Flotación */
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
@@ -255,6 +360,7 @@
             z-index: -1;
         }
 
+        /* Confirmación de Eliminación */
         .delete-confirmation {
             display: flex;
             justify-content: flex-end;
@@ -267,8 +373,14 @@
             border: none;
             cursor: pointer;
             font-size: 18px;
+            transition: color 0.3s;
         }
 
+        .delete-confirmation button:hover {
+            color: red;
+        }
+
+        /* Teletipo */
         .teletipo-wrapper {
             position: relative;
             width: 100%;
@@ -286,6 +398,11 @@
             background-color: var(--background-color);
             padding: 0 5px;
             z-index: 1;
+            transition: background-color 0.3s;
+        }
+
+        body.dark-mode .rumores-label {
+            background-color: var(--background-color-dark);
         }
 
         #teletipo-container {
@@ -294,17 +411,24 @@
             padding-top: 10px;
             background-color: var(--background-color);
             z-index: 999;
+            transition: background-color 0.3s;
         }
 
+        body.dark-mode #teletipo-container {
+            background-color: var(--background-color-dark);
+        }
+
+        /* Cargando */
         #loading {
             text-align: center;
             padding: 20px;
             display: none;
         }
 
-        /* Estilos Individuales para Cada Pop-up */
+        /* Estilos de los Modales */
+        /* Galería Modal */
         #gallery-modal {
-            display: none; /* Asegurarse de que no se muestre automáticamente */
+            display: none; /* Oculto por defecto */
             position: fixed;
             top: 50%;
             left: 50%;
@@ -317,74 +441,22 @@
             z-index: 5001;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            /* Eliminar 'display: flex;' aquí */
-            justify-content: center; /* Solo se aplica cuando se muestra */
-            align-items: center; /* Solo se aplica cuando se muestra */
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s, border 0.3s;
         }
 
-        #pet-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
-            background-color: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 5001;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        body.dark-mode #gallery-modal {
+            background-color: #1f1f1f;
+            border: 2px solid var(--button-bg-dark);
         }
 
-        #candy-popup {
-            display: none; /* Asegurarse de que no se muestre automáticamente */
-            position: fixed;
-            top: 0; /* Eliminar margen superior */
-            left: 0;
+        #gallery-modal .gallery-container {
             width: 100%;
             height: 100%;
-            background-color: white;
-            border: none; /* Sin bordes para eliminar márgenes */
-            z-index: 5002;
-            overflow: hidden; /* Previene desplazamientos */
-            box-shadow: none; /* Sin sombras */
-            /* Eliminar 'display: flex;' aquí */
-            justify-content: center; /* Solo se aplica cuando se muestra */
-            align-items: center; /* Solo se aplica cuando se muestra */
-        }
-
-        /* Botones de Cierre para Cada Pop-up */
-        #gallery-modal .close-gallery, 
-        #pet-popup #close-popup, 
-        #candy-popup #close-candy-popup {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            z-index: 1002;
-        }
-
-        /* Botón de Cerrar de Candy Popup */
-        #candy-popup #close-candy-popup {
-            color: #ff0000; /* Color rojo para mayor visibilidad */
-            font-size: 30px; /* Aumentar tamaño para mejor visibilidad */
-        }
-
-        /* Contenedores Internos de Cada Pop-up */
-        #gallery-modal .gallery-container, 
-        #candy-popup .candy-iframe, 
-        #pet-popup .pet-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: flex; /* Para centrar el contenido */
-            justify-content: center; /* Horizontalmente */
-            align-items: center; /* Verticalmente */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         #gallery-modal .gallery-container img {
@@ -411,6 +483,7 @@
             padding: 10px;
             border-radius: 50%;
             user-select: none;
+            transition: background 0.3s, color 0.3s;
         }
 
         #prev-btn {
@@ -426,13 +499,85 @@
             background: rgba(255,255,255,1);
         }
 
-        #pet-iframe, #candy-iframe {
+        /* Botones de Cierre para los Modales */
+        #gallery-modal .close-gallery, 
+        #pet-popup #close-popup, 
+        #candy-popup #close-candy-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            z-index: 1002;
+            transition: color 0.3s;
+        }
+
+        /* Botón de Cerrar de Candy Popup */
+        #candy-popup #close-candy-popup {
+            color: #ff0000; /* Rojo para mayor visibilidad */
+            font-size: 30px; /* Tamaño aumentado */
+        }
+
+        /* Popup de Mascota */
+        #pet-popup {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 95%;
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            z-index: 5001;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.3s, border 0.3s;
+        }
+
+        body.dark-mode #pet-popup {
+            background-color: #1f1f1f;
+            border: 2px solid var(--button-bg-dark);
+        }
+
+        #pet-popup .pet-iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
 
-        /* Estilos Responsivos */
+        /* Popup de Candy */
+        #candy-popup {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            top: 0; /* Sin margen superior */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            border: none; /* Sin bordes para eliminar márgenes */
+            z-index: 5002;
+            overflow: hidden; /* Previene desplazamientos */
+            box-shadow: none; /* Sin sombras */
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        body.dark-mode #candy-popup {
+            background-color: #1f1f1f;
+        }
+
+        #candy-popup .candy-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Responsive Design */
         @media (max-width: 1024px) {
             .pet-status-container {
                 gap: 30px;
@@ -454,17 +599,10 @@
                 width: 84px;
                 height: 84px;
             }
-
-            /* Ajustes Solo para el Pop-up de Candy */
-            #candy-popup {
-                /* Ya está configurado para 100% en pantallas pequeñas */
-            }
         }
 
         @media (max-width: 480px) {
-            /* Mantener la galería y mascota virtual con su tamaño original */
-
-            /* Ajustes Solo para el Pop-up de Candy */
+            /* Ajustes para dispositivos móviles */
             #candy-popup {
                 width: 100%;
                 height: 100%;
@@ -476,7 +614,7 @@
             }
 
             #candy-popup #close-candy-popup {
-                font-size: 30px; /* Aumentado para mejor visibilidad */
+                font-size: 30px; /* Tamaño aumentado */
                 top: 10px;
                 right: 10px;
             }
@@ -484,7 +622,7 @@
     </style>
 </head>
 <body>
-    <header>
+    <header id="header-toggle">
         <img src="cabecera.jpg" alt="Tablón de anuncios anónimos" id="header-image">
         <div id="slogan"></div>
         <div class="teletipo-wrapper">
@@ -546,6 +684,7 @@
     </div>
 
     <script>
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
             authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
@@ -559,6 +698,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // Elementos del DOM
         const bulletinBoard = document.getElementById('bulletin-board');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
@@ -570,7 +710,19 @@
         const petPopup = document.getElementById('pet-popup');
         const closePopup = document.getElementById('close-popup');
         const loadingElement = document.getElementById('loading');
+        const galleryLink = document.getElementById('gallery-link');
+        const galleryModal = document.getElementById('gallery-modal');
+        const closeGalleryBtn = document.getElementById('close-gallery');
+        const galleryContainer = document.getElementById('gallery-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const candyGameLink = document.getElementById('candy-game-link');
+        const candyPopup = document.getElementById('candy-popup');
+        const closeCandyPopup = document.getElementById('close-candy-popup');
+        const headerToggle = document.getElementById('header-toggle');
+        const headerImage = document.getElementById('header-image');
 
+        // Variables Globales
         const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
         const slogans = [
             "Ahora más anónimo",
@@ -606,6 +758,7 @@
         let petPopupOpen = false;
         let candyPopupOpen = false;
 
+        // Cargar Mensajes
         function loadMessages(startAfter = null) {
             if (isLoading) return;
             isLoading = true;
@@ -644,6 +797,7 @@
             });
         }
 
+        // Crear Elemento de Mensaje
         function createMessageElement(message) {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
@@ -718,6 +872,7 @@
             return messageDiv;
         }
 
+        // Crear Mensaje Citado
         function createQuotedMessage(originalMessage) {
             const quotedDiv = document.createElement('div');
             quotedDiv.className = 'quoted-message';
@@ -728,6 +883,7 @@
             return quotedDiv;
         }
 
+        // Scroll a un Mensaje Específico
         function scrollToMessage(messageId) {
             const targetMessage = document.getElementById(`message-${messageId}`);
             if (targetMessage) {
@@ -736,6 +892,7 @@
             }
         }
 
+        // Mostrar Formulario de Respuesta
         function showReplyForm(parentId, parentMessage) {
             const parentMessageElement = document.querySelector(`[data-id="${parentId}"]`);
             let replyForm = parentMessageElement.querySelector('.reply-form');
@@ -762,6 +919,7 @@
             parentMessageElement.appendChild(replyForm);
         }
 
+        // Añadir Respuesta
         function addReply(parentId, replyText, parentMessage) {
             const reply = {
                 text: replyText,
@@ -788,6 +946,7 @@
                 });
         }
 
+        // Actualizar Likes/Dislikes
         function updateLikes(id, field) {
             db.collection("messages").doc(id).update({
                 [field]: firebase.firestore.FieldValue.increment(1)
@@ -807,6 +966,7 @@
             });
         }
 
+        // Mostrar Confirmación de Eliminación
         function showDeleteConfirmation(id) {
             const messageElement = document.querySelector(`[data-id="${id}"]`);
             const actions = messageElement.querySelector('.message-actions');
@@ -828,6 +988,7 @@
             cancelDelete.onclick = () => actions.removeChild(deleteConfirmation);
         }
 
+        // Eliminar Mensaje
         function deleteMessage(id) {
             db.collection("messages").doc(id).delete().then(() => {
                 incrementMessagesDeleted();
@@ -841,6 +1002,7 @@
             });
         }
 
+        // Manejar Envío del Formulario de Mensaje
         messageForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
@@ -859,10 +1021,12 @@
             }
         });
 
+        // Obtener Emoji Aleatorio
         function getRandomAnimalEmoji() {
             return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
         }
 
+        // Generar Color Aleatorio con Buen Contraste
         function getRandomContrastColor() {
             const hue = Math.floor(Math.random() * 360);
             const saturation = 70 + Math.random() * 30;
@@ -870,6 +1034,7 @@
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
 
+        // Obtener Color de Texto Contraste
         function getContrastingTextColor(bgColor) {
             const hsl = bgColor.match(/hsl(\d+),\s*(\d+)%?,\s*(\d+)%?/);
             if (hsl) {
@@ -880,6 +1045,7 @@
             }
         }
 
+        // Actualizar Contadores de Mensajes
         function updateMessagesPublished() {
             db.collection("messages").get().then((snapshot) => {
                 messagesPublished.textContent = `Mensajes publicados: ${snapshot.size}`;
@@ -903,10 +1069,12 @@
             });
         }
 
+        // Cambiar Slogan
         function changeSlogan() {
             slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
         }
 
+        // Cargar Teletipo
         function cargarTeletipo() {
             fetch('teletipo.html')
                 .then(response => {
@@ -948,74 +1116,142 @@
                 });
         }
 
+        // Cerrar Popup de Mascota
         closePopup.addEventListener('click', () => {
-            petPopup.style.display = 'none';
-            document.getElementById('pet-iframe').src = 'about:blank';
-            petPopupOpen = false;
+            closeModal(petPopup, 'pet');
         });
 
-        function adjustPetPopupSize() {
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            const popupWidth = windowWidth * 0.95;
-            const popupHeight = windowHeight * 0.95;
-            petPopup.style.width = `${popupWidth}px`;
-            petPopup.style.height = `${popupHeight}px`;
+        // Cerrar Popup de Candy
+        closeCandyPopup.addEventListener('click', () => {
+            closeModal(candyPopup, 'candy');
+        });
+
+        // Cerrar Galería
+        closeGalleryBtn.addEventListener('click', () => {
+            closeModal(galleryModal, 'gallery');
+        });
+
+        // Función para Cerrar Modales y Restaurar Scroll
+        function closeModal(modal, type) {
+            modal.style.display = 'none';
+            if (type === 'pet') {
+                document.getElementById('pet-iframe').src = 'about:blank';
+                petPopupOpen = false;
+            } else if (type === 'candy') {
+                document.getElementById('candy-iframe').src = 'about:blank';
+                candyPopupOpen = false;
+            }
+            document.body.style.overflow = ''; // Restaurar scroll
+            removeScrollLock();
         }
 
-        window.addEventListener('resize', adjustPetPopupSize);
+        // Prevenir Desplazamiento cuando un Modal está Abierto
+        function lockScroll() {
+            document.body.style.overflow = 'hidden';
+            // Prevenir eventos de desplazamiento en dispositivos táctiles
+            document.addEventListener('touchmove', preventScroll, { passive: false });
+            document.addEventListener('wheel', preventScroll, { passive: false });
+        }
 
-        window.addEventListener('scroll', () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoading) {
-                loadMessages(lastVisibleMessage);
+        function unlockScroll() {
+            document.body.style.overflow = '';
+            document.removeEventListener('touchmove', preventScroll);
+            document.removeEventListener('wheel', preventScroll);
+        }
+
+        function preventScroll(e) {
+            e.preventDefault();
+        }
+
+        function addScrollLock() {
+            lockScroll();
+        }
+
+        function removeScrollLock() {
+            unlockScroll();
+        }
+
+        // Función para Abrir Modal de Galería
+        function openGalleryModal() {
+            galleryModal.style.display = 'flex';
+            addScrollLock();
+            if (galleryContainer.children.length === 0) {
+                loadGalleryImages();
+            }
+        }
+
+        // Función para Abrir Popup de Mascota
+        function openPetPopup() {
+            petPopup.style.display = 'block';
+            addScrollLock();
+            if (!petPopupOpen) {
+                document.getElementById('pet-iframe').src = 'pet.html';
+                petPopupOpen = true;
+            }
+        }
+
+        // Función para Abrir Popup de Candy
+        function openCandyPopup() {
+            candyPopup.style.display = 'flex';
+            addScrollLock();
+            if (!candyPopupOpen) {
+                document.getElementById('candy-iframe').src = 'candy.html';
+                candyPopupOpen = true;
+            }
+        }
+
+        // Eventos para Abrir Modales
+        galleryLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openGalleryModal();
+        });
+
+        petEmoji.addEventListener('click', (e) => {
+            e.preventDefault();
+            openPetPopup();
+        });
+
+        candyGameLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openCandyPopup();
+        });
+
+        // Eventos para Cerrar Modales al Hacer Clic Fuera del Contenido
+        window.addEventListener('click', (e) => {
+            if (e.target === galleryModal) {
+                closeModal(galleryModal, 'gallery');
+            }
+            if (e.target === candyPopup) {
+                closeModal(candyPopup, 'candy');
+            }
+            if (e.target === petPopup) {
+                closeModal(petPopup, 'pet');
             }
         });
 
-        function initApp() {
-            loadMessages();
-            changeSlogan();
+        // Manejar Swipe en la Galería (Desplazamiento Táctil)
+        let touchStartX = 0;
+        let touchEndX = 0;
 
-            updateMessagesDeleted();
-            cargarTeletipo();
+        galleryContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
 
-            adjustPetPopupSize();
+        galleryContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleGalleryGesture();
+        }, false);
 
-            const startDate = new Date('2023-06-08');
-            const today = new Date();
-            const daysOperatingCount = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-            daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
-
-            setInterval(changeSlogan, 10000);
+        function handleGalleryGesture() {
+            if (touchEndX < touchStartX - 50) {
+                nextImage();
+            }
+            if (touchEndX > touchStartX + 50) {
+                prevImage();
+            }
         }
 
-        function listenForNewMessages() {
-            db.collection("messages")
-                .orderBy("timestamp", "desc")
-                .limit(1)
-                .onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "added") {
-                            const newMessage = { ...change.doc.data(), id: change.doc.id };
-                            if (!displayedMessageIds.has(newMessage.id)) {
-                                const messageElement = createMessageElement(newMessage);
-                                bulletinBoard.insertBefore(messageElement, bulletinBoard.firstChild);
-                                displayedMessageIds.add(newMessage.id);
-                                updateMessagesPublished();
-                            }
-                        }
-                    });
-                });
-        }
-
-        const galleryLink = document.getElementById('gallery-link');
-        const galleryModal = document.getElementById('gallery-modal');
-        const closeGalleryBtn = document.getElementById('close-gallery');
-        const galleryContainer = document.getElementById('gallery-container');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-
-        let currentImageIndex = 0;
-
+        // Cargar Imágenes de la Galería
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -1060,57 +1296,7 @@
             showImage(currentImageIndex);
         }
 
-        galleryLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            galleryModal.style.display = 'flex';
-            if (galleryContainer.children.length === 0) {
-                loadGalleryImages();
-            }
-        });
-
-        closeGalleryBtn.addEventListener('click', () => {
-            galleryModal.style.display = 'none';
-        });
-
-        nextBtn.addEventListener('click', nextImage);
-        prevBtn.addEventListener('click', prevImage);
-
-        window.addEventListener('click', (e) => {
-            if (e.target === galleryModal) {
-                galleryModal.style.display = 'none';
-            }
-        });
-
-        petEmoji.addEventListener('click', (e) => {
-            if (!petPopupOpen) {
-                e.preventDefault();
-                petPopup.style.display = 'block';
-                document.getElementById('pet-iframe').src = 'pet.html';
-                petPopupOpen = true;
-            }
-        });
-
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        galleryContainer.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, false);
-
-        galleryContainer.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleGesture();
-        }, false);
-
-        function handleGesture() {
-            if (touchEndX < touchStartX - 50) {
-                nextImage();
-            }
-            if (touchEndX > touchStartX + 50) {
-                prevImage();
-            }
-        }
-
+        // Seleccionar Imagen Aleatoria para el Icono de la Galería
         function getRandomGalleryImage() {
             const randomIndex = Math.floor(Math.random() * totalImages) + 1;
             const imgNumber = String(randomIndex).padStart(4, '0');
@@ -1122,38 +1308,74 @@
             galleryLinkImg.src = getRandomGalleryImage();
         }
 
-        const candyGameLink = document.getElementById('candy-game-link');
-        const candyPopup = document.getElementById('candy-popup');
-        const closeCandyPopup = document.getElementById('close-candy-popup');
+        // Toggle de Modo Oscuro al Clicar la Imagen de Cabecera
+        headerToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
 
-        candyGameLink.addEventListener('click', (e) => {
-            if (!candyPopupOpen) {
-                e.preventDefault();
-                candyPopup.style.display = 'flex';
-                document.getElementById('candy-iframe').src = 'candy.html';
-                candyPopupOpen = true;
-                document.body.style.overflow = 'hidden';
+        // Inicializar Aplicación
+        function initApp() {
+            loadMessages();
+            changeSlogan();
+            updateMessagesDeleted();
+            cargarTeletipo();
+            setRandomGalleryImage();
+
+            const startDate = new Date('2023-06-08');
+            const today = new Date();
+            const daysOperatingCount = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
+
+            setInterval(changeSlogan, 10000);
+        }
+
+        // Escuchar Nuevos Mensajes en Tiempo Real
+        function listenForNewMessages() {
+            db.collection("messages")
+                .orderBy("timestamp", "desc")
+                .limit(1)
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const newMessage = { ...change.doc.data(), id: change.doc.id };
+                            if (!displayedMessageIds.has(newMessage.id)) {
+                                const messageElement = createMessageElement(newMessage);
+                                bulletinBoard.insertBefore(messageElement, bulletinBoard.firstChild);
+                                displayedMessageIds.add(newMessage.id);
+                                updateMessagesPublished();
+                            }
+                        }
+                    });
+                });
+        }
+
+        // Bloquear Desplazamiento en el Modal de Candy
+        function preventModalScroll() {
+            // Evitar que el iframe capture eventos de desplazamiento que puedan propagar al padre
+            const candyIframe = document.getElementById('candy-iframe');
+            candyIframe.addEventListener('load', () => {
+                const iframeDocument = candyIframe.contentDocument || candyIframe.contentWindow.document;
+                iframeDocument.body.style.overflow = 'hidden'; // Evita el scroll interno
+                iframeDocument.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                }, { passive: false });
+                iframeDocument.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                }, { passive: false });
+            });
+        }
+
+        // Evento para Cargar el Iframe de Candy y Prevenir Scroll
+        candyPopup.addEventListener('click', (e) => {
+            if (candyPopup.style.display === 'flex') {
+                preventModalScroll();
             }
         });
 
-        closeCandyPopup.addEventListener('click', () => {
-            candyPopup.style.display = 'none';
-            document.getElementById('candy-iframe').src = 'about:blank';
-            candyPopupOpen = false;
-            document.body.style.overflow = '';
-        });
-
-        function adjustCandyPopupSize() {
-            // No es necesario ajustar el tamaño aquí ya que usamos media queries
-        }
-
-        window.addEventListener('resize', adjustCandyPopupSize);
-
+        // Evento de Carga
         window.addEventListener('load', () => {
             initApp();
             listenForNewMessages();
-            setRandomGalleryImage();
-            adjustPetPopupSize();
         });
     </script>
 </body>
