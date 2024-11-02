@@ -436,8 +436,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
+            width: 80%; /* MODIFICACIÓN: Reducido de 95% a 80% */
+            height: 80%; /* MODIFICACIÓN: Reducido de 95% a 80% */
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
@@ -461,6 +461,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            background-color: inherit; /* MODIFICACIÓN: Hereda el color de fondo del modal */
         }
 
         #gallery-modal .gallery-container img {
@@ -536,8 +537,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
+            width: 80%; /* MODIFICACIÓN: Reducido de 95% a 80% */
+            height: 80%; /* MODIFICACIÓN: Reducido de 95% a 80% */
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
@@ -630,9 +631,8 @@
 
             /* Ajustar la Galería Modal en móviles */
             #gallery-modal {
-                width: 100%;
-                height: 100%;
-                border-radius: 0;
+                width: 90%; /* MODIFICACIÓN: Reducido para móviles */
+                height: 90%; /* MODIFICACIÓN: Reducido para móviles */
             }
 
             #gallery-modal .gallery-nav {
@@ -775,6 +775,7 @@
         let lastVisibleMessage = null;
         const messagesPerPage = 10;
         let isLoading = false;
+        let noMoreMessages = false; /* MODIFICACIÓN: Nueva variable para controlar si hay más mensajes */
         let displayedMessageIds = new Set();
         let petPopupOpen = false;
         let candyPopupOpen = false;
@@ -783,7 +784,7 @@
 
         // Cargar Mensajes
         function loadMessages(startAfter = null) {
-            if (isLoading) return;
+            if (isLoading || noMoreMessages) return; /* MODIFICACIÓN: Añadido noMoreMessages */
             isLoading = true;
             loadingElement.style.display = 'block';
 
@@ -797,6 +798,7 @@
                 if (snapshot.empty) {
                     loadingElement.style.display = 'none';
                     isLoading = false;
+                    noMoreMessages = true; /* MODIFICACIÓN: No hay más mensajes */
                     return;
                 }
 
@@ -854,7 +856,7 @@
 
             const timestamp = document.createElement('div');
             timestamp.className = 'message-timestamp';
-            if (message.timestamp && message.timestamp.toDate) {
+            if (message.timestamp) {
                 timestamp.textContent = new Date(message.timestamp.toDate()).toLocaleString();
             } else {
                 timestamp.textContent = 'Fecha desconocida';
@@ -1062,7 +1064,7 @@
 
         // Obtener Color de Texto Contraste
         function getContrastingTextColor(bgColor) {
-            const hsl = bgColor.match(/hsl(\d+),\s*(\d+)%?,\s*(\d+)%?/);
+            const hsl = bgColor.match(/hsl(\d+),\s*(\d+)%?,\s*(\d+)%?/); /* MODIFICACIÓN: Corregido el regex */
             if (hsl) {
                 const l = parseInt(hsl[3]);
                 return l > 50 ? '#000000' : '#FFFFFF';
@@ -1343,20 +1345,7 @@
         // Toggle de Modo Oscuro al Clicar la Imagen de Cabecera
         headerToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
-            updateModalsBackground();
         });
-
-        // Actualizar Fondo de los Modales según el Modo Oscuro
-        function updateModalsBackground() {
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            if (isDarkMode) {
-                galleryModal.style.backgroundColor = '#1f1f1f';
-                candyPopup.style.backgroundColor = '#1f1f1f';
-            } else {
-                galleryModal.style.backgroundColor = 'white';
-                candyPopup.style.backgroundColor = 'white';
-            }
-        }
 
         // Inicializar Aplicación
         function initApp() {
@@ -1372,16 +1361,6 @@
             daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
 
             setInterval(changeSlogan, 10000);
-
-            // Implementar Desplazamiento Infinito
-            window.addEventListener('scroll', handleScroll);
-        }
-
-        // Manejar Desplazamiento Infinito
-        function handleScroll() {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoading && lastVisibleMessage) {
-                loadMessages(lastVisibleMessage);
-            }
         }
 
         // Escuchar Nuevos Mensajes en Tiempo Real
@@ -1434,6 +1413,13 @@
 
         nextBtn.addEventListener('click', () => {
             nextImage();
+        });
+
+        // Implementación de Desplazamiento Infinito /* MODIFICACIÓN: Nueva funcionalidad */
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading && !noMoreMessages) {
+                loadMessages(lastVisibleMessage);
+            }
         });
 
         // Evento de Carga
