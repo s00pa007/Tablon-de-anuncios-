@@ -304,7 +304,7 @@
 
         /* Estilos Individuales para Cada Pop-up */
         #gallery-modal {
-            display: none;
+            display: none; /* Asegurarse de que no se muestre automáticamente */
             position: fixed;
             top: 50%;
             left: 50%;
@@ -317,6 +317,9 @@
             z-index: 5001;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            /* Eliminar 'display: flex;' aquí */
+            justify-content: center; /* Solo se aplica cuando se muestra */
+            align-items: center; /* Solo se aplica cuando se muestra */
         }
 
         #pet-popup {
@@ -336,23 +339,26 @@
         }
 
         #candy-popup {
-            display: none;
+            display: none; /* Asegurarse de que no se muestre automáticamente */
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
+            top: 0; /* Eliminar margen superior */
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-color: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 5001;
+            border: none; /* Sin bordes para eliminar márgenes */
+            z-index: 5002;
             overflow: hidden; /* Previene desplazamientos */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: none; /* Sin sombras */
+            /* Eliminar 'display: flex;' aquí */
+            justify-content: center; /* Solo se aplica cuando se muestra */
+            align-items: center; /* Solo se aplica cuando se muestra */
         }
 
         /* Botones de Cierre para Cada Pop-up */
-        #gallery-modal .close-gallery, #pet-popup #close-popup, #candy-popup #close-candy-popup {
+        #gallery-modal .close-gallery, 
+        #pet-popup #close-popup, 
+        #candy-popup #close-candy-popup {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -363,11 +369,22 @@
             z-index: 1002;
         }
 
+        /* Botón de Cerrar de Candy Popup */
+        #candy-popup #close-candy-popup {
+            color: #ff0000; /* Color rojo para mayor visibilidad */
+            font-size: 30px; /* Aumentar tamaño para mejor visibilidad */
+        }
+
         /* Contenedores Internos de Cada Pop-up */
-        #gallery-modal .gallery-container, #candy-popup .candy-iframe, #pet-popup .pet-iframe {
+        #gallery-modal .gallery-container, 
+        #candy-popup .candy-iframe, 
+        #pet-popup .pet-iframe {
             width: 100%;
             height: 100%;
             border: none;
+            display: flex; /* Para centrar el contenido */
+            justify-content: center; /* Horizontalmente */
+            align-items: center; /* Verticalmente */
         }
 
         #gallery-modal .gallery-container img {
@@ -440,13 +457,12 @@
 
             /* Ajustes Solo para el Pop-up de Candy */
             #candy-popup {
-                width: 90%;
-                height: 90%;
+                /* Ya está configurado para 100% en pantallas pequeñas */
             }
         }
 
         @media (max-width: 480px) {
-            /* Mantener la galería y mascota con su tamaño original */
+            /* Mantener la galería y mascota virtual con su tamaño original */
 
             /* Ajustes Solo para el Pop-up de Candy */
             #candy-popup {
@@ -454,12 +470,15 @@
                 height: 100%;
                 border-radius: 0;
                 box-shadow: none;
+                top: 0;
+                left: 0;
+                transform: none;
             }
 
             #candy-popup #close-candy-popup {
-                font-size: 20px;
-                top: 5px;
-                right: 5px;
+                font-size: 30px; /* Aumentado para mejor visibilidad */
+                top: 10px;
+                right: 10px;
             }
         }
     </style>
@@ -517,13 +536,13 @@
     <!-- Mascota Popup -->
     <div id="pet-popup">
         <button id="close-popup">&times;</button>
-        <iframe id="pet-iframe" src="about:blank" frameborder="0"></iframe>
+        <iframe class="pet-iframe" id="pet-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
     <!-- Candy Popup -->
     <div id="candy-popup">
         <button id="close-candy-popup">&times;</button>
-        <iframe id="candy-iframe" src="about:blank" frameborder="0"></iframe>
+        <iframe class="candy-iframe" id="candy-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
     <script>
@@ -585,6 +604,7 @@
         let isLoading = false;
         let displayedMessageIds = new Set();
         let petPopupOpen = false;
+        let candyPopupOpen = false;
 
         function loadMessages(startAfter = null) {
             if (isLoading) return;
@@ -790,6 +810,9 @@
         function showDeleteConfirmation(id) {
             const messageElement = document.querySelector(`[data-id="${id}"]`);
             const actions = messageElement.querySelector('.message-actions');
+            // Verificar si ya existe una confirmación de eliminación
+            if (actions.querySelector('.delete-confirmation')) return;
+
             const deleteConfirmation = document.createElement('div');
             deleteConfirmation.className = 'delete-confirmation';
             deleteConfirmation.innerHTML = `
@@ -1102,12 +1125,11 @@
         const candyGameLink = document.getElementById('candy-game-link');
         const candyPopup = document.getElementById('candy-popup');
         const closeCandyPopup = document.getElementById('close-candy-popup');
-        let candyPopupOpen = false;
 
         candyGameLink.addEventListener('click', (e) => {
             if (!candyPopupOpen) {
                 e.preventDefault();
-                candyPopup.style.display = 'block';
+                candyPopup.style.display = 'flex';
                 document.getElementById('candy-iframe').src = 'candy.html';
                 candyPopupOpen = true;
                 document.body.style.overflow = 'hidden';
