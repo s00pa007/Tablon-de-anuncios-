@@ -520,6 +520,11 @@
             font-size: 30px; /* Tamaño aumentado */
         }
 
+        /* Botón de Cerrar de Galería Modal - Ahora Rojo */
+        #gallery-modal .close-gallery {
+            color: #ff0000; /* Rojo para mayor visibilidad */
+        }
+
         /* Popup de Mascota */
         #pet-popup {
             display: none; /* Oculto por defecto */
@@ -757,6 +762,8 @@
         let displayedMessageIds = new Set();
         let petPopupOpen = false;
         let candyPopupOpen = false;
+
+        let currentImageIndex = 0; // Mover fuera de funciones para mantener el estado global
 
         // Cargar Mensajes
         function loadMessages(startAfter = null) {
@@ -1175,9 +1182,11 @@
         function openGalleryModal() {
             galleryModal.style.display = 'flex';
             addScrollLock();
+            currentImageIndex = 0; // Resetear índice al abrir
             if (galleryContainer.children.length === 0) {
                 loadGalleryImages();
             }
+            showImage(currentImageIndex); // Mostrar la primera imagen
         }
 
         // Función para Abrir Popup de Mascota
@@ -1230,23 +1239,23 @@
         });
 
         // Manejar Swipe en la Galería (Desplazamiento Táctil)
-        let touchStartX = 0;
-        let touchEndX = 0;
+        let touchStartXGallery = 0;
+        let touchEndXGallery = 0;
 
         galleryContainer.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
+            touchStartXGallery = e.changedTouches[0].screenX;
         }, false);
 
         galleryContainer.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
+            touchEndXGallery = e.changedTouches[0].screenX;
             handleGalleryGesture();
         }, false);
 
         function handleGalleryGesture() {
-            if (touchEndX < touchStartX - 50) {
+            if (touchEndXGallery < touchStartXGallery - 50) {
                 nextImage();
             }
-            if (touchEndX > touchStartX + 50) {
+            if (touchEndXGallery > touchStartXGallery + 50) {
                 prevImage();
             }
         }
@@ -1286,12 +1295,14 @@
 
         function nextImage() {
             const images = galleryContainer.querySelectorAll('img');
+            if (images.length === 0) return;
             currentImageIndex = (currentImageIndex + 1) % images.length;
             showImage(currentImageIndex);
         }
 
         function prevImage() {
             const images = galleryContainer.querySelectorAll('img');
+            if (images.length === 0) return;
             currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
             showImage(currentImageIndex);
         }
