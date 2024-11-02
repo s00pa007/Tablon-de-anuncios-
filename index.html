@@ -436,8 +436,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%; /* MODIFICACIÓN: Reducido de 95% a 80% */
-            height: 80%; /* MODIFICACIÓN: Reducido de 95% a 80% */
+            width: 95%;
+            height: 95%;
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
@@ -461,7 +461,6 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            background-color: inherit; /* MODIFICACIÓN: Hereda el color de fondo del modal */
         }
 
         #gallery-modal .gallery-container img {
@@ -491,6 +490,11 @@
             transition: background 0.3s, color 0.3s;
         }
 
+        body.dark-mode .gallery-nav {
+            color: rgba(255,255,255,0.9);
+            background: rgba(0,0,0,0.7);
+        }
+
         #prev-btn {
             left: 10px;
         }
@@ -502,6 +506,11 @@
         .gallery-nav:hover {
             color: rgba(0,0,0,0.9);
             background: rgba(255,255,255,1);
+        }
+
+        body.dark-mode .gallery-nav:hover {
+            color: rgba(255,255,255,1);
+            background: rgba(0,0,0,0.9);
         }
 
         /* Botones de Cierre para los Modales */
@@ -537,8 +546,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%; /* MODIFICACIÓN: Reducido de 95% a 80% */
-            height: 80%; /* MODIFICACIÓN: Reducido de 95% a 80% */
+            width: 95%;
+            height: 95%;
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
@@ -563,22 +572,25 @@
         #candy-popup {
             display: none; /* Oculto por defecto */
             position: fixed;
-            top: 0; /* Sin margen superior */
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 95%;
             background-color: white;
-            border: none; /* Sin bordes para eliminar márgenes */
+            border: 2px solid #333;
+            border-radius: 10px;
             z-index: 5002;
             overflow: hidden; /* Previene desplazamientos */
-            box-shadow: none; /* Sin sombras */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, border 0.3s;
         }
 
         body.dark-mode #candy-popup {
             background-color: #1f1f1f;
+            border: 2px solid var(--button-bg-dark);
         }
 
         #candy-popup .candy-iframe {
@@ -631,8 +643,9 @@
 
             /* Ajustar la Galería Modal en móviles */
             #gallery-modal {
-                width: 90%; /* MODIFICACIÓN: Reducido para móviles */
-                height: 90%; /* MODIFICACIÓN: Reducido para móviles */
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
             }
 
             #gallery-modal .gallery-nav {
@@ -675,13 +688,14 @@
             
             <div id="bulletin-board"></div>
             <div id="loading">Cargando más mensajes...</div>
-            
-            <div class="statistics">
-                <div id="days-operating">Días en funcionamiento: 1</div>
-                <div id="messages-published">Mensajes publicados: 0</div>
-                <div id="messages-deleted">Mensajes borrados: 0</div>
-            </div>
         </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="statistics">
+        <div id="days-operating">Días en funcionamiento: 1</div>
+        <div id="messages-published">Mensajes publicados: 0</div>
+        <div id="messages-deleted">Mensajes borrados: 0</div>
     </div>
 
     <!-- Galería Modal -->
@@ -775,7 +789,6 @@
         let lastVisibleMessage = null;
         const messagesPerPage = 10;
         let isLoading = false;
-        let noMoreMessages = false; /* MODIFICACIÓN: Nueva variable para controlar si hay más mensajes */
         let displayedMessageIds = new Set();
         let petPopupOpen = false;
         let candyPopupOpen = false;
@@ -784,7 +797,7 @@
 
         // Cargar Mensajes
         function loadMessages(startAfter = null) {
-            if (isLoading || noMoreMessages) return; /* MODIFICACIÓN: Añadido noMoreMessages */
+            if (isLoading) return;
             isLoading = true;
             loadingElement.style.display = 'block';
 
@@ -798,7 +811,6 @@
                 if (snapshot.empty) {
                     loadingElement.style.display = 'none';
                     isLoading = false;
-                    noMoreMessages = true; /* MODIFICACIÓN: No hay más mensajes */
                     return;
                 }
 
@@ -1064,7 +1076,7 @@
 
         // Obtener Color de Texto Contraste
         function getContrastingTextColor(bgColor) {
-            const hsl = bgColor.match(/hsl(\d+),\s*(\d+)%?,\s*(\d+)%?/); /* MODIFICACIÓN: Corregido el regex */
+            const hsl = bgColor.match(/hsl(\d+),\s*(\d+)%?,\s*(\d+)%?/);
             if (hsl) {
                 const l = parseInt(hsl[3]);
                 return l > 50 ? '#000000' : '#FFFFFF';
@@ -1383,6 +1395,13 @@
                 });
         }
 
+        // Implementar Desplazamiento Infinito
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoading) {
+                loadMessages(lastVisibleMessage);
+            }
+        });
+
         // Bloquear Desplazamiento en el Modal de Candy
         function preventModalScroll() {
             // Evitar que el iframe capture eventos de desplazamiento que puedan propagar al padre
@@ -1413,13 +1432,6 @@
 
         nextBtn.addEventListener('click', () => {
             nextImage();
-        });
-
-        // Implementación de Desplazamiento Infinito /* MODIFICACIÓN: Nueva funcionalidad */
-        window.addEventListener('scroll', () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading && !noMoreMessages) {
-                loadMessages(lastVisibleMessage);
-            }
         });
 
         // Evento de Carga
