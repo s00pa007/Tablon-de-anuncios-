@@ -6,25 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tablón de anuncios anónimos</title>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-        /* Aplicar box-sizing globalmente */
         *, *::before, *::after {
             box-sizing: border-box;
         }
 
         :root {
-            /* Variables para Modo Claro */
             --background-color: #f0f0f0;
             --text-color: #333333;
             --header-bg: #ffffff;
             --counter-bg: #e0e0e0;
             --button-bg: #4caf50;
             --button-text: #ffffff;
-
-            /* Variables para Modo Oscuro */
             --background-color-dark: #121212;
             --text-color-dark: #e0e0e0;
             --header-bg-dark: #1f1f1f;
@@ -33,7 +28,6 @@
             --button-text-dark: #000000;
         }
 
-        /* Estilos Generales */
         body {
             background-color: var(--background-color);
             color: var(--text-color);
@@ -45,7 +39,6 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Modo Oscuro */
         body.dark-mode {
             background-color: var(--background-color-dark);
             color: var(--text-color-dark);
@@ -64,13 +57,12 @@
             border: 2px solid var(--button-bg-dark);
         }
 
-        /* Header */
         header {
             background-color: var(--header-bg);
             padding: 10px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             width: 100%;
-            cursor: pointer; /* Indica que es clickeable para modo oscuro */
+            cursor: pointer;
             transition: background-color 0.3s;
         }
 
@@ -82,7 +74,6 @@
             transition: filter 0.3s;
         }
 
-        /* Slogan */
         #slogan {
             background-color: #ffff00;
             color: #000000;
@@ -98,7 +89,6 @@
             height: 60px;
         }
 
-        /* Contenedor de Mascota, Galería y Candy */
         .pet-status-container {
             display: flex;
             justify-content: center;
@@ -126,20 +116,19 @@
             height: 120px;
             position: relative;
             flex-shrink: 0;
-            overflow: hidden; /* Elimina márgenes internos */
-            border-radius: 10%; /* Bordes redondeados */
-            border: 4px solid var(--button-bg); /* Marco verde */
-            padding: 0; /* Elimina padding interno */
-            margin: 0; /* Elimina margen interno */
+            overflow: hidden;
+            border-radius: 10%;
+            border: 4px solid var(--button-bg);
+            padding: 0;
+            margin: 0;
         }
 
-        /* Imágenes dentro de los botones */
         .pet-status-container div img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* La imagen cubre todo el contenedor */
-            display: block; /* Elimina espacios adicionales */
-            border: none; /* Sin bordes internos */
+            object-fit: cover;
+            display: block;
+            border: none;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -149,13 +138,11 @@
             border: 4px solid var(--button-bg-dark);
         }
 
-        /* Hover Efecto para las Imágenes */
         .gallery-link img:hover, .pet-emoji img:hover, .candy-game-link img:hover {
             transform: scale(1.1);
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
         }
 
-        /* Contenedor Principal */
         .main-container {
             display: flex;
             flex: 1;
@@ -168,7 +155,6 @@
             padding-right: 20px;
         }
 
-        /* Formulario de Mensaje */
         #message-form {
             background-color: var(--header-bg);
             padding: 20px;
@@ -220,7 +206,6 @@
             color: var(--button-text-dark);
         }
 
-        /* Tablero de Anuncios */
         #bulletin-board {
             display: flex;
             flex-direction: column;
@@ -281,7 +266,6 @@
             color: var(--button-bg);
         }
 
-        /* Mensajes Citados */
         .quoted-message {
             font-size: 12px;
             padding: 5px;
@@ -295,7 +279,6 @@
             background-color: rgba(0, 0, 0, 0.05);
         }
 
-        /* Formulario de Respuesta */
         .reply-form {
             margin-top: 10px;
         }
@@ -330,7 +313,6 @@
             color: var(--button-text-dark);
         }
 
-        /* Estadísticas */
         .statistics {
             background-color: var(--counter-bg);
             padding: 15px;
@@ -348,7 +330,6 @@
             margin-bottom: 5px;
         }
 
-        /* Animación de Flotación */
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
@@ -363,7 +344,6 @@
             z-index: -1;
         }
 
-        /* Confirmación de Eliminación */
         .delete-confirmation {
             display: flex;
             justify-content: flex-end;
@@ -383,7 +363,6 @@
             color: red;
         }
 
-        /* Teletipo */
         .teletipo-wrapper {
             position: relative;
             width: 100%;
@@ -421,23 +400,20 @@
             background-color: var(--background-color-dark);
         }
 
-        /* Cargando */
         #loading {
             text-align: center;
             padding: 20px;
             display: none;
         }
 
-        /* Estilos de los Modales */
-        /* Galería Modal */
         #gallery-modal {
-            display: none; /* Oculto por defecto */
+            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
+            width: 90%;
+            height: 90%;
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
@@ -474,7 +450,6 @@
             display: block;
         }
 
-        /* Navegación en la Galería */
         .gallery-nav {
             position: absolute;
             top: 50%;
@@ -490,11 +465,6 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        body.dark-mode .gallery-nav {
-            color: rgba(255,255,255,0.9);
-            background: rgba(0,0,0,0.7);
-        }
-
         #prev-btn {
             left: 10px;
         }
@@ -508,12 +478,6 @@
             background: rgba(255,255,255,1);
         }
 
-        body.dark-mode .gallery-nav:hover {
-            color: rgba(255,255,255,1);
-            background: rgba(0,0,0,0.9);
-        }
-
-        /* Botones de Cierre para los Modales */
         #gallery-modal .close-gallery, 
         #pet-popup #close-popup, 
         #candy-popup #close-candy-popup {
@@ -528,26 +492,23 @@
             transition: color 0.3s;
         }
 
-        /* Botón de Cerrar de Candy Popup */
         #candy-popup #close-candy-popup {
-            color: #ff0000; /* Rojo para mayor visibilidad */
-            font-size: 30px; /* Tamaño aumentado */
+            color: #ff0000;
+            font-size: 30px;
         }
 
-        /* Botón de Cerrar de Galería Modal - Ahora Rojo */
         #gallery-modal .close-gallery {
-            color: #ff0000; /* Rojo para mayor visibilidad */
+            color: #ff0000;
         }
 
-        /* Popup de Mascota */
         #pet-popup {
-            display: none; /* Oculto por defecto */
+            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
+            width: 90%;
+            height: 90%;
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
@@ -568,20 +529,19 @@
             border: none;
         }
 
-        /* Popup de Candy */
         #candy-popup {
-            display: none; /* Oculto por defecto */
+            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 95%;
-            height: 95%;
+            width: 90%;
+            height: 90%;
             background-color: white;
             border: 2px solid #333;
             border-radius: 10px;
             z-index: 5002;
-            overflow: hidden; /* Previene desplazamientos */
+            overflow: hidden;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             justify-content: center;
             align-items: center;
@@ -599,7 +559,6 @@
             border: none;
         }
 
-        /* Responsive Design */
         @media (max-width: 1024px) {
             .pet-status-container {
                 gap: 30px;
@@ -624,7 +583,6 @@
         }
 
         @media (max-width: 480px) {
-            /* Ajustes para dispositivos móviles */
             #candy-popup {
                 width: 100%;
                 height: 100%;
@@ -636,21 +594,9 @@
             }
 
             #candy-popup #close-candy-popup {
-                font-size: 30px; /* Tamaño aumentado */
+                font-size: 30px;
                 top: 10px;
                 right: 10px;
-            }
-
-            /* Ajustar la Galería Modal en móviles */
-            #gallery-modal {
-                width: 100%;
-                height: 100%;
-                border-radius: 0;
-            }
-
-            #gallery-modal .gallery-nav {
-                font-size: 24px;
-                padding: 8px;
             }
         }
     </style>
@@ -688,17 +634,15 @@
             
             <div id="bulletin-board"></div>
             <div id="loading">Cargando más mensajes...</div>
+            
+            <div class="statistics">
+                <div id="days-operating">Días en funcionamiento: 1</div>
+                <div id="messages-published">Mensajes publicados: 0</div>
+                <div id="messages-deleted">Mensajes borrados: 0</div>
+            </div>
         </div>
     </div>
 
-    <!-- Estadísticas -->
-    <div class="statistics">
-        <div id="days-operating">Días en funcionamiento: 1</div>
-        <div id="messages-published">Mensajes publicados: 0</div>
-        <div id="messages-deleted">Mensajes borrados: 0</div>
-    </div>
-
-    <!-- Galería Modal -->
     <div id="gallery-modal">
         <button class="close-gallery" id="close-gallery">&times;</button>
         <div class="gallery-container" id="gallery-container"></div>
@@ -706,20 +650,17 @@
         <button class="gallery-nav" id="next-btn">&#10095;</button>
     </div>
 
-    <!-- Mascota Popup -->
     <div id="pet-popup">
         <button id="close-popup">&times;</button>
         <iframe class="pet-iframe" id="pet-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
-    <!-- Candy Popup -->
     <div id="candy-popup">
         <button id="close-candy-popup">&times;</button>
         <iframe class="candy-iframe" id="candy-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
     <script>
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
             authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
@@ -733,7 +674,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Elementos del DOM
         const bulletinBoard = document.getElementById('bulletin-board');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
@@ -757,7 +697,6 @@
         const headerToggle = document.getElementById('header-toggle');
         const headerImage = document.getElementById('header-image');
 
-        // Variables Globales
         const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
         const slogans = [
             "Ahora más anónimo",
@@ -783,7 +722,7 @@
             "La página de la gente que no se peina",
             "Escribe lo que quieras, que no hay consecuencias"
         ];
-        const imageFolder = './'; // Asegúrate de que las imágenes estén en la misma carpeta
+        const imageFolder = './';
         const totalImages = 48;
 
         let lastVisibleMessage = null;
@@ -792,10 +731,8 @@
         let displayedMessageIds = new Set();
         let petPopupOpen = false;
         let candyPopupOpen = false;
+        let currentImageIndex = 0;
 
-        let currentImageIndex = 0; // Índice actual de imagen en la galería
-
-        // Cargar Mensajes
         function loadMessages(startAfter = null) {
             if (isLoading) return;
             isLoading = true;
@@ -834,7 +771,6 @@
             });
         }
 
-        // Crear Elemento de Mensaje
         function createMessageElement(message) {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
@@ -909,7 +845,6 @@
             return messageDiv;
         }
 
-        // Crear Mensaje Citado
         function createQuotedMessage(originalMessage) {
             const quotedDiv = document.createElement('div');
             quotedDiv.className = 'quoted-message';
@@ -920,7 +855,6 @@
             return quotedDiv;
         }
 
-        // Scroll a un Mensaje Específico
         function scrollToMessage(messageId) {
             const targetMessage = document.getElementById(`message-${messageId}`);
             if (targetMessage) {
@@ -932,7 +866,6 @@
             }
         }
 
-        // Mostrar Formulario de Respuesta
         function showReplyForm(parentId, parentMessage) {
             const parentMessageElement = document.querySelector(`[data-id="${parentId}"]`);
             let replyForm = parentMessageElement.querySelector('.reply-form');
@@ -959,7 +892,6 @@
             parentMessageElement.appendChild(replyForm);
         }
 
-        // Añadir Respuesta
         function addReply(parentId, replyText, parentMessage) {
             const reply = {
                 text: replyText,
@@ -977,16 +909,13 @@
             };
 
             db.collection("messages").add(reply)
-                .then(() => {
-                    console.log("Respuesta añadida con éxito");
-                })
+                .then(() => {})
                 .catch((error) => {
                     console.error("Error al añadir la respuesta: ", error);
                     alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
                 });
         }
 
-        // Actualizar Likes/Dislikes
         function updateLikes(id, field) {
             db.collection("messages").doc(id).update({
                 [field]: firebase.firestore.FieldValue.increment(1)
@@ -1006,11 +935,9 @@
             });
         }
 
-        // Mostrar Confirmación de Eliminación
         function showDeleteConfirmation(id) {
             const messageElement = document.querySelector(`[data-id="${id}"]`);
             const actions = messageElement.querySelector('.message-actions');
-            // Verificar si ya existe una confirmación de eliminación
             if (actions.querySelector('.delete-confirmation')) return;
 
             const deleteConfirmation = document.createElement('div');
@@ -1028,7 +955,6 @@
             cancelDelete.onclick = () => actions.removeChild(deleteConfirmation);
         }
 
-        // Eliminar Mensaje
         function deleteMessage(id) {
             db.collection("messages").doc(id).delete().then(() => {
                 incrementMessagesDeleted();
@@ -1042,7 +968,6 @@
             });
         }
 
-        // Manejar Envío del Formulario de Mensaje
         messageForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
@@ -1061,12 +986,10 @@
             }
         });
 
-        // Obtener Emoji Aleatorio
         function getRandomAnimalEmoji() {
             return animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
         }
 
-        // Generar Color Aleatorio con Buen Contraste
         function getRandomContrastColor() {
             const hue = Math.floor(Math.random() * 360);
             const saturation = 70 + Math.random() * 30;
@@ -1074,7 +997,6 @@
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
 
-        // Obtener Color de Texto Contraste
         function getContrastingTextColor(bgColor) {
             const hsl = bgColor.match(/hsl(\d+),\s*(\d+)%?,\s*(\d+)%?/);
             if (hsl) {
@@ -1085,7 +1007,6 @@
             }
         }
 
-        // Actualizar Contadores de Mensajes
         function updateMessagesPublished() {
             db.collection("messages").get().then((snapshot) => {
                 messagesPublished.textContent = `Mensajes publicados: ${snapshot.size}`;
@@ -1109,12 +1030,10 @@
             });
         }
 
-        // Cambiar Slogan
         function changeSlogan() {
             slogan.textContent = slogans[Math.floor(Math.random() * slogans.length)];
         }
 
-        // Cargar Teletipo
         function cargarTeletipo() {
             fetch('teletipo.html')
                 .then(response => {
@@ -1156,22 +1075,18 @@
                 });
         }
 
-        // Cerrar Popup de Mascota
         closePopup.addEventListener('click', () => {
             closeModal(petPopup, 'pet');
         });
 
-        // Cerrar Popup de Candy
         closeCandyPopup.addEventListener('click', () => {
             closeModal(candyPopup, 'candy');
         });
 
-        // Cerrar Galería
         closeGalleryBtn.addEventListener('click', () => {
             closeModal(galleryModal, 'gallery');
         });
 
-        // Función para Cerrar Modales y Restaurar Scroll
         function closeModal(modal, type) {
             modal.style.display = 'none';
             if (type === 'pet') {
@@ -1181,14 +1096,12 @@
                 document.getElementById('candy-iframe').src = 'about:blank';
                 candyPopupOpen = false;
             }
-            document.body.style.overflow = ''; // Restaurar scroll
+            document.body.style.overflow = '';
             removeScrollLock();
         }
 
-        // Prevenir Desplazamiento cuando un Modal está Abierto
         function lockScroll() {
             document.body.style.overflow = 'hidden';
-            // Prevenir eventos de desplazamiento en dispositivos táctiles
             document.addEventListener('touchmove', preventScroll, { passive: false });
             document.addEventListener('wheel', preventScroll, { passive: false });
         }
@@ -1211,20 +1124,18 @@
             unlockScroll();
         }
 
-        // Función para Abrir Modal de Galería
         function openGalleryModal() {
             galleryModal.style.display = 'flex';
             addScrollLock();
-            currentImageIndex = 0; // Resetear índice al abrir
+            currentImageIndex = 0;
             if (galleryContainer.children.length === 0) {
                 loadGalleryImages();
             }
-            setTimeout(() => { // Esperar a que las imágenes se carguen
-                showImage(currentImageIndex); // Mostrar la primera imagen
-            }, 100); // 100ms de retraso
+            setTimeout(() => {
+                showImage(currentImageIndex);
+            }, 100);
         }
 
-        // Función para Abrir Popup de Mascota
         function openPetPopup() {
             petPopup.style.display = 'block';
             addScrollLock();
@@ -1234,17 +1145,15 @@
             }
         }
 
-        // Función para Abrir Popup de Candy
         function openCandyPopup() {
             candyPopup.style.display = 'flex';
             addScrollLock();
             if (!candyPopupOpen) {
-                document.getElementById('candy-iframe').src = 'candy.html'; // Asegúrate de que 'candy.html' exista
+                document.getElementById('candy-iframe').src = 'candy.html';
                 candyPopupOpen = true;
             }
         }
 
-        // Eventos para Abrir Modales
         galleryLink.addEventListener('click', (e) => {
             e.preventDefault();
             openGalleryModal();
@@ -1260,7 +1169,6 @@
             openCandyPopup();
         });
 
-        // Eventos para Cerrar Modales al Hacer Clic Fuera del Contenido
         window.addEventListener('click', (e) => {
             if (e.target === galleryModal) {
                 closeModal(galleryModal, 'gallery');
@@ -1273,7 +1181,6 @@
             }
         });
 
-        // Manejar Swipe en la Galería (Desplazamiento Táctil)
         let touchStartXGallery = 0;
         let touchEndXGallery = 0;
 
@@ -1295,7 +1202,6 @@
             }
         }
 
-        // Cargar Imágenes de la Galería
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -1342,7 +1248,6 @@
             showImage(currentImageIndex);
         }
 
-        // Seleccionar Imagen Aleatoria para el Icono de la Galería
         function getRandomGalleryImage() {
             const randomIndex = Math.floor(Math.random() * totalImages) + 1;
             const imgNumber = String(randomIndex).padStart(4, '0');
@@ -1354,12 +1259,10 @@
             galleryLinkImg.src = getRandomGalleryImage();
         }
 
-        // Toggle de Modo Oscuro al Clicar la Imagen de Cabecera
         headerToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
         });
 
-        // Inicializar Aplicación
         function initApp() {
             loadMessages();
             changeSlogan();
@@ -1375,7 +1278,6 @@
             setInterval(changeSlogan, 10000);
         }
 
-        // Escuchar Nuevos Mensajes en Tiempo Real
         function listenForNewMessages() {
             db.collection("messages")
                 .orderBy("timestamp", "desc")
@@ -1395,20 +1297,11 @@
                 });
         }
 
-        // Implementar Desplazamiento Infinito
-        window.addEventListener('scroll', () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoading) {
-                loadMessages(lastVisibleMessage);
-            }
-        });
-
-        // Bloquear Desplazamiento en el Modal de Candy
         function preventModalScroll() {
-            // Evitar que el iframe capture eventos de desplazamiento que puedan propagar al padre
             const candyIframe = document.getElementById('candy-iframe');
             candyIframe.addEventListener('load', () => {
                 const iframeDocument = candyIframe.contentDocument || candyIframe.contentWindow.document;
-                iframeDocument.body.style.overflow = 'hidden'; // Evita el scroll interno
+                iframeDocument.body.style.overflow = 'hidden';
                 iframeDocument.addEventListener('touchmove', (e) => {
                     e.preventDefault();
                 }, { passive: false });
@@ -1418,26 +1311,21 @@
             });
         }
 
-        // Evento para Cargar el Iframe de Candy y Prevenir Scroll
         candyPopup.addEventListener('click', (e) => {
             if (candyPopup.style.display === 'flex') {
                 preventModalScroll();
             }
         });
 
-        // Evento para los Botones de Navegación de la Galería
-        prevBtn.addEventListener('click', () => {
-            prevImage();
-        });
-
-        nextBtn.addEventListener('click', () => {
-            nextImage();
-        });
-
-        // Evento de Carga
         window.addEventListener('load', () => {
             initApp();
             listenForNewMessages();
+        });
+
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading && lastVisibleMessage) {
+                loadMessages(lastVisibleMessage);
+            }
         });
     </script>
 </body>
