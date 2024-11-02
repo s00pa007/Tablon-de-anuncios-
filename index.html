@@ -302,7 +302,8 @@
             display: none;
         }
 
-        #gallery-modal, #pet-popup, #candy-popup {
+        /* Estilos Individuales para Cada Pop-up */
+        #gallery-modal {
             display: none;
             position: fixed;
             top: 50%;
@@ -318,6 +319,39 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
+        #pet-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 95%;
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            z-index: 5001;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #candy-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 95%;
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            z-index: 5001;
+            overflow: hidden; /* Previene desplazamientos */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Botones de Cierre para Cada Pop-up */
         #gallery-modal .close-gallery, #pet-popup #close-popup, #candy-popup #close-candy-popup {
             position: absolute;
             top: 10px;
@@ -329,6 +363,7 @@
             z-index: 1002;
         }
 
+        /* Contenedores Internos de Cada Pop-up */
         #gallery-modal .gallery-container, #candy-popup .candy-iframe, #pet-popup .pet-iframe {
             width: 100%;
             height: 100%;
@@ -346,6 +381,7 @@
             display: block;
         }
 
+        /* Navegación en la Galería */
         .gallery-nav {
             position: absolute;
             top: 50%;
@@ -379,33 +415,53 @@
             border: none;
         }
 
-@media (max-width: 480px) {
-    /* Asegura que el pop-up ocupe todo el ancho y alto */
-    #gallery-modal, #pet-popup, #candy-popup {
-        width: 100%;
-        height: 100%;
-        border-radius: 0;
-        box-shadow: none;
-        top: 0;
-        left: 0;
-        transform: none;
-    }
+        /* Estilos Responsivos */
+        @media (max-width: 1024px) {
+            .pet-status-container {
+                gap: 30px;
+            }
 
-    /* Ajusta el tamaño y posición del botón de cerrar */
-    #gallery-modal .close-gallery,
-    #pet-popup #close-popup,
-    #candy-popup #close-candy-popup {
-        font-size: 20px;
-        top: 5px;
-        right: 5px;
-    }
+            .pet-status-container div {
+                width: 96px;
+                height: 96px;
+            }
+        }
 
-    /* Asegura que el iframe ocupe todo el espacio del pop-up */
-    #candy-popup iframe {
-        width: 100%;
-        height: 100%;
-    }
-}
+        @media (max-width: 768px) {
+            .pet-status-container {
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .pet-status-container div {
+                width: 84px;
+                height: 84px;
+            }
+
+            /* Ajustes Solo para el Pop-up de Candy */
+            #candy-popup {
+                width: 90%;
+                height: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Mantener la galería y mascota con su tamaño original */
+
+            /* Ajustes Solo para el Pop-up de Candy */
+            #candy-popup {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            #candy-popup #close-candy-popup {
+                font-size: 20px;
+                top: 5px;
+                right: 5px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -450,6 +506,7 @@
         </div>
     </div>
 
+    <!-- Galería Modal -->
     <div id="gallery-modal">
         <button class="close-gallery" id="close-gallery">&times;</button>
         <div class="gallery-container" id="gallery-container"></div>
@@ -457,11 +514,13 @@
         <button class="gallery-nav" id="next-btn">&#10095;</button>
     </div>
 
+    <!-- Mascota Popup -->
     <div id="pet-popup">
         <button id="close-popup">&times;</button>
         <iframe id="pet-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
+    <!-- Candy Popup -->
     <div id="candy-popup">
         <button id="close-candy-popup">&times;</button>
         <iframe id="candy-iframe" src="about:blank" frameborder="0"></iframe>
@@ -1063,7 +1122,7 @@
         });
 
         function adjustCandyPopupSize() {
-            // No es necesario ajustar el tamaño aquí ya que usamos vmin para mantener el cuadrado
+            // No es necesario ajustar el tamaño aquí ya que usamos media queries
         }
 
         window.addEventListener('resize', adjustCandyPopupSize);
