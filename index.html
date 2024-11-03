@@ -518,9 +518,9 @@
             font-size: 30px;
         }
 
-        /* Filtro para el iframe de Candy en modo oscuro */
-        body.dark-mode #candy-popup .candy-iframe {
-            filter: invert(1) hue-rotate(180deg) brightness(0.9);
+        /* Añade esta regla para el modo oscuro del botón de cierre del Candy modal */
+        body.dark-mode #candy-popup #close-candy-popup {
+            color: #ff6347; /* Puedes elegir otro color que contraste mejor */
         }
 
         #gallery-modal .close-gallery {
@@ -574,6 +574,7 @@
             transition: background-color 0.3s, border 0.3s;
         }
 
+        /* Actualiza los estilos para el modo oscuro del Candy modal */
         body.dark-mode #candy-popup {
             background-color: var(--background-color-dark);
             border: 2px solid var(--button-bg-dark);
