@@ -518,6 +518,11 @@
             font-size: 30px;
         }
 
+        /* Añade esta regla para el modo oscuro del botón de cierre del Candy modal */
+        body.dark-mode #candy-popup #close-candy-popup {
+            color: #ff6347; /* Puedes elegir otro color que contraste mejor */
+        }
+
         #gallery-modal .close-gallery {
             color: #ff0000;
         }
@@ -569,8 +574,9 @@
             transition: background-color 0.3s, border 0.3s;
         }
 
+        /* Actualiza los estilos para el modo oscuro del Candy modal */
         body.dark-mode #candy-popup {
-            background-color: #000000;
+            background-color: var(--background-color-dark);
             border: 2px solid var(--button-bg-dark);
         }
 
