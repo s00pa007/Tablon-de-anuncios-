@@ -4,28 +4,6 @@
     <meta charset="UTF-8">
     <title>Match-3 Game</title>
     <style>
-        /* Variables de color para modo claro y oscuro */
-        :root {
-            --bg-color-light: rgba(224, 247, 250, 0.95);
-            --bg-color-dark: rgba(34, 34, 34, 0.95);
-            --border-color-light: #00838f;
-            --border-color-dark: #00bcd4;
-            --text-color-light: #ffffff;
-            --text-color-dark: #e0e0e0;
-            --button-bg-light: #ff4081;
-            --button-bg-dark: #f50057;
-            --button-hover-bg-light: #e91e63;
-            --button-hover-bg-dark: #c51162;
-            --grid-gap: 2px; /* Ajustado para prevenir superposición */
-        }
-
-        /* Modo oscuro */
-        body.dark-mode {
-            background-color: #121212;
-            color: var(--text-color-dark);
-        }
-
-        /* Estilos generales */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -40,8 +18,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             background-color: #f0f0f0;
+            /* Cambiado de padding: 20px 0; a padding: 10vh 0; para reducir espacio superior e inferior */
             padding: 10vh 0;
-            transition: background-color 0.3s, color 0.3s;
         }
 
         .game-container {
@@ -52,18 +30,14 @@
             text-align: center;
             position: relative;
             width: 100%;
-            max-width: 800px;
+            max-width: none;
+            /* Añadido height: 80vh; para reducir la altura total de la ventana modal */
             height: 80vh;
-            transition: transform 0.3s, background-color 0.3s;
+            transition: transform 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
             overflow: hidden;
-        }
-
-        /* Modo oscuro para .game-container */
-        body.dark-mode .game-container {
-            background: linear-gradient(135deg, #424242, #616161);
         }
 
         .stats {
@@ -77,7 +51,7 @@
 
         .stat {
             font-size: 2rem;
-            color: var(--text-color-light);
+            color: #ffffff;
             position: relative;
             display: flex;
             align-items: center;
@@ -85,18 +59,10 @@
             margin: 5px 0;
         }
 
-        body.dark-mode .stat {
-            color: var(--text-color-dark);
-        }
-
         .stat .counter {
             font-size: 2rem;
             font-weight: bold;
             color: #ff4081;
-        }
-
-        body.dark-mode .stat .counter {
-            color: #f50057;
         }
 
         .stat.matches-left::before {
@@ -117,7 +83,7 @@
         }
 
         .controls button {
-            background-color: var(--button-bg-light);
+            background-color: #ff4081;
             border: none;
             color: white;
             padding: 15px 30px;
@@ -132,24 +98,15 @@
             justify-content: center;
         }
 
-        /* Modo oscuro para botones */
-        body.dark-mode .controls button {
-            background-color: var(--button-bg-dark);
-        }
-
         .controls button:hover {
-            background-color: var(--button-hover-bg-light);
+            background-color: #e91e63;
             transform: translateY(-3px);
-        }
-
-        body.dark-mode .controls button:hover {
-            background-color: var(--button-hover-bg-dark);
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: var(--grid-gap);
+            gap: 2px;
             justify-content: center;
             align-content: start;
             background-image: url('galaxy.png');
@@ -165,34 +122,23 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        body.dark-mode .grid {
-            background-image: url('galaxy-dark.png'); /* Asegúrate de tener una imagen para modo oscuro */
-        }
-
         .grid div {
-            background-color: var(--bg-color-light);
-            border: 2px solid var(--border-color-light);
+            background-color: var(--bg-color, rgba(224, 247, 250, 0.95));
+            border: 2px solid #00838f;
             border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             font-size: 2.1rem;
-            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, border 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
             position: relative;
             overflow: hidden;
             box-shadow: 0 3px 7px rgba(0,0,0,0.15);
-            color: var(--text-color-light);
+            color: #fff;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
             width: 100%;
             aspect-ratio: 1 / 1;
-        }
-
-        body.dark-mode .grid div {
-            background-color: var(--bg-color-dark);
-            border: 2px solid var(--border-color-dark);
-            color: var(--text-color-dark);
-            text-shadow: none;
         }
 
         .grid div img {
@@ -209,12 +155,7 @@
         .grid div:hover {
             transform: scale(1.1);
             box-shadow: 0 0 15px rgba(0, 131, 143, 0.8);
-            background-color: rgba(178, 235, 242, 0.95);
-        }
-
-        body.dark-mode .grid div:hover {
-            box-shadow: 0 0 15px rgba(0, 188, 212, 0.8);
-            background-color: rgba(0, 188, 212, 0.95);
+            background-color: var(--bg-color, rgba(178, 235, 242, 0.95));
         }
 
         .game-over {
@@ -327,6 +268,15 @@
             100% { transform: translate(0); }
         }
 
+        .hint {
+            animation: hintAnimation 1s infinite;
+        }
+
+        @keyframes hintAnimation {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
         .score-popup {
             position: absolute;
             font-size: 1.2rem;
@@ -370,11 +320,6 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
-        body.dark-mode .stats-popup {
-            background: rgba(50, 50, 50, 0.95);
-            color: #e0e0e0;
-        }
-
         .stats-popup h2, .stats-popup h3 {
             font-size: 1.5rem;
             text-align: center;
@@ -399,24 +344,15 @@
             padding: 10px 25px;
             font-size: 1.2rem;
             cursor: pointer;
-            background-color: var(--button-bg-light);
+            background-color: #ff4081;
             border: none;
             color: #fff;
             border-radius: 8px;
             transition: background-color 0.3s;
         }
 
-        body.dark-mode .stats-popup button {
-            background-color: var(--button-bg-dark);
-            color: #fff;
-        }
-
         .stats-popup button:hover {
-            background-color: var(--button-hover-bg-light);
-        }
-
-        body.dark-mode .stats-popup button:hover {
-            background-color: var(--button-hover-bg-dark);
+            background-color: #e91e63;
         }
 
         .level-up-message {
@@ -432,12 +368,6 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
             animation: levelUpAnimation 1.5s forwards;
             z-index: 1000;
-        }
-
-        body.dark-mode .level-up-message {
-            background-color: rgba(34, 34, 34, 0.95);
-            color: #ffeb3b;
-            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.5);
         }
 
         @keyframes levelUpAnimation {
@@ -480,6 +410,7 @@
             }
             .game-container {
                 padding: 10px 0;
+                /* Asegurar que la altura se mantenga correctamente en dispositivos pequeños */
                 height: 80vh;
             }
             .controls {
@@ -525,6 +456,7 @@
             <button id="info">ℹ️</button>
         </div>
     </div> 
+
 
 
     <script>
