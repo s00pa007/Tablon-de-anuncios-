@@ -18,7 +18,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             background-color: #f0f0f0;
-            padding: 20px 0;
+            /* Cambiado de padding: 20px 0; a padding: 10vh 0; para reducir espacio superior e inferior */
+            padding: 10vh 0;
         }
 
         .game-container {
@@ -30,6 +31,8 @@
             position: relative;
             width: 100%;
             max-width: none;
+            /* Añadido height: 80vh; para reducir la altura total de la ventana modal */
+            height: 80vh;
             transition: transform 0.3s;
             display: flex;
             flex-direction: column;
@@ -407,6 +410,8 @@
             }
             .game-container {
                 padding: 10px 0;
+                /* Asegurar que la altura se mantenga correctamente en dispositivos pequeños */
+                height: 80vh;
             }
             .controls {
                 margin-top: 10px;
@@ -451,6 +456,8 @@
             <button id="info">ℹ️</button>
         </div>
     </div> 
+
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
