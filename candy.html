@@ -22,7 +22,7 @@
         }
 
         .game-container {
-            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            background-color: #6a11cb;
             padding: 20px 0;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
@@ -59,7 +59,7 @@
         .stat .counter {
             font-size: 2rem;
             font-weight: bold;
-            color: #ff4081;
+            color: #ffeb3b;
         }
 
         .stat.matches-left::before {
@@ -373,6 +373,37 @@
             100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
         }
 
+        .combo-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: transparent;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 3rem;
+            background: linear-gradient(45deg, #ff0000, #0000ff);
+            -webkit-background-clip: text;
+            color: transparent;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .combo-display.show {
+            opacity: 1;
+            animation: fadeOutCombo 3s forwards;
+        }
+
+        @keyframes fadeOutCombo {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
         @media (max-width: 800px) {
             .grid {
                 width: 100%;
@@ -424,11 +455,15 @@
             .stat .counter {
                 font-size: 1.5rem;
             }
+            .combo-display {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
+        <div id="combo-display" class="combo-display"></div>
         <div class="stats">
             <div class="stat matches-made">
                 <span>🔢</span><span id="matches-made">0</span>
@@ -437,7 +472,7 @@
                 <span id="level-indicator">1</span>
             </div>
             <div class="stat matches-left">
-                <span id="matches-left">35</span>
+                <span id="matches-left">100</span>
             </div>
             <div class="stat high-score">
                 <span>🏆</span><span id="high-score-value">0</span>
@@ -589,6 +624,9 @@
             let previousEmojis = [];
             let isLevelUpInProgress = false;
 
+            let comboCount = 0;
+            let maxComboInMove = 0;
+
             const gameOverDisplay = document.getElementById('game-over');
             const matchesDisplay = document.getElementById('matches-made');
             const levelDisplay = document.getElementById('level-indicator');
@@ -598,6 +636,7 @@
             const infoButton = document.getElementById('info');
             const particlesContainer = document.getElementById('particles');
             const gameContainer = document.querySelector('.game-container');
+            const comboDisplay = document.getElementById('combo-display');
 
             let dragStartIndex;
             let dragEndIndex;
@@ -628,17 +667,9 @@
             function getTargetMatches(level) {
                 switch(level) {
                     case 1:
-                        return 35;
+                        return 100;
                     case 2:
-                        return 30;
-                    case 3:
-                        return 25;
-                    case 4:
-                        return 20;
-                    case 5:
-                        return 15;
-                    case 6:
-                        return 10;
+                        return 50;
                     default:
                         return 5;
                 }
@@ -794,7 +825,7 @@
             function clearSquareContent(square) {
                 square.innerHTML = '';
                 square.textContent = '';
-                square.style.setProperty('--bg-color', 'transparent'); // Establecer fondo transparente
+                square.style.setProperty('--bg-color', 'transparent');
             }
 
             function addEventListeners() {
@@ -828,7 +859,10 @@
                 dragEndIndex = parseInt(this.id);
                 if (isAdjacent(dragStartIndex, dragEndIndex)) {
                     swapEmojis(dragStartIndex, dragEndIndex);
-                    if (findMatchesUserAction().length > 0) {
+                    const initialMatches = findMatchesUserAction();
+                    if (initialMatches.length > 0) {
+                        comboCount = 0;
+                        maxComboInMove = 0;
                         checkMatches(true);
                     } else {
                         swapEmojis(dragEndIndex, dragStartIndex);
@@ -871,7 +905,10 @@
                 }
                 if (isAdjacent(touchStartIdLocal, dragEndIndexLocal) && dragEndIndexLocal >= 0 && dragEndIndexLocal < width * width) {
                     swapEmojis(touchStartIdLocal, dragEndIndexLocal);
-                    if (findMatchesUserAction().length > 0) {
+                    const initialMatches = findMatchesUserAction();
+                    if (initialMatches.length > 0) {
+                        comboCount = 0;
+                        maxComboInMove = 0;
                         checkMatches(true);
                     } else {
                         swapEmojis(dragEndIndexLocal, touchStartIdLocal);
@@ -980,37 +1017,41 @@
                 let matches = findAllMatches();
                 if (matches.length > 0) {
                     if (isUserAction) {
-                        matches.forEach(match => {
-                            let matchLength = match.length;
-                            let points = 1;
-                            if (matchLength === 4) {
-                                points = 2;
-                            } else if (matchLength >= 5) {
-                                points = 3;
-                            }
-                            matchesMade += points;
-                            levelMatches += points;
-                            matchesDisplay.textContent = matchesMade;
-                            updateHighScore();
-                            updateMatchesLeft();
-                            const popupIndex = match[Math.floor(match.length / 2)];
-                            createScorePopup(popupIndex, `+${points}`);
-                            const square = squares[popupIndex];
-                            const rect = square.getBoundingClientRect();
-                            const gameRect = gameContainer.getBoundingClientRect();
-                            createParticles(4, emojiColors[emojis[popupIndex]], rect.left - gameRect.left + rect.width / 2, rect.top - gameRect.top + rect.height / 2);
-                        });
-                        if (levelMatches >= getTargetMatches(level)) {
-                            checkLevelUp();
+                        comboCount = 0;
+                        maxComboInMove = 0;
+                    } else {
+                        comboCount += 1;
+                        if (comboCount > maxComboInMove) {
+                            maxComboInMove = comboCount;
                         }
+                        showCombo(`Combo +${comboCount}`);
                     }
+
+                    matches.forEach(match => {
+                        let points = 1;
+                        matchesMade += points;
+                        levelMatches += points;
+                        matchesDisplay.textContent = matchesMade;
+                        updateHighScore();
+                        updateMatchesLeft();
+                        const popupIndex = match[Math.floor(match.length / 2)];
+                        createScorePopup(popupIndex, `+${points}`);
+                        const square = squares[popupIndex];
+                        const rect = square.getBoundingClientRect();
+                        const gameRect = gameContainer.getBoundingClientRect();
+                        createParticles(4 + comboCount, emojiColors[emojis[popupIndex]], rect.left - gameRect.left + rect.width / 2, rect.top - gameRect.top + rect.height / 2);
+                    });
+
+                    if (levelMatches >= getTargetMatches(level)) {
+                        checkLevelUp();
+                    }
+
                     matches.forEach(match => {
                         match.forEach(index => {
                             let emoji = emojis[index];
                             destroyedEmojis[emoji] = (destroyedEmojis[emoji] || 0) + 1;
                             emojis[index] = '';
                             clearSquareContent(squares[index]);
-                            // squares[index].style.removeProperty('--bg-color'); // Ya se establece en transparente
                             if (powerUpActive && index === blinkingIndex) {
                                 squares[index].classList.remove('blinking');
                                 powerUpActive = false;
@@ -1027,9 +1068,15 @@
                     }
                     setTimeout(() => {
                         fillEmptySpaces();
-                        checkMatches(isUserAction);
+                        checkMatches(false);
                     }, 400);
                 } else {
+                    if (isUserAction && maxComboInMove > 0) {
+                        showCombo(`Total Combo: +${maxComboInMove}`);
+                    }
+                    comboCount = 0;
+                    maxComboInMove = 0;
+                    hideCombo();
                     checkEndGame();
                 }
             }
@@ -1139,7 +1186,7 @@
                             emojis[idx] = '';
                             clearSquareContent(squares[idx]);
                             squares[idx].style.removeProperty('--bg-color');
-                            createParticles(4, emojiColors[emoji], squares[idx].offsetLeft + squares[idx].offsetWidth / 2, squares[idx].offsetTop + squares[idx].offsetHeight / 2);
+                            createParticles(4 + comboCount, emojiColors[emoji], squares[idx].offsetLeft + squares[idx].offsetWidth / 2, squares[idx].offsetTop + squares[idx].offsetHeight / 2);
                         }
                     }, i * 30);
                 });
@@ -1154,7 +1201,7 @@
             }
 
             function createParticles(count, color, x, y) {
-                const maxParticles = 4;
+                const maxParticles = 4 + count;
                 const actualCount = Math.min(count, maxParticles);
                 for (let i = 0; i < actualCount; i++) {
                     const particle = document.createElement('div');
@@ -1230,7 +1277,7 @@
                         emojis[index] = '';
                         clearSquareContent(square);
                         if (particlesCreated < maxParticles) {
-                            createParticles(1, emojiColors[emoji], square.offsetLeft + square.offsetWidth / 2, square.offsetTop + square.offsetHeight / 2);
+                            createParticles(1 + comboCount, emojiColors[emoji], square.offsetLeft + square.offsetWidth / 2, square.offsetTop + square.offsetHeight / 2);
                             particlesCreated++;
                         }
                     }
@@ -1262,6 +1309,8 @@
                 powerUpActive = false;
                 blinkingIndex = null;
                 isLevelUpInProgress = false;
+                comboCount = 0;
+                maxComboInMove = 0;
                 matchesDisplay.textContent = matchesMade;
                 levelDisplay.textContent = level;
                 highScoreDisplay.textContent = highScore;
@@ -1389,6 +1438,18 @@
                     }
                 }
                 return possibleMoves;
+            }
+
+            function showCombo(text) {
+                comboDisplay.textContent = text;
+                comboDisplay.classList.add('show');
+                setTimeout(() => {
+                    comboDisplay.classList.remove('show');
+                }, 3000);
+            }
+
+            function hideCombo() {
+                comboDisplay.classList.remove('show');
             }
 
             initializeGame();
