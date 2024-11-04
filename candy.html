@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Match-3 Game</title>
     <style>
+        /* General Styles */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -29,7 +30,7 @@
             text-align: center;
             position: relative;
             width: 100%;
-            max-width: none;
+            max-width: 900px;
             transition: transform 0.3s;
             display: flex;
             flex-direction: column;
@@ -60,11 +61,6 @@
             font-size: 2rem;
             font-weight: bold;
             color: #ffeb3b;
-        }
-
-        .stat.matches-left::before {
-            content: '⭐';
-            margin-right: 5px;
         }
 
         .stat.level::before {
@@ -398,26 +394,6 @@
                 3px 3px 0 #0077ff;
         }
 
-        .combo-text::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="50" cy="50" r="2" fill="white" /></svg>') repeat;
-            mix-blend-mode: screen;
-            opacity: 0.5;
-            animation: sparkle 1s linear infinite;
-            clip-path: text;
-        }
-
-        @keyframes sparkle {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(10px, 10px) scale(1.5); }
-            100% { transform: translate(0, 0) scale(1); }
-        }
-
         .combo-text.show {
             opacity: 1;
             animation: fadeInOut 3s forwards;
@@ -491,24 +467,23 @@
 <body>
 
 <div class="game-container">
-    <div class="combo-text" id="combo-text">COMBO</div>
+    <div class="combo-text" id="combo-text"></div>
     
     <div class="stats">
-        <div class="stat matches-made">
-            <span>🔢</span><span id="matches-made">0</span>
+        <div class="stat score">
+            <span>💯</span><span id="score">0</span>
         </div>
         <div class="stat level">
             <span id="level-indicator">1</span>
         </div>
-        <div class="stat matches-left">
-            <span id="matches-left">15</span>
+        <div class="stat target-score">
+            <span>🎯</span><span id="target-score">1000</span>
         </div>
         <div class="stat high-score">
             <span>🏆</span><span id="high-score-value">0</span>
         </div>
     </div>
     <div class="grid">
-        <!-- Cuadrícula vacía, los emojis serán generados dinámicamente por JavaScript -->
     </div>
     <div id="particles" class="particles"></div>
     <div id="game-over" class="game-over">💀</div>
@@ -518,129 +493,127 @@
     </div>
 </div> 
 
-
 <script>
-
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid');
     const width = 8;
-    const allEmojis = ['😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
-    '🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
-    '😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸',
-    '🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️',
-    '😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡',
-    '🤬','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗',
-    '🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯',
-    '😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐',
-    '🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈',
-    '👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾',
-    '🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿',
-    '😾',
-    // Personas y profesiones
-    '🧑','👨','👩','👶','👧','👦','👩‍🦰','👨‍🦰','👱‍♀️','👱‍♂️',
-    '👩‍🦱','👨‍🦱','👩‍🦳','👨‍🦳','👩‍🦲','👨‍🦲','🧓','👴','👵','👲',
-    '👳‍♀️','👳‍♂️','👮‍♀️','👮‍♂️','🕵️‍♀️','🕵️‍♂️','💂‍♀️','💂‍♂️','👷‍♀️','👷‍♂️',
-    '🤴','👸','👼','🤰','🤱','👩‍⚕️','👨‍⚕️','👩‍🎓','👨‍🎓','👩‍🏫',
-    '👨‍🏫','👩‍⚖️','👨‍⚖️','👩‍🌾','👨‍🌾','👩‍🍳','👨‍🍳','👩‍🔧','👨‍🔧','👩‍🏭',
-    '👨‍🏭','👩‍💼','👨‍💼','👩‍🔬','👨‍🔬','👩‍💻','👨‍💻','👩‍🎤','👨‍🎤','👩‍🎨',
-    '👨‍🎨','👩‍✈️','👨‍✈️','👩‍🚀','👨‍🚀','👩‍🚒','👨‍🚒','🧑‍🚒',
-    // Animales y naturaleza
-    '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
-    '🦁','🐮','🐷','🐽','🐸','🐵','🙈','🙉','🙊','🐒',
-    '🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇',
-    '🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐚','🐞',
-    '🐜','🕷️','🕸️','🦂','🐢','🐍','🦎','🐙','🦑','🦐',
-    '🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅',
-    '🐆','🦓','🦍','🦧','🐘','🦏','🐪','🐫','🦒','🐃',
-    '🐂','🐄','🐎','🐖','🐏','🐑','🐐','🦌','🐕','🐩',
-    '🐈','🐓','🦃','🕊️','🐇','🐁','🐀','🐿️','🦔',
-    // Comida y bebidas
-    '🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐',
-    '🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑',
-    '🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅',
-    '🍄','🥜','🌰','🍞','🥐','🥖','🥨','🥯','🥞','🧇',
-    '🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪',
-    '🌮','🌯','🥙','🧆','🥚','🍳','🧈','🥘','🍲','🥣',
-    '🥗','🍿','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜',
-    '🍝','🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠',
-    '🥡','🦪','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁',
-    '🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🍵',
-    '🍶','🍾','🍷','🍸','🍹','🥂','🍺','🍻','🥃','🥤',
-    '🧋','🧃','🧉','🧊',
-    // Actividades
-    '⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🎱','🏓',
-    '🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯','🪁',
-    '🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤','🎧',
-    '🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗','🎬',
-    '🧩','🧸',
-    // Viajes y lugares
-    '🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐',
-    '🚚','🚛','🚜','🛴','🚲','🛵','🏍️','🛺','🚨','🚔',
-    '✈️','🛩️','🛫','🛬','🪂','💺','🚁','🛶','⛵','🚤',
-    '🛥️','🚢','⚓','⛴️','🪝','🚧','🗺️','🧭','🏞️','🏕️',
-    '🏖️','🏜️','🏝️','🏟️','🏛️','🏗️','🧱','🪨','🪵','🪴',
-    '🌋','🗻','🏔️','⛰️',
-    // Objetos
-    '⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','💽',
-    '💾','💿','📀','📼','📷','📸','📹','🎥','📽️','🎞️',
-    '📞','☎️','📟','📠','🔋','🔌','💡','🔦','🕯️','🪔',
-    '🧯','💰','🪙','💴','💵','💶','💷','💸','💳','🧾',
-    '💎','⚖️','🔧','🔨','⚒️','🛠️','⛏️','🔩','⚙️','🗜️',
-    '⚗️','🧪','🧫','🧬','🔬','🔭','📡','💉','🩸','💊',
-    '🩹','🩺','🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪠',
-    '🧴','🧷','🧹','🧺','🧻','🪣','🪤','🧼','🪒','🧽',
-    '🛒','🚬','⚰️','⚱️','🗿','🪆','🛍️','🧳','👓',
-    '🕶️','🥽','🥼','🦺','👔','👕','👖','🧣','🧤','🧥',
-    '🧦','👗','👘','👙','👚','👛','👜','👝','🎒','🩴',
-    '👞','👟','🥾','🥿','👠','👡','🩰','👢','👑','👒',
-    '🎩','🎓','🧢','⛑️','📿','💄','💍','💎','🔇','🔈',
-    '🔉','🔊','📢','📣','📯','🔔','🔕','🎼','🎵','🎶',
-    '🏧','🚮','🚰','♿','🚹','🚺','🚻','🚼','🚾','🛂',
-    '🛃','🛄','🛅','⚠️','🚸','⛔','🚫','🚳','🚭','❌',
-    '⭕','✅','☑️','✔️','❎','➕','➖','➗','✖️','💱',
-    '💲','⚕️','♻️','📛','🔰','🆗','🆙','🆒','🆕','🆓',
-    '🆖','🅰️','🅱️','🆎','🆑','🅾️','🆘','🛑','‼️','⁉️',
-    '❓','❔','❕','❗','🔅','🔆','🔱','⚜️',
-    // Banderas
-    '🏳️','🏴','🏁','🚩','🏳️‍🌈','🏳️‍⚧️','🇦🇫','🇦🇱','🇩🇿','🇦🇸',
-    '🇦🇩','🇦🇴','🇦🇮','🇦🇶','🇦🇬','🇦🇷','🇦🇲','🇦🇼','🇦🇺','🇦🇹',
-    '🇦🇿','🇧🇸','🇧🇭','🇧🇩','🇧🇧','🇧🇾','🇧🇪','🇧🇿','🇧🇯','🇧🇲',
-    '🇧🇹','🇧🇴','🇧🇦','🇧🇼','🇧🇷','🇮🇴','🇻🇬','🇧🇳','🇧🇬','🇧🇫',
-    '🇧🇮','🇨🇻','🇰🇭','🇨🇲','🇨🇦','🇮🇨','🇰🇾','🇨🇫','🇹🇩','🇨🇱',
-    '🇨🇳','🇨🇽','🇨🇨','🇨🇴','🇰🇲','🇨🇬','🇨🇩','🇨🇰','🇨🇷','🇨🇮',
-    '🇭🇷','🇨🇺','🇨🇾','🇨🇿','🇩🇰','🇩🇯','🇩🇲','🇩🇴','🇪🇨','🇪🇬',
-    '🇸🇻','🇬🇶','🇪🇷','🇪🇪','🇪🇹','🇫🇯','🇫🇮','🇫🇷','🇬🇫','🇵🇫',
-    '🇹🇫','🇬🇦','🇬🇲','🇬🇪','🇩🇪','🇬🇭','🇬🇮','🇬🇷','🇬🇱','🇬🇩',
-    '🇬🇵','🇬🇺','🇬🇹','🇬🇬','🇬🇳','🇬🇼','🇬🇾','🇭🇹','🇭🇳','🇭🇰',
-    '🇭🇺','🇮🇸','🇮🇳','🇮🇩','🇮🇷','🇮🇶','🇮🇪','🇮🇱','🇮🇹','🇯🇲',
-    '🇯🇵','🇯🇪','🇯🇴','🇰🇿','🇰🇪','🇰🇮','🇽🇰','🇰🇼','🇰🇬','🇱🇦',
-    '🇱🇻','🇱🇧','🇱🇸','🇱🇷','🇱🇾','🇱🇮','🇱🇹','🇱🇺','🇲🇴','🇲🇰',
-    '🇲🇬','🇲🇼','🇲🇾','🇲🇻','🇲🇱','🇲🇹','🇲🇭','🇲🇶','🇲🇷','🇲🇺',
-    '🇾🇹','🇲🇽','🇫🇲','🇲🇩','🇲🇨','🇲🇳','🇲🇪','🇲🇸','🇲🇦','🇲🇿',
-    '🇲🇲','🇳🇦','🇳🇷','🇳🇵','🇳🇱','🇳🇨','🇳🇿','🇳🇮','🇳🇪','🇳🇬',
-    '🇳🇺','🇳🇫','🇰🇵','🇳🇴','🇴🇲','🇵🇰','🇵🇼','🇵🇸','🇵🇦','🇵🇬',
-    '🇵🇾','🇵🇪','🇵🇭','🇵🇱','🇵🇹','🇵🇷','🇶🇦','🇷🇴','🇷🇺','🇷🇼',
-    '🇧🇱','🇸🇭','🇰🇳','🇱🇨','🇵🇲','🇻🇨','🇼🇸','🇸🇲','🇸🇹','🇸🇦',
-    '🇸🇳','🇷🇸','🇸🇨','🇸🇱','🇸🇬','🇸🇰','🇸🇮','🇸🇧','🇸🇴','🇿🇦',
-    '🇰🇷','🇸🇸','🇪🇸','🇱🇰','🇸🇩','🇸🇷','🇸🇿','🇸🇪','🇨🇭','🇸🇾',
-    '🇹🇼','🇹🇯','🇹🇿','🇹🇭','🇹🇱','🇹🇬','🇹🇰','🇹🇴','🇹🇹','🇹🇳',
-    '🇹🇷','🇹🇲','🇹🇨','🇺🇬','🇺🇦','🇦🇪','🇬🇧','🇺🇸','🇺🇾','🇺🇿',
-    '🇻🇺','🇻🇦','🇻🇪','🇻🇳','🇼🇫','🇪🇭','🇾🇪','🇿🇲','🇿🇼',
-    // Otros emojis populares
-    '🎉','🎊','🎈','🎂','🍰','🍦','🍩','🍪','🍫','🍬',
-    '🍭','🍮','🎁','🎀','🎗️','🎟️','🎫','🎖️','🏆','🥇',
-    '🥈','🥉','⚽️','🏀','🏈','⚾️','🎾','🏐','🏉','🎱',
-    '🏓','🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯',
-    '🪁','🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤',
-    '🎧','🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗',
-    '🎬','🧩','🧸',
-    ];
+    const allEmojis = [
+'😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
+'🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
+'😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸',
+'🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️',
+'😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡',
+'🤬','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗',
+'🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯',
+'😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐',
+'🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈',
+'👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾',
+'🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿',
+'😾',
+// Personas y profesiones
+'🧑','👨','👩','👶','👧','👦','👩‍🦰','👨‍🦰','👱‍♀️','👱‍♂️',
+'👩‍🦱','👨‍🦱','👩‍🦳','👨‍🦳','👩‍🦲','👨‍🦲','🧓','👴','👵','👲',
+'👳‍♀️','👳‍♂️','👮‍♀️','👮‍♂️','🕵️‍♀️','🕵️‍♂️','💂‍♀️','💂‍♂️','👷‍♀️','👷‍♂️',
+'🤴','👸','👼','🤰','🤱','👩‍⚕️','👨‍⚕️','👩‍🎓','👨‍🎓','👩‍🏫',
+'👨‍🏫','👩‍⚖️','👨‍⚖️','👩‍🌾','👨‍🌾','👩‍🍳','👨‍🍳','👩‍🔧','👨‍🔧','👩‍🏭',
+'👨‍🏭','👩‍💼','👨‍💼','👩‍🔬','👨‍🔬','👩‍💻','👨‍💻','👩‍🎤','👨‍🎤','👩‍🎨',
+'👨‍🎨','👩‍✈️','👨‍✈️','👩‍🚀','👨‍🚀','👩‍🚒','👨‍🚒','🧑‍🚒',
+// Animales y naturaleza
+'🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
+'🦁','🐮','🐷','🐽','🐸','🐵','🙈','🙉','🙊','🐒',
+'🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇',
+'🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐚','🐞',
+'🐜','🕷️','🕸️','🦂','🐢','🐍','🦎','🐙','🦑','🦐',
+'🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅',
+'🐆','🦓','🦍','🦧','🐘','🦏','🐪','🐫','🦒','🐃',
+'🐂','🐄','🐎','🐖','🐏','🐑','🐐','🦌','🐕','🐩',
+'🐈','🐓','🦃','🕊️','🐇','🐁','🐀','🐿️','🦔',
+// Comida y bebidas
+'🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐',
+'🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑',
+'🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅',
+'🍄','🥜','🌰','🍞','🥐','🥖','🥨','🥯','🥞','🧇',
+'🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪',
+'🌮','🌯','🥙','🧆','🥚','🍳','🧈','🥘','🍲','🥣',
+'🥗','🍿','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜',
+'🍝','🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠',
+'🥡','🦪','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁',
+'🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🍵',
+'🍶','🍾','🍷','🍸','🍹','🥂','🍺','🍻','🥃','🥤',
+'🧋','🧃','🧉','🧊',
+// Actividades
+'⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🎱','🏓',
+'🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯','🪁',
+'🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤','🎧',
+'🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗','🎬',
+'🧩','🧸',
+// Viajes y lugares
+'🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐',
+'🚚','🚛','🚜','🛴','🚲','🛵','🏍️','🛺','🚨','🚔',
+'✈️','🛩️','🛫','🛬','🪂','💺','🚁','🛶','⛵','🚤',
+'🛥️','🚢','⚓','⛴️','🪝','🚧','🗺️','🧭','🏞️','🏕️',
+'🏖️','🏜️','🏝️','🏟️','🏛️','🏗️','🧱','🪨','🪵','🪴',
+'🌋','🗻','🏔️','⛰️',
+// Objetos
+'⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','💽',
+'💾','💿','📀','📼','📷','📸','📹','🎥','📽️','🎞️',
+'📞','☎️','📟','📠','🔋','🔌','💡','🔦','🕯️','🪔',
+'🧯','💰','🪙','💴','💵','💶','💷','💸','💳','🧾',
+'💎','⚖️','🔧','🔨','⚒️','🛠️','⛏️','🔩','⚙️','🗜️',
+'⚗️','🧪','🧫','🧬','🔬','🔭','📡','💉','🩸','💊',
+'🩹','🩺','🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪠',
+'🧴','🧷','🧹','🧺','🧻','🪣','🪤','🧼','🪒','🧽',
+'🛒','🚬','⚰️','⚱️','🗿','🪆','🛍️','🧳','👓',
+'🕶️','🥽','🥼','🦺','👔','👕','👖','🧣','🧤','🧥',
+'🧦','👗','👘','👙','👚','👛','👜','👝','🎒','🩴',
+'👞','👟','🥾','🥿','👠','👡','🩰','👢','👑','👒',
+'🎩','🎓','🧢','⛑️','📿','💄','💍','💎','🔇','🔈',
+'🔉','🔊','📢','📣','📯','🔔','🔕','🎼','🎵','🎶',
+'🏧','🚮','🚰','♿','🚹','🚺','🚻','🚼','🚾','🛂',
+'🛃','🛄','🛅','⚠️','🚸','⛔','🚫','🚳','🚭','❌',
+'⭕','✅','☑️','✔️','❎','➕','➖','➗','✖️','💱',
+'💲','⚕️','♻️','📛','🔰','🆗','🆙','🆒','🆕','🆓',
+'🆖','🅰️','🅱️','🆎','🆑','🅾️','🆘','🛑','‼️','⁉️',
+'❓','❔','❕','❗','🔅','🔆','🔱','⚜️',
+// Banderas
+'🏳️','🏴','🏁','🚩','🏳️‍🌈','🏳️‍⚧️','🇦🇫','🇦🇱','🇩🇿','🇦🇸',
+'🇦🇩','🇦🇴','🇦🇮','🇦🇶','🇦🇬','🇦🇷','🇦🇲','🇦🇼','🇦🇺','🇦🇹',
+'🇦🇿','🇧🇸','🇧🇭','🇧🇩','🇧🇧','🇧🇾','🇧🇪','🇧🇿','🇧🇯','🇧🇲',
+'🇧🇹','🇧🇴','🇧🇦','🇧🇼','🇧🇷','🇮🇴','🇻🇬','🇧🇳','🇧🇬','🇧🇫',
+'🇧🇮','🇨🇻','🇰🇭','🇨🇲','🇨🇦','🇮🇨','🇰🇾','🇨🇫','🇹🇩','🇨🇱',
+'🇨🇳','🇨🇽','🇨🇨','🇨🇴','🇰🇲','🇨🇬','🇨🇩','🇨🇰','🇨🇷','🇨🇮',
+'🇭🇷','🇨🇺','🇨🇾','🇨🇿','🇩🇰','🇩🇯','🇩🇲','🇩🇴','🇪🇨','🇪🇬',
+'🇸🇻','🇬🇶','🇪🇷','🇪🇪','🇪🇹','🇫🇯','🇫🇮','🇫🇷','🇬🇫','🇵🇫',
+'🇹🇫','🇬🇦','🇬🇲','🇬🇪','🇩🇪','🇬🇭','🇬🇮','🇬🇷','🇬🇱','🇬🇩',
+'🇬🇵','🇬🇺','🇬🇹','🇬🇬','🇬🇳','🇬🇼','🇬🇾','🇭🇹','🇭🇳','🇭🇰',
+'🇭🇺','🇮🇸','🇮🇳','🇮🇩','🇮🇷','🇮🇶','🇮🇪','🇮🇱','🇮🇹','🇯🇲',
+'🇯🇵','🇯🇪','🇯🇴','🇰🇿','🇰🇪','🇰🇮','🇽🇰','🇰🇼','🇰🇬','🇱🇦',
+'🇱🇻','🇱🇧','🇱🇸','🇱🇷','🇱🇾','🇱🇮','🇱🇹','🇱🇺','🇲🇴','🇲🇰',
+'🇲🇬','🇲🇼','🇲🇾','🇲🇻','🇲🇱','🇲🇹','🇲🇭','🇲🇶','🇲🇷','🇲🇺',
+'🇾🇹','🇲🇽','🇫🇲','🇲🇩','🇲🇨','🇲🇳','🇲🇪','🇲🇸','🇲🇦','🇲🇿',
+'🇲🇲','🇳🇦','🇳🇷','🇳🇵','🇳🇱','🇳🇨','🇳🇿','🇳🇮','🇳🇪','🇳🇬',
+'🇳🇺','🇳🇫','🇰🇵','🇳🇴','🇴🇲','🇵🇰','🇵🇼','🇵🇸','🇵🇦','🇵🇬',
+'🇵🇾','🇵🇪','🇵🇭','🇵🇱','🇵🇹','🇵🇷','🇶🇦','🇷🇴','🇷🇺','🇷🇼',
+'🇧🇱','🇸🇭','🇰🇳','🇱🇨','🇵🇲','🇻🇨','🇼🇸','🇸🇲','🇸🇹','🇸🇦',
+'🇸🇳','🇷🇸','🇸🇨','🇸🇱','🇸🇬','🇸🇰','🇸🇮','🇸🇧','🇸🇴','🇿🇦',
+'🇰🇷','🇸🇸','🇪🇸','🇱🇰','🇸🇩','🇸🇷','🇸🇿','🇸🇪','🇨🇭','🇸🇾',
+'🇹🇼','🇹🇯','🇹🇿','🇹🇭','🇹🇱','🇹🇬','🇹🇰','🇹🇴','🇹🇹','🇹🇳',
+'🇹🇷','🇹🇲','🇹🇨','🇺🇬','🇺🇦','🇦🇪','🇬🇧','🇺🇸','🇺🇾','🇺🇿',
+'🇻🇺','🇻🇦','🇻🇪','🇻🇳','🇼🇫','🇪🇭','🇾🇪','🇿🇲','🇿🇼',
+// Otros emojis populares
+'🎉','🎊','🎈','🎂','🍰','🍦','🍩','🍪','🍫','🍬',
+'🍭','🍮','🎁','🎀','🎗️','🎟️','🎫','🎖️','🏆','🥇',
+'🥈','🥉','⚽️','🏀','🏈','⚾️','🎾','🏐','🏉','🎱',
+'🏓','🏸','🥅','🏒','🏑','🥍','🏏','🪀','🥏','🎯',
+'🪁','🎳','🎮','🕹️','🎰','🎲','♟️','🎭','🎨','🎤',
+'🎧','🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪗',
+'🎬','🧩','🧸',
+];
     const bombEmoji = '💣';
     const dogEmoji = '🐶';
     let emojis = [];
     const squares = [];
-    let matchesMade = 0;
-    let levelMatches = 0;
+    let score = 0;
     let level = 1;
     let highScore = 0;
     let destroyedEmojis = {};
@@ -648,20 +621,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalTimePlayed = 0;
     let gameStartTime;
     let powerUpActive = false;
-    let destroyedEmojisCount = 0;
     let blinkingIndex = null;
-    let lastUserActionTime = Date.now();
     let currentEmojis = [];
     let powerUpRange = 1;
     let previousEmojis = [];
     let isLevelUpInProgress = false;
     let emojisDestroyedSinceLastBomb = 0;
-    let comboMultiplier = 0;
+    let comboMultiplier = 1;
     const gameOverDisplay = document.getElementById('game-over');
-    const matchesDisplay = document.getElementById('matches-made');
+    const scoreDisplay = document.getElementById('score');
     const levelDisplay = document.getElementById('level-indicator');
     const highScoreDisplay = document.getElementById('high-score-value');
-    const matchesLeftDisplay = document.getElementById('matches-left');
+    const targetScoreDisplay = document.getElementById('target-score');
     const restartButton = document.getElementById('restart');
     const infoButton = document.getElementById('info');
     const particlesContainer = document.getElementById('particles');
@@ -674,6 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let touchStartIdLocal = null;
     let emojiColors = {};
 
+    // Asignación de colores a emojis
     function assignColorsToEmojis() {
         const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe'];
         let colorIndex = 0;
@@ -688,17 +660,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const softColors = ['#FFEBEE', '#F3E5F5', '#E3F2FD', '#E8F5E9', '#FFF3E0'];
 
-    function getTargetMatches(level) {
-        switch(level) {
-            case 1:
-                return 100;
-            case 2:
-                return 50;
-            default:
-                return 5;
-        }
+    // Obtención del puntaje objetivo basado en el nivel
+    function getTargetScore(level) {
+        if (level === 1) return 1000;
+        if (level === 2) return 500;
+        if (level === 3) return 250;
+        if (level === 4) return 125;
+        if (level >= 5) return 60;
     }
 
+    // Inicialización del juego
     function initializeGame() {
         const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
         grid.style.backgroundColor = randomColor;
@@ -707,26 +678,29 @@ document.addEventListener('DOMContentLoaded', () => {
         setCurrentEmojis(true);
         createBoard();
         gameStartTime = Date.now();
-        updateMatchesLeft();
+        updateTargetScore();
         stabilizeBoard();
     }
 
+    // Carga del puntaje más alto desde localStorage
     function loadHighScore() {
-        const storedHighScore = localStorage.getItem('highMatches');
+        const storedHighScore = localStorage.getItem('highScore');
         if (storedHighScore) {
             highScore = parseInt(storedHighScore);
             highScoreDisplay.textContent = highScore;
         }
     }
 
+    // Actualización del puntaje más alto
     function updateHighScore() {
-        if (matchesMade > highScore) {
-            highScore = matchesMade;
+        if (score > highScore) {
+            highScore = score;
             highScoreDisplay.textContent = highScore;
-            localStorage.setItem('highMatches', highScore);
+            localStorage.setItem('highScore', highScore);
         }
     }
 
+    // Carga de estadísticas desde localStorage
     function loadStatistics() {
         const storedGamesPlayed = localStorage.getItem('gamesPlayed');
         if (storedGamesPlayed) {
@@ -744,16 +718,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Guardado de estadísticas en localStorage
     function saveStatistics() {
         localStorage.setItem('gamesPlayed', totalGamesPlayed);
         localStorage.setItem('timePlayed', totalTimePlayed);
         localStorage.setItem('destroyedEmojis', JSON.stringify(destroyedEmojis));
     }
 
+    // Configuración de emojis actuales
     function setCurrentEmojis(renewAll = false) {
         if (renewAll) {
             currentEmojis = [dogEmoji];
-            const numberOfNewEmojis = 2 + level;
+            const numberOfNewEmojis = Math.min(2 + level, allEmojis.length);
             const newEmojis = getRandomUniqueEmojis(allEmojis, numberOfNewEmojis);
             currentEmojis = currentEmojis.concat(newEmojis);
         } else {
@@ -764,6 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Obtención de emojis únicos aleatorios
     function getRandomUniqueEmojis(array, number) {
         const filteredArray = array.filter(emoji => 
             emoji !== bombEmoji && 
@@ -778,6 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return filteredArray.slice(0, number);
     }
 
+    // Obtención de un nuevo emoji aleatorio
     function getNewEmoji() {
         const availableEmojis = allEmojis.filter(emoji => 
             !currentEmojis.includes(emoji) && 
@@ -790,6 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return availableEmojis[randomIndex];
     }
 
+    // Creación del tablero de juego
     function createBoard() {
         grid.innerHTML = '';
         squares.length = 0;
@@ -804,17 +783,21 @@ document.addEventListener('DOMContentLoaded', () => {
         addEventListeners();
     }
 
+    // Llenado del tablero con emojis
     function fillBoard() {
         for (let i = 0; i < squares.length; i++) {
             if (emojis[i] === undefined || emojis[i] === '') {
                 let randomEmoji = getRandomEmoji();
-                emojis[i] = randomEmoji;
-                setSquareContent(squares[i], randomEmoji);
-                squares[i].style.setProperty('--bg-color', emojiColors[randomEmoji]);
+                if (randomEmoji) { // Asegúrate de que no sea null
+                    emojis[i] = randomEmoji;
+                    setSquareContent(squares[i], randomEmoji);
+                    squares[i].style.setProperty('--bg-color', emojiColors[randomEmoji]);
+                }
             }
         }
     }
 
+    // Estabilización del tablero para evitar matches iniciales
     function stabilizeBoard() {
         let matches = findAllMatches();
         while (matches.length > 0) {
@@ -832,11 +815,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Obtención de un emoji aleatorio de los actuales
     function getRandomEmoji() {
         const rand = Math.floor(Math.random() * currentEmojis.length);
         return currentEmojis[rand];
     }
 
+    // Configuración del contenido de una celda
     function setSquareContent(square, emoji) {
         if (emoji === dogEmoji) {
             square.innerHTML = '<img src="dog.png" alt="Dog" class="dog-image">';
@@ -846,12 +831,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Limpieza del contenido de una celda
     function clearSquareContent(square) {
         square.innerHTML = '';
         square.textContent = '';
         square.style.setProperty('--bg-color', 'transparent');
     }
 
+    // Adición de event listeners a las celdas y controles
     function addEventListeners() {
         squares.forEach(square => {
             square.addEventListener('dragstart', dragStart);
@@ -870,15 +857,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('touchstart', resetIdleTimer);
     }
 
+    // Función de inicio de arrastre
     function dragStart(e) {
         dragStartIndex = parseInt(this.id);
         this.classList.add('dragging');
     }
 
+    // Prevención del comportamiento por defecto al arrastrar sobre una celda
     function dragOver(e) {
         e.preventDefault();
     }
 
+    // Función al soltar el arrastre
     function dragDrop(e) {
         dragEndIndex = parseInt(this.id);
         if (isAdjacent(dragStartIndex, dragEndIndex)) {
@@ -892,10 +882,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Limpieza de clases después del arrastre
     function dragEnd() {
         squares.forEach(square => square.classList.remove('dragging'));
     }
 
+    // Manejo de inicio de toque en dispositivos móviles
     function handleTouchStart(e) {
         if (e.touches.length === 1) {
             touchStartX = e.touches[0].clientX;
@@ -904,6 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Manejo del final de toque en dispositivos móviles
     function handleTouchEnd(e) {
         if (touchStartX === null || touchStartY === null) return;
         const touchEndX = e.changedTouches[0].clientX;
@@ -939,6 +932,7 @@ document.addEventListener('DOMContentLoaded', () => {
         touchStartIdLocal = null;
     }
 
+    // Manejo de clic en una celda (para activar power-up)
     function handleSquareClick(e) {
         const index = parseInt(this.id);
         if (powerUpActive && index === blinkingIndex && emojis[index] === bombEmoji) {
@@ -946,6 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Verificación de si dos índices son adyacentes
     function isAdjacent(index1, index2) {
         const row1 = Math.floor(index1 / width);
         const col1 = index1 % width;
@@ -956,6 +951,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
     }
 
+    // Intercambio de emojis entre dos celdas
     function swapEmojis(index1, index2) {
         const tempEmoji = emojis[index1];
         emojis[index1] = emojis[index2];
@@ -967,6 +963,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePowerUpPosition(index1, index2);
     }
 
+    // Actualización de la posición del power-up si es necesario
     function updatePowerUpPosition(oldIndex, newIndex) {
         if (powerUpActive) {
             if (oldIndex === blinkingIndex) {
@@ -981,8 +978,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Búsqueda de todos los matches en el tablero
     function findAllMatches() {
         const matches = [];
+        // Búsqueda horizontal
         for (let row = 0; row < width; row++) {
             for (let col = 0; col < width - 2; col++) {
                 const idx = row * width + col;
@@ -1004,6 +1003,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        // Búsqueda vertical
         for (let col = 0; col < width; col++) {
             for (let row = 0; row < width - 2; row++) {
                 const idx = row * width + col;
@@ -1028,28 +1028,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return matches;
     }
 
+    // Función para obtener matches tras una acción del usuario
     function findMatchesUserAction() {
         return findAllMatches();
     }
 
+    // Verificación y procesamiento de los matches
     async function checkMatches(isUserAction = false) {
         let matches = findAllMatches();
+
         if (isUserAction && matches.length > 0) {
-            comboMultiplier = 1;
+            comboMultiplier = 2; // Primer combo es x2
+        } else if (matches.length > 0) {
+            comboMultiplier += 1; // Incrementa el multiplicador por cada cadena de matches
         }
 
         while (matches.length > 0) {
-            if (!isUserAction && matches.length > 0) {
-                comboMultiplier += 1;
-            }
-
-            if (comboMultiplier >= 2) {
-                showCombo(`x${comboMultiplier}`);
+            if (comboMultiplier > 1) {
+                showCombo(comboMultiplier); // Mostrar el multiplicador de combo
             }
 
             for (let match of matches) {
                 const popupIndex = match[Math.floor(match.length / 2)];
-                createScorePopup(popupIndex, `+${match.length}`);
+                const points = match.length * comboMultiplier;
+                score += points;
+                scoreDisplay.textContent = score;
+                createScorePopup(popupIndex, `+${points}`);
                 const square = squares[popupIndex];
                 const rect = square.getBoundingClientRect();
                 const gameRect = gameContainer.getBoundingClientRect();
@@ -1071,28 +1075,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            matchesMade += 1 * comboMultiplier;
-            levelMatches += 1 * comboMultiplier;
-            matchesDisplay.textContent = matchesMade;
             updateHighScore();
-            updateMatchesLeft();
+            updateTargetScore();
 
-            if (levelMatches >= getTargetMatches(level)) {
+            if (score >= getTargetScore(level)) {
                 await checkLevelUp();
             }
 
             await fillEmptySpaces();
             matches = findAllMatches();
-            isUserAction = false;
+            if (matches.length > 0) {
+                comboMultiplier += 1; // Incrementa el multiplicador por nueva cadena de matches
+            }
         }
 
-        if (comboMultiplier >= 2) {
+        if (comboMultiplier > 1) {
             hideCombo();
         }
-        comboMultiplier = 0;
+        // Resetear el multiplicador después de procesar todos los matches en la jugada
+        if (!isUserAction) {
+            comboMultiplier = 1;
+        }
         checkEndGame();
     }
 
+    // Llenado de espacios vacíos tras eliminar matches
     function fillEmptySpaces() {
         return new Promise(resolve => {
             for (let col = 0; col < width; col++) {
@@ -1123,22 +1130,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let row = 0; row < emptySpots; row++) {
                     const idx = row * width + col;
                     const newEmoji = getRandomEmoji();
-                    emojis[idx] = newEmoji;
-                    setSquareContent(squares[idx], newEmoji);
-                    squares[idx].style.setProperty('--bg-color', emojiColors[newEmoji]);
-                    squares[idx].classList.add('fall');
-                    setTimeout(() => {
-                        squares[idx].classList.remove('fall');
-                        if (powerUpActive && newEmoji === bombEmoji) {
-                            if (blinkingIndex !== idx) {
-                                if (blinkingIndex !== null) {
-                                    squares[blinkingIndex].classList.remove('blinking');
+                    if (newEmoji) { // Asegúrate de que no sea null
+                        emojis[idx] = newEmoji;
+                        setSquareContent(squares[idx], newEmoji);
+                        squares[idx].style.setProperty('--bg-color', emojiColors[newEmoji]);
+                        squares[idx].classList.add('fall');
+                        setTimeout(() => {
+                            squares[idx].classList.remove('fall');
+                            if (powerUpActive && newEmoji === bombEmoji) {
+                                if (blinkingIndex !== idx) {
+                                    if (blinkingIndex !== null) {
+                                        squares[blinkingIndex].classList.remove('blinking');
+                                    }
+                                    blinkingIndex = idx;
+                                    squares[blinkingIndex].classList.add('blinking');
                                 }
-                                blinkingIndex = idx;
-                                squares[blinkingIndex].classList.add('blinking');
                             }
-                        }
-                    }, 600);
+                        }, 600);
+                    }
                 }
             }
             setTimeout(() => {
@@ -1147,6 +1156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Activación del power-up
     function activatePowerup() {
         if (powerUpActive) return;
         const availableIndices = squares.map((_, idx) => idx).filter(idx => emojis[idx] !== bombEmoji && emojis[idx] !== dogEmoji);
@@ -1157,9 +1167,10 @@ document.addEventListener('DOMContentLoaded', () => {
         squares[blinkingIndex].style.setProperty('--bg-color', emojiColors[bombEmoji]);
         squares[blinkingIndex].classList.add('blinking');
         powerUpActive = true;
-        destroyedEmojisCount = 0;
+        emojisDestroyedSinceLastBomb = 0;
     }
 
+    // Disparo del power-up al interactuar con la bomba
     async function triggerPowerUp(index) {
         const row = Math.floor(index / width);
         const col = index % width;
@@ -1186,6 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await animateExplosion(index, indicesToDestroy);
     }
 
+    // Animación de explosión del power-up
     async function animateExplosion(centerIdx, indices) {
         powerUpActive = false;
         blinkingIndex = null;
@@ -1194,6 +1206,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (emojis[idx] !== '') {
                 let emoji = emojis[idx];
                 destroyedEmojis[emoji] = (destroyedEmojis[emoji] || 0) + 1;
+                score += 5 * comboMultiplier;
+                scoreDisplay.textContent = score;
                 emojis[idx] = '';
                 clearSquareContent(squares[idx]);
                 squares[idx].style.removeProperty('--bg-color');
@@ -1201,9 +1215,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 await delay(15);
             }
         }
-        emojis[centerIdx] = '';
-        clearSquareContent(squares[centerIdx]);
-        squares[centerIdx].style.removeProperty('--bg-color');
         squares[centerIdx].classList.remove('blinking');
         gameContainer.classList.add('vibrate');
         setTimeout(() => {
@@ -1213,6 +1224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await checkMatches(false);
     }
 
+    // Creación de partículas para efectos visuales
     function createParticles(count, color, x, y) {
         const maxParticles = 112;
         const actualCount = Math.min(count, maxParticles);
@@ -1242,6 +1254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Creación de popups de puntaje al hacer match
     function createScorePopup(index, text) {
         const popup = document.createElement('div');
         popup.classList.add('score-popup');
@@ -1259,6 +1272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
+    // Mostrar mensaje de subida de nivel
     function showLevelUpMessage() {
         const message = document.createElement('div');
         message.classList.add('level-up-message');
@@ -1269,10 +1283,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
 
+    // Verificación y manejo de subida de nivel
     async function checkLevelUp() {
         if (isLevelUpInProgress) return;
         isLevelUpInProgress = true;
-        destroyAllEmojisWithParticles();
+        await destroyAllEmojisWithParticles();
         previousEmojis = currentEmojis.filter(emoji => emoji !== dogEmoji);
         setTimeout(() => {
             levelUp();
@@ -1281,16 +1296,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
 
+    // Manejo de subida de nivel
     function levelUp() {
         level += 1;
         levelDisplay.textContent = level;
-        levelMatches = 0;
-        updateMatchesLeft();
+        updateTargetScore();
         setCurrentEmojis(true);
         powerUpRange += 1;
         resetGridForNewLevel();
     }
 
+    // Destrucción de todos los emojis con partículas al subir de nivel
     async function destroyAllEmojisWithParticles() {
         const maxParticles = 8;
         let particlesCreated = 0;
@@ -1298,6 +1314,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (emojis[i] !== '' && emojis[i] !== bombEmoji) {
                 let emoji = emojis[i];
                 destroyedEmojis[emoji] = (destroyedEmojis[emoji] || 0) + 1;
+                score += 2 * comboMultiplier;
+                scoreDisplay.textContent = score;
                 emojis[i] = '';
                 clearSquareContent(squares[i]);
                 if (particlesCreated < maxParticles) {
@@ -1310,6 +1328,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Reinicio del tablero al subir de nivel
     function resetGridForNewLevel() {
         squares.forEach(square => {
             square.classList.remove('blinking', 'match', 'fall', 'hint');
@@ -1323,23 +1342,23 @@ document.addEventListener('DOMContentLoaded', () => {
         stabilizeBoard();
     }
 
+    // Reinicio completo del juego
     function resetGame() {
         totalGamesPlayed += 1;
         totalTimePlayed += Date.now() - gameStartTime;
         saveStatistics();
-        matchesMade = 0;
-        levelMatches = 0;
+        score = 0;
         level = 1;
         powerUpRange = 1;
-        destroyedEmojisCount = 0;
+        emojisDestroyedSinceLastBomb = 0;
         powerUpActive = false;
         blinkingIndex = null;
         isLevelUpInProgress = false;
-        comboMultiplier = 0;
-        matchesDisplay.textContent = matchesMade;
+        comboMultiplier = 1;
+        scoreDisplay.textContent = score;
         levelDisplay.textContent = level;
         highScoreDisplay.textContent = highScore;
-        matchesLeftDisplay.textContent = getTargetMatches(level);
+        updateTargetScore();
         gameOverDisplay.style.display = 'none';
         squares.forEach(square => {
             square.classList.remove('blinking', 'match', 'fall', 'hint');
@@ -1355,9 +1374,10 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.style.backgroundColor = randomColor;
         fillBoard();
         stabilizeBoard();
-        updateMatchesLeft();
+        updateTargetScore();
     }
 
+    // Función para mostrar estadísticas del juego
     function showInfo() {
         if (document.querySelector('.stats-popup')) return;
         const infoContainer = document.createElement('div');
@@ -1396,21 +1416,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(infoContainer);
     }
 
+    // Reinicio del temporizador de inactividad
     function resetIdleTimer() {
-        lastUserActionTime = Date.now();
+        comboMultiplier = 1;
+        hideCombo();
     }
 
-    function updateMatchesLeft() {
-        const matchesLeft = getTargetMatches(level) - levelMatches;
-        matchesLeftDisplay.textContent = matchesLeft > 0 ? matchesLeft : 0;
+    // Actualización del puntaje objetivo en la interfaz
+    function updateTargetScore() {
+        const target = getTargetScore(level);
+        targetScoreDisplay.textContent = target;
     }
 
+    // Función para proporcionar pistas si hay inactividad
     setInterval(() => {
-        if (Date.now() - lastUserActionTime >= 6000) {
+        if (comboMultiplier === 1) { // Solo si no está en un combo
             hintPossibleMatch();
         }
     }, 1000);
 
+    // Mostrar pistas de posibles movimientos
     function hintPossibleMatch() {
         const possibleMoves = findPossibleMoves();
         if (possibleMoves.length > 0) {
@@ -1424,6 +1449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Verificación del fin del juego
     function checkEndGame() {
         const hasBomb = emojis.includes(bombEmoji);
         if (hasBomb) return;
@@ -1442,6 +1468,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Búsqueda de posibles movimientos para continuar el juego
     function findPossibleMoves() {
         let possibleMoves = [];
         for (let i = 0; i < width * width; i++) {
@@ -1465,24 +1492,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return possibleMoves;
     }
 
-    function showCombo(text) {
-        if (comboMultiplier < 2) return;
-        comboDisplay.innerHTML = '';
-        comboDisplay.textContent = `COMBO ${text}`;
+    // Mostrar el texto de combo con el multiplicador
+    function showCombo(multiplier) {
+        if (multiplier < 2) return;
+        comboDisplay.innerHTML = ''; // Limpia cualquier contenido previo
+        comboDisplay.textContent = `COMBO x${multiplier}`; // Asegura un espacio entre "COMBO" y "x2"
         comboDisplay.style.opacity = '1';
         comboDisplay.classList.add('show');
         setTimeout(() => {
             comboDisplay.classList.remove('show');
-            comboDisplay.textContent = 'COMBO';
         }, 2500);
     }
 
+    // Ocultar el texto de combo
     function hideCombo() {
         comboDisplay.style.opacity = '0';
         comboDisplay.classList.remove('show');
-        comboDisplay.textContent = 'COMBO';
     }
 
+    // Función para manejar la explosión de una celda
     async function triggerExplosion(index) {
         const square = squares[index];
         square.classList.add('explode');
@@ -1492,13 +1520,15 @@ document.addEventListener('DOMContentLoaded', () => {
         square.classList.remove('explode');
     }
 
+    // Función de retraso
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    // Inicialización del juego al cargar la página
     initializeGame();
+
 });
 </script>
-
 </body>
 </html>
