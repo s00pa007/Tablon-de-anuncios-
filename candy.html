@@ -188,13 +188,13 @@ body {
 .grid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    gap: 2px; /* Reducido para cuadrículas más grandes */
+    gap: 2px;
     justify-content: center;
     align-content: start;
     background-image: url('galaxy.png');
     background-size: cover;
     background-repeat: no-repeat;
-    padding: 6px; /* Reducido para cuadrículas más grandes */
+    padding: 6px;
     border-radius: 10px;
     transition: all 0.3s ease-in-out;
     position: relative;
@@ -215,7 +215,7 @@ body {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-size: 1.587rem;
+    font-size: 1.825rem; /* Aumentado un 15% desde 1.587rem */
     transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s;
     position: relative;
     overflow: hidden;
@@ -530,7 +530,7 @@ body {
     .grid {
         width: 100%;
         height: 100%;
-        padding: 4px; /* Ajustado para pantallas más pequeñas */
+        padding: 4px;
         gap: 2px;
     }
 }
@@ -558,6 +558,9 @@ body {
     .grid {
         padding: 4px;
         gap: 1px;
+    }
+    .grid div {
+        font-size: 1.7rem; /* Ajuste responsivo para los emojis */
     }
     .stat-label, .stat-count {
         font-size: 1.0rem;
@@ -621,7 +624,6 @@ body {
     </p>
     <button onclick="closeInfo()">Cerrar</button>
 </div>
-
 
 
 <script>
