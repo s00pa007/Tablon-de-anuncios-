@@ -15,22 +15,21 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Arial Black', Gadget, sans-serif;
     overflow: hidden;
-    background-color: #f0f0f0;
+    background-color: #000; /* Fondo negro para mejor contraste */
     padding: 20px 0;
 }
 
 .game-container {
-    background-color: #6a11cb;
+    background-color: #1a1a1a; /* Fondo oscuro profesional */
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     text-align: center;
     position: relative;
     width: 100%;
     max-width: 900px;
-    transition: transform 0.3s;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -40,11 +39,16 @@ body {
 
 .stats {
     display: flex;
-    justify-content: space-around;
-    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
     margin-bottom: 20px;
-    width: 90%;
-    flex-wrap: wrap;
+}
+
+.left-stats, .right-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .stat {
@@ -54,28 +58,22 @@ body {
 }
 
 .stat-label, .stat-count {
-    background-color: #4a148c;
-    padding: 2px 6px;
+    background-color: #004d40; /* Fondo oscuro para etiquetas */
+    padding: 4px 8px;
     border-radius: 4px;
-    font-size: 0.6rem;
+    font-size: 1rem; /* Tamaño de fuente doble */
     font-weight: bold;
-    color: #ffffff;
+    color: #00e676; /* Verde brillante para buen contraste */
 }
 
-.stat.score .stat-label {
-    background-color: #1e88e5;
+.stat.target-score .stat-count {
+    background-color: #ffab00; /* Naranja vibrante para objetivo */
+    color: #fff;
 }
 
-.stat.level .stat-label {
-    background-color: #43a047;
-}
-
-.stat.target-score .stat-label {
-    background-color: #f4511e;
-}
-
-.stat.high-score .stat-label {
-    background-color: #8e24aa;
+.stat.high-score .stat-count {
+    background-color: #d500f9; /* Púrpura vibrante para mejor puntuación */
+    color: #fff;
 }
 
 .controls {
@@ -86,26 +84,29 @@ body {
 }
 
 .controls button {
-    background-color: #3949ab;
+    background-color: #ff4081; /* Rosa vibrante */
     border: none;
     color: white;
-    padding: 4px 10px;
-    margin: 0 5px;
-    border-radius: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.6rem;
+    font-size: 1rem;
     font-weight: bold;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Arial Black', Gadget, sans-serif;
     transition: background-color 0.3s, transform 0.2s;
-    box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 10px rgba(255,64,129,0.5);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .controls button:hover {
-    background-color: #303f9f;
-    transform: translateY(-2px);
+    background-color: #e91e63;
+    transform: translateY(-3px);
+}
+
+#info {
+    font-size: 1rem; /* Tamaño igual al botón reiniciar */
 }
 
 .grid {
@@ -125,13 +126,13 @@ body {
     width: 100%;
     max-width: 800px;
     aspect-ratio: 1 / 1;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 10px rgba(255,255,255,0.1);
     flex-grow: 1;
 }
 
 .grid div {
-    background-color: var(--bg-color, rgba(224, 247, 250, 0.95));
-    border: 2px solid #00838f;
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro para las celdas */
+    border: 2px solid #00e676; /* Borde verde brillante */
     border-radius: 12px;
     display: flex;
     justify-content: center;
@@ -141,9 +142,9 @@ body {
     transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 3px 7px rgba(0,0,0,0.15);
-    color: #fff;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 7px rgba(0,0,0,0.3);
+    color: #00e676; /* Verde brillante para los emojis */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     width: 100%;
     aspect-ratio: 1 / 1;
 }
@@ -162,8 +163,8 @@ body {
 
 .grid div:hover {
     transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(0, 131, 143, 0.8);
-    background-color: var(--bg-color, rgba(178, 235, 242, 0.95));
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.8); /* Verde más brillante al pasar */
+    background-color: rgba(0, 100, 0, 0.9); /* Verde oscuro al pasar */
 }
 
 .game-over {
@@ -174,11 +175,11 @@ body {
     transform: translate(-50%, -50%);
     font-size: 2rem;
     color: #d32f2f;
-    text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    text-shadow: 2px 2px 10px rgba(255,255,255,0.5);
     z-index: 10;
     animation: shake 0.5s;
     font-weight: bold;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Arial Black', Gadget, sans-serif;
 }
 
 @keyframes shake {
@@ -211,7 +212,7 @@ body {
 .score-popup {
     position: absolute;
     font-size: 0.48rem;
-    color: #ffeb3b;
+    color: #00e676;
     animation: popUp 0.8s forwards;
     pointer-events: none;
     font-weight: bold;
@@ -220,7 +221,7 @@ body {
 }
 
 .score-popup.move-score {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Arial Black', Gadget, sans-serif;
     font-size: 1.8rem;
     font-weight: 900;
     text-align: center;
@@ -230,19 +231,19 @@ body {
 }
 
 .score-popup.move-score-green {
-    color: #32CD32;
+    color: #00e676;
     text-shadow: 
-    0 0 5px #FFD700,
-    0 0 10px #FFD700,
-    0 0 15px #FFD700;
+    0 0 5px #00e676,
+    0 0 10px #00e676,
+    0 0 15px #00e676;
 }
 
 .score-popup.move-score-purple {
-    color: #9932CC;
+    color: #d500f9;
     text-shadow: 
-    0 0 5px #FFFFFF,
-    0 0 10px #FFFFFF,
-    0 0 15px #FFFFFF;
+    0 0 5px #d500f9,
+    0 0 10px #d500f9,
+    0 0 15px #d500f9;
 }
 
 @keyframes popUpScore {
@@ -276,7 +277,7 @@ body {
     position: absolute;
     width: 6px;
     height: 6px;
-    background: #ff4081;
+    background: #00e676;
     border-radius: 50%;
     opacity: 0;
     animation: particle 0.6s forwards;
@@ -312,13 +313,13 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #0077ff, #00c6ff, #ffffff);
+    background: #000; /* Fondo negro tipo Matrix */
     padding: 20px 40px;
     border-radius: 10px;
-    font-size: 2.64rem;
-    font-family: 'Arial', sans-serif;
-    color: #000;
-    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    font-size: 1.8rem;
+    font-family: 'Courier New', Courier, monospace; /* Fuente tipo Matrix */
+    color: #00ff00; /* Verde brillante */
+    box-shadow: 0 0 20px #00ff00;
     animation: levelUpAnimation 1.5s forwards;
     z-index: 1000;
 }
@@ -332,7 +333,7 @@ body {
 .combo-text {
     font-size: 2.112em;
     font-weight: 900;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Arial Black', Gadget, sans-serif;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -343,13 +344,13 @@ body {
     transition: opacity 0.5s ease-in-out;
     letter-spacing: -0.05em;
     text-shadow:
-    0 0 8px white,
-    0 0 16px white,
-    0 0 24px #0077ff,
-    -3px -3px 0 #0077ff,
-    3px -3px 0 #0077ff,
-    -3px 3px 0 #0077ff,
-    3px 3px 0 #0077ff;
+    0 0 8px #00ff00,
+    0 0 16px #00ff00,
+    0 0 24px #00ff00,
+    -3px -3px 0 #00ff00,
+    3px -3px 0 #00ff00,
+    -3px 3px 0 #00ff00,
+    3px 3px 0 #00ff00;
 }
 
 .combo-text.show {
@@ -375,7 +376,7 @@ body {
 }
 
 .hint {
-    border: 2px solid #ffffff;
+    border: 2px solid #00e676;
     animation: blink 0.8s infinite;
 }
 
@@ -417,6 +418,69 @@ body {
         letter-spacing: -0.04em;
     }
 }
+
+/* Información Modal Estilo Matrix */
+.info-modal {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95); /* Fondo negro semi-transparente */
+    color: #00ff00; /* Verde Matrix */
+    font-family: 'Courier New', Courier, monospace;
+    padding: 20px;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.info-modal-content {
+    max-width: 600px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: #000;
+    border: 2px solid #00ff00;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.info-modal-content h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.info-modal-content p {
+    font-size: 0.8rem; /* Fuente muy pequeña */
+    line-height: 1.4;
+}
+
+.info-modal-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.info-modal-content li {
+    margin-bottom: 5px;
+}
+
+.close-info {
+    display: block;
+    margin: 20px auto 0;
+    background-color: #00e676;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: 'Arial Black', Gadget, sans-serif;
+    transition: background-color 0.3s;
+}
+
+.close-info:hover {
+    background-color: #00c853;
+}
 </style>
 </head>
 <body>
@@ -424,17 +488,21 @@ body {
     <div class="combo-text" id="combo-text"></div>
 
     <div class="stats">
-        <div class="stat score">
-            <span class="stat-label">Puntuación</span><span class="stat-count" id="score">0</span>
+        <div class="left-stats">
+            <div class="stat score">
+                <span class="stat-label">Puntuación</span><span class="stat-count" id="score">0</span>
+            </div>
+            <div class="stat target-score">
+                <span class="stat-label">Objetivo</span><span class="stat-count" id="target-score">3000</span>
+            </div>
         </div>
-        <div class="stat level">
-            <span class="stat-label">Nivel</span><span class="stat-count" id="level-indicator">1</span>
-        </div>
-        <div class="stat target-score">
-            <span class="stat-label">Objetivo</span><span class="stat-count" id="target-score">3000</span>
-        </div>
-        <div class="stat high-score">
-            <span class="stat-label">Mejor Puntuación</span><span class="stat-count" id="high-score-value">0</span>
+        <div class="right-stats">
+            <div class="stat level">
+                <span class="stat-label">Nivel</span><span class="stat-count" id="level-indicator">1</span>
+            </div>
+            <div class="stat high-score">
+                <span class="stat-label">Mejor Puntuación</span><span class="stat-count" id="high-score-value">0</span>
+            </div>
         </div>
     </div>
     <div class="grid">
@@ -443,9 +511,27 @@ body {
     <div id="game-over" class="game-over">Juego Terminado</div>
     <div class="controls">
         <button id="restart">Reiniciar</button>
-        <button id="info">Información</button>
+        <button id="info">ℹ️</button>
     </div>
 </div>
+
+<!-- Información Modal -->
+<div id="info-modal" class="info-modal">
+    <div class="info-modal-content">
+        <h2>Información del Juego</h2>
+        <p>Bienvenido al juego de Match-3. Alinea tres o más emojis iguales para destruirlos y ganar puntos. Completa los objetivos para avanzar de nivel.</p>
+        <ul>
+            <li>🎯 **Objetivo:** Alcanzar la puntuación requerida para subir de nivel.</li>
+            <li>🐶 **Perro:** Utiliza el poder del perro para destruir emojis específicos.</li>
+            <li>💣 **Bomba:** Activa la bomba para eliminar emojis en su rango.</li>
+            <li>🔥 **Combos:** Realiza múltiples combinaciones consecutivas para ganar puntos adicionales.</li>
+            <li>🏆 **Mejor Puntuación:** Supera tu mejor puntuación anterior.</li>
+        </ul>
+        <button class="close-info">Cerrar</button>
+    </div>
+</div>
+
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
