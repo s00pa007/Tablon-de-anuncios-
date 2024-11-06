@@ -15,14 +15,14 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    font-family: 'Arial Black', Gadget, sans-serif;
+    font-family: 'Arial', sans-serif;
     overflow: hidden;
-    background-color: #000; /* Fondo negro para mejor contraste */
+    background-color: #000; /* Dark background for better contrast */
     padding: 20px 0;
 }
 
 .game-container {
-    background-color: #1a1a1a; /* Fondo oscuro profesional */
+    background-color: #1a1a1a; /* Dark background for professional look */
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
@@ -30,6 +30,7 @@ body {
     position: relative;
     width: 100%;
     max-width: 900px;
+    transition: transform 0.3s;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -40,40 +41,48 @@ body {
 .stats {
     display: flex;
     justify-content: space-between;
-    width: 100%;
-    max-width: 800px;
+    align-items: flex-start;
     margin-bottom: 20px;
+    width: 100%;
 }
 
-.left-stats, .right-stats {
+.stats-left, .stats-right {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .stat {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
 }
 
 .stat-label, .stat-count {
-    background-color: #004d40; /* Fondo oscuro para etiquetas */
-    padding: 4px 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
     border-radius: 4px;
-    font-size: 1rem; /* Tamaño de fuente doble */
+    font-size: 0.75rem; /* Extremely small font */
     font-weight: bold;
-    color: #00e676; /* Verde brillante para buen contraste */
+    color: #ffffff;
+    text-shadow: 0 0 2px #000; /* Black outline for better contrast */
 }
 
-.stat.target-score .stat-count {
-    background-color: #ffab00; /* Naranja vibrante para objetivo */
-    color: #fff;
+.stat.score .stat-label {
+    background-color: #1e88e5;
 }
 
-.stat.high-score .stat-count {
-    background-color: #d500f9; /* Púrpura vibrante para mejor puntuación */
-    color: #fff;
+.stat.level .stat-label {
+    background-color: #43a047;
+}
+
+.stat.target-score .stat-label {
+    background-color: #f4511e;
+}
+
+.stat.high-score .stat-label {
+    background-color: #8e24aa;
+    font-size: 0.375rem; /* Half size for Mejor Puntuación */
 }
 
 .controls {
@@ -84,29 +93,30 @@ body {
 }
 
 .controls button {
-    background-color: #ff4081; /* Rosa vibrante */
+    background-color: #ff5722;
     border: none;
     color: white;
     padding: 6px 12px;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.75rem; /* Small font */
     font-weight: bold;
-    font-family: 'Arial Black', Gadget, sans-serif;
+    font-family: 'Arial', sans-serif;
     transition: background-color 0.3s, transform 0.2s;
-    box-shadow: 0 6px 10px rgba(255,64,129,0.5);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .controls button:hover {
-    background-color: #e91e63;
-    transform: translateY(-3px);
+    background-color: #e64a19;
+    transform: translateY(-2px);
 }
 
-#info {
-    font-size: 1rem; /* Tamaño igual al botón reiniciar */
+.controls button#info::before {
+    content: 'ℹ️'; /* Information emoji */
+    margin-right: 4px;
 }
 
 .grid {
@@ -126,25 +136,25 @@ body {
     width: 100%;
     max-width: 800px;
     aspect-ratio: 1 / 1;
-    box-shadow: 0 4px 10px rgba(255,255,255,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     flex-grow: 1;
 }
 
 .grid div {
-    background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro para las celdas */
-    border: 2px solid #00e676; /* Borde verde brillante */
+    background-color: transparent; /* Transparent to show galaxy background when empty */
+    border: 2px solid #00838f;
     border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-size: 1.8rem;
+    font-size: 2rem; /* Original emoji size */
     transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s;
     position: relative;
     overflow: hidden;
     box-shadow: 0 3px 7px rgba(0,0,0,0.3);
-    color: #00e676; /* Verde brillante para los emojis */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    text-shadow: 0 0 2px #000; /* Black outline for better contrast */
     width: 100%;
     aspect-ratio: 1 / 1;
 }
@@ -163,8 +173,8 @@ body {
 
 .grid div:hover {
     transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(0, 230, 118, 0.8); /* Verde más brillante al pasar */
-    background-color: rgba(0, 100, 0, 0.9); /* Verde oscuro al pasar */
+    box-shadow: 0 0 15px rgba(0, 131, 143, 0.8);
+    background-color: rgba(178, 235, 242, 0.3);
 }
 
 .game-over {
@@ -175,11 +185,11 @@ body {
     transform: translate(-50%, -50%);
     font-size: 2rem;
     color: #d32f2f;
-    text-shadow: 2px 2px 10px rgba(255,255,255,0.5);
+    text-shadow: 0 0 5px #000;
     z-index: 10;
     animation: shake 0.5s;
     font-weight: bold;
-    font-family: 'Arial Black', Gadget, sans-serif;
+    font-family: 'Arial', sans-serif;
 }
 
 @keyframes shake {
@@ -212,16 +222,19 @@ body {
 .score-popup {
     position: absolute;
     font-size: 0.48rem;
-    color: #00e676;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #ffeb3b;
     animation: popUp 0.8s forwards;
     pointer-events: none;
     font-weight: bold;
-    text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    text-shadow: 0 0 2px #000;
     z-index: 25;
+    padding: 2px 4px;
+    border-radius: 4px;
 }
 
 .score-popup.move-score {
-    font-family: 'Arial Black', Gadget, sans-serif;
+    font-family: 'Arial', sans-serif;
     font-size: 1.8rem;
     font-weight: 900;
     text-align: center;
@@ -231,19 +244,15 @@ body {
 }
 
 .score-popup.move-score-green {
-    color: #00e676;
-    text-shadow: 
-    0 0 5px #00e676,
-    0 0 10px #00e676,
-    0 0 15px #00e676;
+    color: #32CD32;
+    background-color: rgba(0, 0, 0, 0.7);
+    text-shadow: 0 0 2px #000;
 }
 
 .score-popup.move-score-purple {
-    color: #d500f9;
-    text-shadow: 
-    0 0 5px #d500f9,
-    0 0 10px #d500f9,
-    0 0 15px #d500f9;
+    color: #9932CC;
+    background-color: rgba(0, 0, 0, 0.7);
+    text-shadow: 0 0 2px #000;
 }
 
 @keyframes popUpScore {
@@ -277,7 +286,7 @@ body {
     position: absolute;
     width: 6px;
     height: 6px;
-    background: #00e676;
+    background: #ff4081;
     border-radius: 50%;
     opacity: 0;
     animation: particle 0.6s forwards;
@@ -313,13 +322,13 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #000; /* Fondo negro tipo Matrix */
+    background: linear-gradient(135deg, #00ff00, #007700);
     padding: 20px 40px;
     border-radius: 10px;
-    font-size: 1.8rem;
-    font-family: 'Courier New', Courier, monospace; /* Fuente tipo Matrix */
-    color: #00ff00; /* Verde brillante */
-    box-shadow: 0 0 20px #00ff00;
+    font-size: 2.64rem;
+    font-family: 'Courier New', Courier, monospace; /* Matrix-like font */
+    color: #00ff00;
+    box-shadow: 0 0 20px rgba(0,255,0,0.7);
     animation: levelUpAnimation 1.5s forwards;
     z-index: 1000;
 }
@@ -333,19 +342,19 @@ body {
 .combo-text {
     font-size: 2.112em;
     font-weight: 900;
-    font-family: 'Arial Black', Gadget, sans-serif;
+    font-family: 'Arial', sans-serif;
     position: absolute;
-    top: 50%;
+    top: 10px; /* Adjusted position to fit in the top area */
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     pointer-events: none;
     z-index: 20;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
     letter-spacing: -0.05em;
     text-shadow:
-    0 0 8px #00ff00,
-    0 0 16px #00ff00,
+    0 0 8px #000,
+    0 0 16px #000,
     0 0 24px #00ff00,
     -3px -3px 0 #00ff00,
     3px -3px 0 #00ff00,
@@ -376,7 +385,7 @@ body {
 }
 
 .hint {
-    border: 2px solid #00e676;
+    border: 2px solid #00ff00;
     animation: blink 0.8s infinite;
 }
 
@@ -418,69 +427,6 @@ body {
         letter-spacing: -0.04em;
     }
 }
-
-/* Información Modal Estilo Matrix */
-.info-modal {
-    display: none; /* Oculto por defecto */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.95); /* Fondo negro semi-transparente */
-    color: #00ff00; /* Verde Matrix */
-    font-family: 'Courier New', Courier, monospace;
-    padding: 20px;
-    z-index: 2000;
-    overflow: hidden;
-}
-
-.info-modal-content {
-    max-width: 600px;
-    margin: 100px auto;
-    padding: 20px;
-    background-color: #000;
-    border: 2px solid #00ff00;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.info-modal-content h2 {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.info-modal-content p {
-    font-size: 0.8rem; /* Fuente muy pequeña */
-    line-height: 1.4;
-}
-
-.info-modal-content ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.info-modal-content li {
-    margin-bottom: 5px;
-}
-
-.close-info {
-    display: block;
-    margin: 20px auto 0;
-    background-color: #00e676;
-    color: #000;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: 'Arial Black', Gadget, sans-serif;
-    transition: background-color 0.3s;
-}
-
-.close-info:hover {
-    background-color: #00c853;
-}
 </style>
 </head>
 <body>
@@ -488,7 +434,7 @@ body {
     <div class="combo-text" id="combo-text"></div>
 
     <div class="stats">
-        <div class="left-stats">
+        <div class="stats-left">
             <div class="stat score">
                 <span class="stat-label">Puntuación</span><span class="stat-count" id="score">0</span>
             </div>
@@ -496,7 +442,7 @@ body {
                 <span class="stat-label">Objetivo</span><span class="stat-count" id="target-score">3000</span>
             </div>
         </div>
-        <div class="right-stats">
+        <div class="stats-right">
             <div class="stat level">
                 <span class="stat-label">Nivel</span><span class="stat-count" id="level-indicator">1</span>
             </div>
@@ -510,27 +456,19 @@ body {
     <div id="particles" class="particles"></div>
     <div id="game-over" class="game-over">Juego Terminado</div>
     <div class="controls">
-        <button id="restart">Reiniciar</button>
+        <button id="restart">🔄 Reiniciar</button>
         <button id="info">ℹ️</button>
     </div>
 </div>
 
-<!-- Información Modal -->
-<div id="info-modal" class="info-modal">
-    <div class="info-modal-content">
-        <h2>Información del Juego</h2>
-        <p>Bienvenido al juego de Match-3. Alinea tres o más emojis iguales para destruirlos y ganar puntos. Completa los objetivos para avanzar de nivel.</p>
-        <ul>
-            <li>🎯 **Objetivo:** Alcanzar la puntuación requerida para subir de nivel.</li>
-            <li>🐶 **Perro:** Utiliza el poder del perro para destruir emojis específicos.</li>
-            <li>💣 **Bomba:** Activa la bomba para eliminar emojis en su rango.</li>
-            <li>🔥 **Combos:** Realiza múltiples combinaciones consecutivas para ganar puntos adicionales.</li>
-            <li>🏆 **Mejor Puntuación:** Supera tu mejor puntuación anterior.</li>
-        </ul>
-        <button class="close-info">Cerrar</button>
-    </div>
+<!-- Information Popup -->
+<div class="stats-popup" id="info-popup" style="display: none;">
+    <h2 style="color: #00ff00; font-family: 'Courier New', Courier, monospace; font-size: 0.8rem;">Información del Juego</h2>
+    <p style="color: #00ff00; font-family: 'Courier New', Courier, monospace; font-size: 0.6rem;">
+        Bienvenido al juego Match-3. Combina tres o más emojis iguales para ganar puntos. Al alcanzar el objetivo, subirás de nivel y desbloquearás nuevas funcionalidades. Usa las bombas para eliminar emojis estratégicamente y mejorar tu puntuación. ¡Buena suerte!
+    </p>
+    <button onclick="closeInfo()" style="background-color: #00ff00; border: none; color: #000; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 0.6rem; font-weight: bold; font-family: 'Courier New', Courier, monospace;">Cerrar</button>
 </div>
-
 
 
 <script>
