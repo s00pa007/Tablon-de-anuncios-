@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Match-3 Game</title>
 <style>
+/* Reset y Estilos Base */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -17,15 +18,15 @@ body {
     min-height: 100vh;
     font-family: 'Arial', sans-serif;
     overflow: hidden;
-    background-color: #000; /* Dark background for better contrast */
+    background-color: #2c003e;
     padding: 20px 0;
 }
 
 .game-container {
-    background-color: #1a1a1a; /* Dark background for professional look */
+    background-color: #4b0082;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
     text-align: center;
     position: relative;
     width: 100%;
@@ -38,6 +39,54 @@ body {
     height: auto;
 }
 
+/* Estilos del Texto "Combo" */
+.combo-text {
+    font-size: 2em;
+    font-weight: 900;
+    font-family: 'Arial', sans-serif;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    letter-spacing: -0.05em;
+    color: #ffff00;
+    text-shadow:
+        0 0 6px #000,
+        0 0 12px #ffff00,
+        0 0 18px #ffff00,
+        0 0 24px #ffff00;
+}
+
+.combo-text.combo-2 { color: #ffff00; }
+.combo-text.combo-10 { color: #ff0000; }
+
+/* Gradiente de Amarillo a Rojo para Combo 2-10 */
+.combo-text.combo-3 { color: #ffea00; }
+.combo-text.combo-4 { color: #ffcc00; }
+.combo-text.combo-5 { color: #ffb300; }
+.combo-text.combo-6 { color: #ffa500; }
+.combo-text.combo-7 { color: #ff8c00; }
+.combo-text.combo-8 { color: #ff7f50; }
+.combo-text.combo-9 { color: #ff6347; }
+
+/* Animación para Mostrar el Combo */
+.combo-text.show {
+    opacity: 1;
+    animation: fadeInOut 3s forwards;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Sección de Estadísticas */
 .stats {
     display: flex;
     justify-content: space-between;
@@ -49,23 +98,23 @@ body {
 .stats-left, .stats-right {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 }
 
+/* Estilos de las Estadísticas */
 .stat {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
 }
 
 .stat-label, .stat-count {
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 2px 6px;
+    padding: 4px 12px;
     border-radius: 4px;
-    font-size: 0.75rem; /* Extremely small font */
+    font-size: 1.2rem;
     font-weight: bold;
     color: #ffffff;
-    text-shadow: 0 0 2px #000; /* Black outline for better contrast */
+    text-shadow: 0 0 4px #000;
 }
 
 .stat.score .stat-label {
@@ -80,11 +129,22 @@ body {
     background-color: #f4511e;
 }
 
-.stat.high-score .stat-label {
-    background-color: #8e24aa;
-    font-size: 0.375rem; /* Half size for Mejor Puntuación */
+.stat.high-score {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
+.stat.high-score .stat-label {
+    background-color: #8e24aa;
+    color: #ffffff;
+    font-size: 0.51rem;
+    padding: 4px 12px;
+    border-radius: 4px;
+    text-shadow: 0 0 4px #000;
+}
+
+/* Sección de Controles */
 .controls {
     margin-top: 20px;
     display: flex;
@@ -96,14 +156,14 @@ body {
     background-color: #ff5722;
     border: none;
     color: white;
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 12px 24px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.75rem; /* Small font */
+    font-size: 1.2rem;
     font-weight: bold;
     font-family: 'Arial', sans-serif;
     transition: background-color 0.3s, transform 0.2s;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -115,20 +175,26 @@ body {
 }
 
 .controls button#info::before {
-    content: 'ℹ️'; /* Information emoji */
-    margin-right: 4px;
+    content: '';
 }
 
+.controls button#info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Sección de la Grid */
 .grid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    gap: 2px;
+    gap: 4px;
     justify-content: center;
     align-content: start;
     background-image: url('galaxy.png');
     background-size: cover;
     background-repeat: no-repeat;
-    padding: 10px;
+    padding: 20px;
     border-radius: 10px;
     transition: all 0.3s ease-in-out;
     position: relative;
@@ -136,38 +202,32 @@ body {
     width: 100%;
     max-width: 800px;
     aspect-ratio: 1 / 1;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.7);
     flex-grow: 1;
 }
 
 .grid div {
-    background-color: transparent; /* Transparent to show galaxy background when empty */
+    background-color: var(--bg-color, transparent);
     border: 2px solid #00838f;
     border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-size: 2rem; /* Original emoji size */
+    font-size: 1.587rem;
     transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s;
     position: relative;
     overflow: hidden;
     box-shadow: 0 3px 7px rgba(0,0,0,0.3);
     color: #fff;
-    text-shadow: 0 0 2px #000; /* Black outline for better contrast */
+    text-shadow: 0 0 2px #000;
     width: 100%;
     aspect-ratio: 1 / 1;
 }
 
 .grid div img {
-    width: 60%;
-    height: 60%;
-    object-fit: contain;
-}
-
-.grid div img.dog-image {
-    width: 100%;
-    height: 100%;
+    width: 94.875%;
+    height: 94.875%;
     object-fit: contain;
 }
 
@@ -177,13 +237,64 @@ body {
     background-color: rgba(178, 235, 242, 0.3);
 }
 
+/* Animación para Bombas */
+.bomb {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Animación cuando se activa la bomba */
+.bomb-activated {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    20% { transform: translate(-4px, 0) scale(1.05); }
+    40% { transform: translate(4px, 0) scale(1.05); }
+    60% { transform: translate(-4px, 0) scale(1.05); }
+    80% { transform: translate(4px, 0) scale(1.05); }
+}
+
+/* Animación para las casillas que se destruyen por la bomba */
+.bomb-destroy {
+    animation: bombDestroyAnimation 0.3s forwards;
+}
+
+@keyframes bombDestroyAnimation {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        background-color: var(--bg-color, transparent);
+        border-color: #00838f;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.5;
+        background-color: rgba(255, 0, 0, 0.3);
+        border-color: rgba(255, 0, 0, 0.5);
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+        background-color: transparent;
+        border-color: transparent;
+        visibility: hidden;
+    }
+}
+
+/* Sección de Fin de Juego */
 .game-over {
     display: none;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 2rem;
+    font-size: 1.05rem;
     color: #d32f2f;
     text-shadow: 0 0 5px #000;
     z-index: 10;
@@ -192,14 +303,7 @@ body {
     font-family: 'Arial', sans-serif;
 }
 
-@keyframes shake {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    25% { transform: translate(-50%, -50%) rotate(5deg); }
-    50% { transform: translate(-50%, -50%) rotate(-5deg); }
-    75% { transform: translate(-50%, -50%) rotate(5deg); }
-    100% { transform: translate(-50%, -50%) rotate(0deg); }
-}
-
+/* Animación de Match */
 .match {
     animation: matchAnimation 0.2s forwards;
 }
@@ -208,20 +312,28 @@ body {
     0% {
         transform: scale(1);
         opacity: 1;
+        background-color: var(--bg-color, transparent);
+        border-color: #00838f;
     }
     50% {
         transform: scale(1.3);
-        opacity: 1;
+        opacity: 0.5;
+        background-color: transparent;
+        border-color: transparent;
     }
     100% {
         transform: scale(1);
         opacity: 0;
+        background-color: transparent;
+        border-color: transparent;
+        visibility: hidden;
     }
 }
 
+/* Popup de Puntuación */
 .score-popup {
     position: absolute;
-    font-size: 0.48rem;
+    font-size: 0.96rem;
     background-color: rgba(0, 0, 0, 0.7);
     color: #ffeb3b;
     animation: popUp 0.8s forwards;
@@ -229,13 +341,13 @@ body {
     font-weight: bold;
     text-shadow: 0 0 2px #000;
     z-index: 25;
-    padding: 2px 4px;
+    padding: 4px 8px;
     border-radius: 4px;
 }
 
 .score-popup.move-score {
     font-family: 'Arial', sans-serif;
-    font-size: 1.8rem;
+    font-size: 1.35rem;
     font-weight: 900;
     text-align: center;
     animation: popUpScore 1s forwards;
@@ -270,6 +382,7 @@ body {
     }
 }
 
+/* Partículas */
 .particles {
     position: absolute;
     top: 0;
@@ -304,6 +417,7 @@ body {
     }
 }
 
+/* Animación de Caída */
 .fall {
     animation: fallAnimation 0.6s ease-out forwards;
 }
@@ -317,6 +431,7 @@ body {
     }
 }
 
+/* Mensaje de Subida de Nivel */
 .level-up-message {
     position: absolute;
     top: 50%;
@@ -326,7 +441,7 @@ body {
     padding: 20px 40px;
     border-radius: 10px;
     font-size: 2.64rem;
-    font-family: 'Courier New', Courier, monospace; /* Matrix-like font */
+    font-family: 'Courier New', Courier, monospace;
     color: #00ff00;
     box-shadow: 0 0 20px rgba(0,255,0,0.7);
     animation: levelUpAnimation 1.5s forwards;
@@ -339,56 +454,65 @@ body {
     100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
 }
 
-.combo-text {
-    font-size: 2.112em;
-    font-weight: 900;
-    font-family: 'Arial', sans-serif;
-    position: absolute;
-    top: 10px; /* Adjusted position to fit in the top area */
+/* Ventana de Información */
+.info-popup {
+    position: fixed;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    pointer-events: none;
-    z-index: 20;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    letter-spacing: -0.05em;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    color: #000000;
+    box-shadow: 0 0 20px rgba(0,255,0,0.7);
+    z-index: 1001;
+    max-width: 300px;
+    width: 90%;
+}
+
+.info-popup h2 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #00ff00;
     text-shadow:
-    0 0 8px #000,
-    0 0 16px #000,
-    0 0 24px #00ff00,
-    -3px -3px 0 #00ff00,
-    3px -3px 0 #00ff00,
-    -3px 3px 0 #00ff00,
-    3px 3px 0 #00ff00;
+        0 0 6px #000,
+        0 0 12px #00ff00,
+        0 0 18px #00ff00,
+        0 0 24px #00ff00;
 }
 
-.combo-text.show {
-    opacity: 1;
-    animation: fadeInOut 3s forwards;
+.info-popup p {
+    font-size: 0.6rem;
+    line-height: 1.4;
+    text-align: justify;
+    color: #000000;
 }
 
-@keyframes fadeInOut {
-    0% { opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { opacity: 0; }
+.info-popup button {
+    background-color: #00ff00;
+    border: none;
+    color: #000;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.6rem;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    margin-top: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+.info-popup button:hover {
+    background-color: #00cc00;
+    transform: translateY(-1px);
 }
 
-.blinking {
-    animation: blink 1s infinite;
-}
-
-.hint {
-    border: 2px solid #00ff00;
-    animation: blink 0.8s infinite;
-}
-
+/* Diseño Responsivo */
 @media (max-width: 800px) {
     .grid {
         width: 100%;
@@ -398,17 +522,17 @@ body {
 
 @media (max-width: 600px) {
     .stats .stat-label, .stats .stat-count {
-        font-size: 0.48rem;
+        font-size: 1.0rem;
     }
     .game-over {
-        font-size: 1.6rem;
+        font-size: 1.05rem;
     }
     .score-popup {
-        font-size: 0.384rem;
+        font-size: 0.48rem;
     }
     .controls button {
-        padding: 3px 6px;
-        font-size: 0.48rem;
+        padding: 6px 12px;
+        font-size: 0.6rem;
     }
     .game-container {
         padding: 10px 0;
@@ -417,21 +541,26 @@ body {
         margin-top: 10px;
     }
     .grid {
-        padding: 5px;
+        padding: 10px;
     }
     .stat-label, .stat-count {
-        font-size: 0.48rem;
+        font-size: 1.0rem;
     }
     .combo-text {
         font-size: 1.68em;
         letter-spacing: -0.04em;
+        text-shadow:
+            0 0 6px #000,
+            0 0 12px #ffff00,
+            0 0 18px #ffff00,
+            0 0 24px #ffff00;
     }
 }
 </style>
 </head>
 <body>
 <div class="game-container">
-    <div class="combo-text" id="combo-text"></div>
+    <div class="combo-text" id="combo-text">Combo</div>
 
     <div class="stats">
         <div class="stats-left">
@@ -452,24 +581,30 @@ body {
         </div>
     </div>
     <div class="grid">
+        <!-- Cuadrículas del tablero serán pobladas por JavaScript -->
+        <!-- Ejemplo de cuadrícula con emoji -->
+        <!-- <div style="--bg-color: #ffcc00;">😊</div> -->
+        <!-- Ejemplo de cuadrícula con bomba -->
+        <div class="bomb" style="--bg-color: #ffcc00;">💣</div>
+        <!-- Ejemplo de cuadrícula con perro -->
+        <div style="--bg-color: #ffcc00;"><img src="dog.png" alt="Perro"></div>
     </div>
     <div id="particles" class="particles"></div>
     <div id="game-over" class="game-over">Juego Terminado</div>
     <div class="controls">
-        <button id="restart">🔄 Reiniciar</button>
+        <button id="restart">🔄</button>
         <button id="info">ℹ️</button>
     </div>
 </div>
 
-<!-- Information Popup -->
-<div class="stats-popup" id="info-popup" style="display: none;">
-    <h2 style="color: #00ff00; font-family: 'Courier New', Courier, monospace; font-size: 0.8rem;">Información del Juego</h2>
-    <p style="color: #00ff00; font-family: 'Courier New', Courier, monospace; font-size: 0.6rem;">
+<!-- Ventana de Información -->
+<div class="info-popup" id="info-popup" style="display: none;">
+    <h2>Información del Juego</h2>
+    <p>
         Bienvenido al juego Match-3. Combina tres o más emojis iguales para ganar puntos. Al alcanzar el objetivo, subirás de nivel y desbloquearás nuevas funcionalidades. Usa las bombas para eliminar emojis estratégicamente y mejorar tu puntuación. ¡Buena suerte!
     </p>
-    <button onclick="closeInfo()" style="background-color: #00ff00; border: none; color: #000; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 0.6rem; font-weight: bold; font-family: 'Courier New', Courier, monospace;">Cerrar</button>
+    <button onclick="closeInfo()">Cerrar</button>
 </div>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
