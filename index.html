@@ -303,20 +303,41 @@
         display: none;
     }
 
+    /* Estilos para los pop-ups */
     #gallery-modal, #pet-popup, #candy-popup {
         display: none;
         position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 95%;
-        height: 95%;
         background-color: white;
         border: 2px solid #333;
         border-radius: 10px;
         z-index: 5001;
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    /* Estilos específicos para cada pop-up */
+    #gallery-modal {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 95%;
+        height: 95%;
+    }
+
+    #pet-popup {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 95%;
+        height: 95%;
+    }
+
+    #candy-popup {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 95%;
+        height: 95%;
     }
 
     #gallery-modal .close-gallery, #pet-popup #close-popup, #candy-popup #close-candy-popup {
@@ -423,6 +444,7 @@
         width: 80px;
     }
 
+    /* Media queries para dispositivos móviles */
     @media (max-width: 1024px) {
         .pet-status-container {
             gap: 30px;
@@ -448,15 +470,18 @@
         #gallery-modal, #pet-popup, #candy-popup {
             width: 90%;
             height: 90%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
     }
 
-    /* Ajustes para dispositivos móviles */
+    /* Ajustes para dispositivos móviles - Ventana emergente del juego Candy */
     @media (max-width: 768px) {
         #candy-popup {
             width: 100%;
-            height: 100%;
-            top: 0;
+            height: 80%; /* Ajusta este valor según prefieras */
+            top: 10%;    /* Centra verticalmente */
             left: 0;
             transform: none;
             border-radius: 0;
@@ -469,6 +494,14 @@
             font-size: 30px;
         }
     }
+
+    /* Clase para evitar el scroll en el fondo cuando el popup está abierto */
+    body.no-scroll {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+    }
+
 </style>
 </head>
 <body>
