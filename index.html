@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-        /* Tus estilos existentes */
         *, *::before, *::after {
             box-sizing: border-box;
         }
@@ -154,8 +153,8 @@
         }
 
         .main-container {
-            display: flex;
-            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
             position: relative;
         }
@@ -231,6 +230,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border: 1px solid #333;
             margin-bottom: 15px;
+            max-width: 600px;
+            margin: 0 auto 15px auto;
             transition: background-color 0.3s, color 0.3s, border 0.3s;
         }
 
@@ -330,6 +331,8 @@
             margin-top: 20px;
             font-size: 14px;
             transition: background-color 0.3s;
+            max-width: 600px;
+            margin: 20px auto 0 auto;
         }
 
         body.dark-mode .statistics {
@@ -416,6 +419,134 @@
             display: none;
         }
 
+        /* Estilos para el ranking */
+        .ranking-container {
+            background-color: #ffffff;
+            color: #333333;
+            padding: 20px;
+            margin: 20px auto;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .ranking-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .ranking-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .ranking-list li {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        .ranking-position {
+            display: inline-block;
+            width: 30px;
+        }
+
+        .ranking-initials {
+            display: inline-block;
+            width: 60px;
+        }
+
+        .ranking-score {
+            display: inline-block;
+            width: 80px;
+        }
+
+        /* Aseguramos que el pop-up del juego Candy se mantenga */
+        #candy-popup {
+            display: none;
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 80%;
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            z-index: 5002;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s, border 0.3s;
+        }
+
+        body.dark-mode #candy-popup {
+            background-color: #000000;
+            border: 2px solid var(--button-bg-dark);
+        }
+
+        #candy-popup .candy-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        #candy-popup #close-candy-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            z-index: 1002;
+            color: #ff0000;
+        }
+
+        /* Estilos para el pop-up de la mascota virtual */
+        #pet-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 90%;
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            z-index: 5001;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.3s, border 0.3s;
+        }
+
+        body.dark-mode #pet-popup {
+            background-color: #1f1f1f;
+            border: 2px solid var(--button-bg-dark);
+        }
+
+        #pet-popup .pet-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        #pet-popup #close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            z-index: 1002;
+            color: #ff0000;
+        }
+
+        /* Estilos para el modal de la galería */
         #gallery-modal {
             display: none;
             position: fixed;
@@ -499,9 +630,7 @@
             background: rgba(0,0,0,1);
         }
 
-        #gallery-modal .close-gallery, 
-        #pet-popup #close-popup, 
-        #candy-popup #close-candy-popup {
+        #gallery-modal .close-gallery {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -510,135 +639,7 @@
             background: none;
             border: none;
             z-index: 1002;
-            transition: color 0.3s;
-        }
-
-        #candy-popup #close-candy-popup {
             color: #ff0000;
-            font-size: 30px;
-        }
-
-        /* Añade esta regla para el modo oscuro del botón de cierre del Candy modal */
-        body.dark-mode #candy-popup #close-candy-popup {
-            color: #ff6347; /* Puedes elegir otro color que contraste mejor */
-        }
-
-        #gallery-modal .close-gallery {
-            color: #ff0000;
-        }
-
-        #pet-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            height: 90%;
-            background-color: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 5001;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: background-color 0.3s, border 0.3s;
-        }
-
-        body.dark-mode #pet-popup {
-            background-color: #1f1f1f;
-            border: 2px solid var(--button-bg-dark);
-        }
-
-        #pet-popup .pet-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        #candy-popup {
-            display: none;
-            position: fixed;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            height: 80%;
-            background-color: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 5002;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.3s, border 0.3s;
-        }
-
-        /* Actualiza los estilos para el modo oscuro del Candy modal */
-        body.dark-mode #candy-popup {
-            background-color: var(--background-color-dark);
-            border: 2px solid var(--button-bg-dark);
-        }
-
-        #candy-popup .candy-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Estilos para el ranking */
-        .ranking-container {
-            background-color: #000;
-            color: #00ff00;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            margin: 20px;
-            border: 3px solid #00ff00;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .ranking-title {
-            font-size: 24px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px #00ff00;
-        }
-
-        .ranking-list {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .ranking-list li {
-            font-size: 20px;
-            margin: 5px 0;
-        }
-
-        .ranking-position {
-            display: inline-block;
-            width: 30px;
-        }
-
-        .ranking-initials {
-            display: inline-block;
-            width: 60px;
-        }
-
-        .ranking-score {
-            display: inline-block;
-            width: 80px;
-        }
-
-        /* Adaptación al modo oscuro */
-        body.dark-mode .ranking-container {
-            background-color: #1a1a1a;
-            color: #39ff14;
-            border-color: #39ff14;
-        }
-
-        body.dark-mode .ranking-title {
-            text-shadow: 0 0 10px #39ff14;
         }
 
         @media (max-width: 1024px) {
@@ -679,19 +680,6 @@
                 font-size: 30px;
                 top: 10px;
                 right: 10px;
-            }
-
-            .ranking-container {
-                margin: 10px;
-                padding: 15px;
-            }
-
-            .ranking-title {
-                font-size: 20px;
-            }
-
-            .ranking-list li {
-                font-size: 16px;
             }
         }
     </style>
@@ -781,7 +769,6 @@ const firebaseConfig = {
 
     <!-- Tu script existente -->
     <script>
-        // Tus variables y funciones existentes
         const bulletinBoard = document.getElementById('bulletin-board');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
@@ -841,11 +828,9 @@ const firebaseConfig = {
         let candyPopupOpen = false;
         let currentImageIndex = 0;
 
-        // Variables y funciones para el ranking
-        const rankingList = document.getElementById('ranking-list');
-
         // Función para cargar el ranking
         async function loadRanking() {
+            const rankingList = document.getElementById('ranking-list');
             const highScoresCollection = db.collection('highscores');
             const snapshot = await highScoresCollection
                 .orderBy('score', 'desc')
@@ -1434,26 +1419,6 @@ const firebaseConfig = {
                     });
                 });
         }
-
-        function preventModalScroll() {
-            const candyIframe = document.getElementById('candy-iframe');
-            candyIframe.addEventListener('load', () => {
-                const iframeDocument = candyIframe.contentDocument || candyIframe.contentWindow.document;
-                iframeDocument.body.style.overflow = 'hidden';
-                iframeDocument.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
-                }, { passive: false });
-                iframeDocument.addEventListener('wheel', (e) => {
-                    e.preventDefault();
-                }, { passive: false });
-            });
-        }
-
-        candyPopup.addEventListener('click', (e) => {
-            if (candyPopup.style.display === 'flex') {
-                preventModalScroll();
-            }
-        });
 
         window.addEventListener('load', () => {
             initApp();
