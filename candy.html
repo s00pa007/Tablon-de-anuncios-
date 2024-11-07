@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -362,7 +360,6 @@ body {
     padding: 20px 40px;
     border-radius: 10px;
     font-size: 2.64rem;
-    font-family: 'Courier New', Courier, monospace;
     color: #00ff00;
     box-shadow: 0 0 20px rgba(0,255,0,0.7);
     animation: levelUpAnimation 1.5s forwards;
@@ -546,13 +543,12 @@ body {
     color: #9932CC;
 }
 
-/* Nuevas reglas para colores opuestos */
 .reaction-text.green-score {
-    color: #9932CC; /* Lila */
+    color: #9932CC;
 }
 
 .reaction-text.purple-score {
-    color: #32CD32; /* Verde */
+    color: #32CD32;
 }
 
 .reaction-text {
@@ -778,6 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let matchCountThisMove = 0;
     let hintInterval;
     let hintTimeout;
+    let targetScore = 1200;
     const gameOverDisplay = document.getElementById('game-over');
     const scoreDisplay = document.getElementById('score');
     const levelDisplay = document.getElementById('level-indicator');
@@ -812,22 +809,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const softColors = ['#FFEBEE', '#F3E5F5', '#E3F2FD', '#E8F5E9', '#FFF3E0'];
 
-function getTargetScore(level) {
-    if (level === 1) return 1200;
-    if (level === 2) return 700;
-    if (level === 3) return 600;
-    if (level === 4) return 450;
-    if (level >= 5) return 450;
-}
+    function getTargetScore(level) {
+        if (level === 1) return 1200;
+        if (level === 2) return 2100;
+        if (level === 3) return 2900;
+        if (level === 4) return 3600;
+        if (level === 5) return 4200;
+        return 4200 + (level - 5) * 500;
+    }
 
     function initializeGame() {
         const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
         grid.style.backgroundColor = randomColor;
         loadHighScore();
         loadStatistics();
-        setCurrentEmojis(true);
+        setCurrentEmojis();
         createBoard();
         gameStartTime = Date.now();
+        targetScore = getTargetScore(level);
         updateTargetScore();
         stabilizeBoard();
         playTotalScore = 0;
@@ -874,18 +873,69 @@ function getTargetScore(level) {
         localStorage.setItem('destroyedEmojis', JSON.stringify(destroyedEmojis));
     }
 
-    function setCurrentEmojis(renewAll = false) {
-        if (renewAll) {
+    function setCurrentEmojis() {
+        if (level === 1) {
             currentEmojis = [dogEmoji];
-            const numberOfNewEmojis = Math.min(2 + level, allEmojis.length);
-            const newEmojis = getRandomUniqueEmojis(allEmojis, numberOfNewEmojis);
-            currentEmojis = currentEmojis.concat(newEmojis);
+            const initialEmojis = getRandomUniqueEmojis(allEmojis, 3);
+            currentEmojis = currentEmojis.concat(initialEmojis);
         } else {
             const newEmoji = getNewEmoji();
             if (newEmoji) {
                 currentEmojis.push(newEmoji);
             }
         }
+    }
+
+    function addNewEmojiForLevel() {
+        const newEmoji = getNewEmoji();
+        if (newEmoji && !currentEmojis.includes(newEmoji)) {
+            currentEmojis.push(newEmoji);
+        }
+    }
+
+    async function fillEmptySpaces() {
+        return new Promise(resolve => {
+            for (let col = 0; col < width; col++) {
+                let emptySpots = 0;
+                for (let row = width - 1; row >= 0; row--) {
+                    const idx = row * width + col;
+                    if (emojis[idx] === '' || emojis[idx] === undefined) {
+                        emptySpots++;
+                    } else if (emptySpots > 0) {
+                        const newIdx = (row + emptySpots) * width + col;
+                        const movingEmoji = emojis[idx];
+                        emojis[newIdx] = movingEmoji;
+                        setSquareContent(squares[newIdx], movingEmoji);
+                        squares[newIdx].style.setProperty('--bg-color', emojiColors[movingEmoji]);
+                        emojis[idx] = '';
+                        clearSquareContent(squares[idx]);
+                        squares[newIdx].classList.add('fall');
+                        setTimeout(() => {
+                            squares[newIdx].classList.remove('fall');
+                        }, 600);
+                    }
+                }
+                for (let row = 0; row < emptySpots; row++) {
+                    const idx = row * width + col;
+                    if (currentEmojis.length - 1 < level) {
+                        addNewEmojiForLevel();
+                    }
+                    const newEmoji = getRandomEmoji();
+                    if (newEmoji) {
+                        emojis[idx] = newEmoji;
+                        setSquareContent(squares[idx], newEmoji);
+                        squares[idx].style.setProperty('--bg-color', emojiColors[newEmoji]);
+                        squares[idx].classList.add('fall');
+                        setTimeout(() => {
+                            squares[idx].classList.remove('fall');
+                        }, 600);
+                    }
+                }
+            }
+            setTimeout(() => {
+                resolve();
+            }, 600);
+        });
     }
 
     function getRandomUniqueEmojis(array, number) {
@@ -1212,7 +1262,7 @@ function getTargetScore(level) {
             updateHighScore();
             updateTargetScore();
 
-            if (score >= getTargetScore(level)) {
+            if (score >= targetScore) {
                 await checkLevelUp();
             }
 
@@ -1238,63 +1288,6 @@ function getTargetScore(level) {
         }
         checkEndGame();
         resetIdleTimer();
-    }
-
-    function fillEmptySpaces() {
-        return new Promise(resolve => {
-            for (let col = 0; col < width; col++) {
-                let emptySpots = 0;
-                for (let row = width - 1; row >= 0; row--) {
-                    const idx = row * width + col;
-                    if (emojis[idx] === '' || emojis[idx] === undefined) {
-                        emptySpots++;
-                    } else if (emptySpots > 0) {
-                        const newIdx = (row + emptySpots) * width + col;
-                        const movingEmoji = emojis[idx];
-                        emojis[newIdx] = movingEmoji;
-                        setSquareContent(squares[newIdx], movingEmoji);
-                        squares[newIdx].style.setProperty('--bg-color', emojiColors[movingEmoji]);
-                        emojis[idx] = '';
-                        clearSquareContent(squares[idx]);
-                        squares[newIdx].classList.add('fall');
-                        setTimeout(() => {
-                            squares[newIdx].classList.remove('fall');
-                            if (powerUpActive && movingEmoji === bombEmoji) {
-                                squares[blinkingIndex].classList.remove('blinking');
-                                blinkingIndex = newIdx;
-                                squares[blinkingIndex].classList.add('blinking');
-                            }
-                        }, 600);
-                    }
-                }
-                for (let row = 0; row < emptySpots; row++) {
-                    const idx = row * width + col;
-                    if (emojis[idx] === dogEmoji) continue;
-                    const newEmoji = getRandomEmoji();
-                    if (newEmoji) {
-                        emojis[idx] = newEmoji;
-                        setSquareContent(squares[idx], newEmoji);
-                        squares[idx].style.setProperty('--bg-color', emojiColors[newEmoji]);
-                        squares[idx].classList.add('fall');
-                        setTimeout(() => {
-                            squares[idx].classList.remove('fall');
-                            if (powerUpActive && newEmoji === bombEmoji) {
-                                if (blinkingIndex !== idx) {
-                                    if (blinkingIndex !== null) {
-                                        squares[blinkingIndex].classList.remove('blinking');
-                                    }
-                                    blinkingIndex = idx;
-                                    squares[blinkingIndex].classList.add('blinking');
-                                }
-                            }
-                        }, 600);
-                    }
-                }
-            }
-            setTimeout(() => {
-                resolve();
-            }, 600);
-        });
     }
 
     function activatePowerup() {
@@ -1423,7 +1416,6 @@ function getTargetScore(level) {
     async function checkLevelUp() {
         if (isLevelUpInProgress) return;
         isLevelUpInProgress = true;
-        await destroyAllEmojisWithParticles();
         previousEmojis = currentEmojis.filter(emoji => emoji !== dogEmoji);
         setTimeout(() => {
             levelUp();
@@ -1436,45 +1428,10 @@ function getTargetScore(level) {
     function levelUp() {
         level += 1;
         levelDisplay.textContent = level;
+        targetScore = getTargetScore(level);
         updateTargetScore();
-        setCurrentEmojis(true);
+        setCurrentEmojis();
         powerUpRange += 1;
-        resetGridForNewLevel();
-    }
-
-    async function destroyAllEmojisWithParticles() {
-        const maxParticles = 8;
-        let particlesCreated = 0;
-        for (let i = 0; i < squares.length; i++) {
-            if (emojis[i] !== '' && emojis[i] !== bombEmoji) {
-                let emoji = emojis[i];
-                destroyedEmojis[emoji] = (destroyedEmojis[emoji] || 0) + 1;
-                score += 2 * comboMultiplier;
-                playTotalScore += 2 * comboMultiplier;
-                scoreDisplay.textContent = score;
-                emojis[i] = '';
-                clearSquareContent(squares[i]);
-                if (particlesCreated < maxParticles) {
-                    const rect = squares[i].getBoundingClientRect();
-                    const gameRect = gameContainer.getBoundingClientRect();
-                    createParticles(1 + comboMultiplier, emojiColors[emoji], rect.left - gameRect.left + rect.width / 2, rect.top - gameRect.top + rect.height / 2);
-                    particlesCreated++;
-                }
-            }
-        }
-    }
-
-    function resetGridForNewLevel() {
-        squares.forEach(square => {
-            square.classList.remove('blinking', 'match', 'fall', 'hint');
-            emojis[square.id] = '';
-            clearSquareContent(square);
-            square.style.removeProperty('--bg-color');
-        });
-        powerUpActive = false;
-        blinkingIndex = null;
-        fillBoard();
-        stabilizeBoard();
     }
 
     function resetGame() {
@@ -1494,6 +1451,7 @@ function getTargetScore(level) {
         scoreDisplay.textContent = score;
         levelDisplay.textContent = level;
         highScoreDisplay.textContent = highScore;
+        targetScore = getTargetScore(level);
         updateTargetScore();
         updatePlayTotalScoreDisplay();
         gameOverDisplay.style.display = 'none';
@@ -1505,7 +1463,7 @@ function getTargetScore(level) {
         });
         currentEmojis = [];
         previousEmojis = [];
-        setCurrentEmojis(true);
+        setCurrentEmojis();
         gameStartTime = Date.now();
         const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
         grid.style.backgroundColor = randomColor;
@@ -1563,12 +1521,11 @@ function getTargetScore(level) {
         });
         hintTimeout = setTimeout(() => {
             hintPossibleMatch();
-        }, 6000);
+        }, 15000);
     }
 
     function updateTargetScore() {
-        const target = getTargetScore(level);
-        targetScoreDisplay.textContent = target;
+        targetScoreDisplay.textContent = targetScore;
     }
 
     function updatePlayTotalScoreDisplay() {
@@ -1788,3 +1745,4 @@ function getTargetScore(level) {
 
 </body>
 </html>
+
