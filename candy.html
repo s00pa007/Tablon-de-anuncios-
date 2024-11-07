@@ -812,13 +812,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const softColors = ['#FFEBEE', '#F3E5F5', '#E3F2FD', '#E8F5E9', '#FFF3E0'];
 
-    function getTargetScore(level) {
-        if (level === 1) return 2000;
-        if (level === 2) return 3500;
-        if (level === 3) return 4500;
-        if (level === 4) return 5500;
-        if (level >= 5) return 5500 + (level - 4) * 500;
-    }
+function getTargetScore(level) {
+    if (level === 1) return 1200;
+    if (level === 2) return 700;
+    if (level === 3) return 600;
+    if (level === 4) return 450;
+    if (level >= 5) return 450;
+}
 
     function initializeGame() {
         const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
