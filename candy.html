@@ -553,7 +553,7 @@ body {
 
 .reaction-text {
     position: absolute;
-    font-size: 1.40rem;
+    font-size: 2.10rem;
     font-weight: bold;
     font-family: 'Arial', sans-serif;
     pointer-events: none;
@@ -1598,12 +1598,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2250);
     }
     function getReactionText(comboCount) {
-        if (comboCount >= 25) return '¡lo vas a romper!';
-        if (comboCount >= 20) return 'excelente';
-        if (comboCount >= 15) return 'guau!';
-        if (comboCount >= 10) return 'ños!';
-        if (comboCount >= 5) return 'chachi';
-        if (comboCount >= 3) return 'meh';
+        if (comboCount >= 25) return '¡LO VAS A ROMPER!';
+        if (comboCount >= 20) return 'EXCELENTE';
+        if (comboCount >= 15) return 'GUAU!';
+        if (comboCount >= 10) return 'ÑOS!';
+        if (comboCount >= 5) return 'CHACHI';
+        if (comboCount >= 3) return 'MEH';
         return '';
     }
     async function triggerExplosion(index) {
@@ -1633,7 +1633,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 square.removeEventListener('touchend', handleTouchEnd);
             });
             if (hintInterval) clearInterval(hintInterval);
+            await handleHighScore();
         }
+    }
+    async function handleHighScore() {
+        const highScores = await getHighScores();
+        if (highScores.length < 3 || score > highScores[highScores.length - 1].score) {
+            const initials = prompt('¡Nuevo High Score! Ingresa tus iniciales (3 letras):', '').toUpperCase().slice(0, 3);
+            if (initials) {
+                await saveHighScore(initials, score);
+                alert('¡Tu puntaje ha sido guardado en el ranking!');
+            }
+        }
+    }
+    async function getHighScores() {
+        const snapshot = await db.collection('highscores')
+            .orderBy('score', 'desc')
+            .limit(3)
+            .get();
+        const highScores = [];
+        snapshot.forEach(doc => {
+            highScores.push({ id: doc.id, ...doc.data() });
+        });
+        return highScores;
+    }
+    async function saveHighScore(initials, scoreValue) {
+        await db.collection('highscores').add({
+            initials: initials,
+            score: scoreValue
+        });
     }
     function saveGameState() {
         const gameState = {
