@@ -2,17 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tablón de anuncios anónimos</title>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Firebase Scripts -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-        /* Tu CSS aquí */
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
         :root {
             --background-color: #f0f0f0;
             --text-color: #333333;
@@ -20,12 +17,12 @@
             --counter-bg: #e0e0e0;
             --button-bg: #4caf50;
             --button-text: #ffffff;
-            --background-color-dark: #121212;
-            --text-color-dark: #e0e0e0;
-            --header-bg-dark: #1f1f1f;
-            --counter-bg-dark: #2c2c2c;
-            --button-bg-dark: #bb86fc;
-            --button-text-dark: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
@@ -36,25 +33,6 @@
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        body.dark-mode {
-            background-color: var(--background-color-dark);
-            color: var(--text-color-dark);
-        }
-
-        body.dark-mode header {
-            background-color: var(--header-bg-dark);
-        }
-
-        body.dark-mode .statistics {
-            background-color: var(--counter-bg-dark);
-        }
-
-        body.dark-mode .pet-status-container {
-            background-color: var(--header-bg-dark);
-            border: 2px solid var(--button-bg-dark);
         }
 
         header {
@@ -62,8 +40,6 @@
             padding: 10px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             width: 100%;
-            cursor: pointer;
-            transition: background-color 0.3s;
         }
 
         #header-image {
@@ -71,7 +47,6 @@
             height: auto;
             display: block;
             margin: 0 auto;
-            transition: filter 0.3s;
         }
 
         #slogan {
@@ -103,12 +78,6 @@
             z-index: 1000;
             gap: 40px;
             flex-wrap: nowrap;
-            transition: background-color 0.3s, border 0.3s;
-        }
-
-        body.dark-mode .pet-status-container {
-            background-color: var(--header-bg-dark);
-            border: 2px solid var(--button-bg-dark);
         }
 
         .pet-status-container div {
@@ -116,35 +85,17 @@
             height: 120px;
             position: relative;
             flex-shrink: 0;
-            overflow: hidden;
+        }
+
+        .pet-status-container div img, .gallery-link img, .candy-game-link img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             border-radius: 10%;
+            cursor: pointer;
             border: 4px solid var(--button-bg);
-            padding: 0;
-            margin: 0;
-            background-color: transparent;
-        }
-
-        .pet-status-container div img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            border: none;
-            margin: 0;
-            padding: 0;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        body.dark-mode .pet-status-container div img, 
-        body.dark-mode .gallery-link img, 
-        body.dark-mode .candy-game-link img {
-            border: 4px solid var(--button-bg-dark);
-        }
-
-        .gallery-link img, .pet-emoji img, .candy-game-link img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
             display: block;
         }
 
@@ -154,11 +105,10 @@
         }
 
         .main-container {
-            max-width: 800px;
-            margin: 0 auto;
+            display: flex;
+            flex: 1;
             padding: 20px;
             position: relative;
-            width: 100%;
         }
 
         .left-column {
@@ -172,13 +122,6 @@
             border-radius: 10px;
             margin-bottom: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: background-color 0.3s;
-            max-width: 600px;
-            margin: 0 auto 20px auto;
-        }
-
-        body.dark-mode #message-form {
-            background-color: var(--header-bg-dark);
         }
 
         #message-form textarea {
@@ -190,13 +133,6 @@
             resize: vertical;
             font-size: 16px;
             font-family: 'Comfortaa', cursive;
-            transition: background-color 0.3s, color 0.3s, border 0.3s;
-        }
-
-        body.dark-mode #message-form textarea {
-            background-color: #2c2c2c;
-            color: var(--text-color-dark);
-            border: 1px solid #555;
         }
 
         #message-form button {
@@ -211,12 +147,6 @@
             font-size: 18px;
             font-family: 'Comfortaa', cursive;
             font-weight: bold;
-            transition: background-color 0.3s;
-        }
-
-        body.dark-mode #message-form button {
-            background-color: var(--button-bg-dark);
-            color: var(--button-text-dark);
         }
 
         #bulletin-board {
@@ -234,10 +164,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border: 1px solid #333;
             margin-bottom: 15px;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto 15px auto;
-            transition: background-color 0.3s, color 0.3s, border 0.3s;
         }
 
         .message-content {
@@ -254,7 +180,6 @@
             flex: 1;
             margin-bottom: 5px;
             line-height: 1.3;
-            word-wrap: break-word;
         }
 
         .message-timestamp {
@@ -276,11 +201,6 @@
             border: none;
             cursor: pointer;
             font-size: 18px;
-            transition: color 0.3s;
-        }
-
-        .like-btn:hover, .dislike-btn:hover, .reply-btn:hover, .delete-btn:hover {
-            color: var(--button-bg);
         }
 
         .quoted-message {
@@ -289,7 +209,6 @@
             border-left: 3px solid #ccc;
             margin-bottom: 10px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
         .quoted-message:hover {
@@ -304,30 +223,10 @@
             width: 100%;
             padding: 5px;
             margin-bottom: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s, border 0.3s;
-        }
-
-        body.dark-mode .reply-form textarea {
-            background-color: #2c2c2c;
-            color: var(--text-color-dark);
-            border: 1px solid #555;
         }
 
         .reply-form button {
             padding: 5px 10px;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        body.dark-mode .reply-form button {
-            background-color: var(--button-bg-dark);
-            color: var(--button-text-dark);
         }
 
         .statistics {
@@ -336,13 +235,6 @@
             border-radius: 10px;
             margin-top: 20px;
             font-size: 14px;
-            transition: background-color 0.3s;
-            max-width: 600px;
-            margin: 20px auto 0 auto;
-        }
-
-        body.dark-mode .statistics {
-            background-color: var(--counter-bg-dark);
         }
 
         .statistics div {
@@ -375,11 +267,6 @@
             border: none;
             cursor: pointer;
             font-size: 18px;
-            transition: color 0.3s;
-        }
-
-        .delete-confirmation button:hover {
-            color: red;
         }
 
         .teletipo-wrapper {
@@ -399,11 +286,6 @@
             background-color: var(--background-color);
             padding: 0 5px;
             z-index: 1;
-            transition: background-color 0.3s;
-        }
-
-        body.dark-mode .rumores-label {
-            background-color: var(--background-color-dark);
         }
 
         #teletipo-container {
@@ -412,11 +294,6 @@
             padding-top: 10px;
             background-color: var(--background-color);
             z-index: 999;
-            transition: background-color 0.3s;
-        }
-
-        body.dark-mode #teletipo-container {
-            background-color: var(--background-color-dark);
         }
 
         #loading {
@@ -425,165 +302,37 @@
             display: none;
         }
 
-        /* Estilos para el ranking */
-        .ranking-container {
-            background-color: #ffffff;
-            color: #333333;
-            padding: 20px;
-            margin: 20px auto;
-            border: 2px solid #4caf50;
+        #gallery-modal, #pet-popup, #candy-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 95%;
+            background-color: white;
+            border: 2px solid #333;
             border-radius: 10px;
-            text-align: center;
-            max-width: 400px;
+            z-index: 5001;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        .ranking-title {
+        #gallery-modal .close-gallery, #pet-popup #close-popup, #candy-popup #close-candy-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .ranking-list {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .ranking-list li {
-            font-size: 18px;
-            margin: 5px 0;
-        }
-
-        .ranking-position {
-            display: inline-block;
-            width: 30px;
-        }
-
-        .ranking-initials {
-            display: inline-block;
-            width: 60px;
-        }
-
-        .ranking-score {
-            display: inline-block;
-            width: 80px;
-        }
-
-        /* Estilos para el pop-up del juego Candy */
-        #candy-popup {
-            display: none;
-            position: fixed;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 80%;
-            background-color: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 5002;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.3s, border 0.3s;
-        }
-
-        body.dark-mode #candy-popup {
-            background-color: #000000;
-            border: 2px solid var(--button-bg-dark);
-        }
-
-        #candy-popup .candy-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        #candy-popup #close-candy-popup {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 30px;
             cursor: pointer;
             background: none;
             border: none;
             z-index: 1002;
-            color: #ff0000;
         }
 
-        /* Estilos para el pop-up de la mascota virtual */
-        #pet-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            height: 90%;
-            background-color: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 5001;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: background-color 0.3s, border 0.3s;
-        }
-
-        body.dark-mode #pet-popup {
-            background-color: #1f1f1f;
-            border: 2px solid var(--button-bg-dark);
-        }
-
-        #pet-popup .pet-iframe {
+        #gallery-modal .gallery-container, #candy-popup .candy-iframe, #pet-popup .pet-iframe {
             width: 100%;
             height: 100%;
             border: none;
-        }
-
-        #pet-popup #close-popup {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 30px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            z-index: 1002;
-            color: #ff0000;
-        }
-
-        /* Estilos para el modal de la galería */
-        #gallery-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            height: 90%;
-            background-color: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 5001;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.3s, border 0.3s;
-        }
-
-        body.dark-mode #gallery-modal {
-            background-color: #1f1f1f;
-            border: 2px solid var(--button-bg-dark);
-        }
-
-        #gallery-modal .gallery-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
         }
 
         #gallery-modal .gallery-container img {
@@ -609,13 +358,6 @@
             padding: 10px;
             border-radius: 50%;
             user-select: none;
-            transition: background 0.3s, color 0.3s;
-            z-index: 1000;
-        }
-
-        body.dark-mode .gallery-nav {
-            color: rgba(255, 255, 255, 0.7);
-            background: rgba(0, 0, 0, 0.7);
         }
 
         #prev-btn {
@@ -631,21 +373,10 @@
             background: rgba(255,255,255,1);
         }
 
-        body.dark-mode .gallery-nav:hover {
-            color: rgba(255,255,255,0.9);
-            background: rgba(0,0,0,1);
-        }
-
-        #gallery-modal .close-gallery {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            background: none;
+        #pet-iframe, #candy-iframe {
+            width: 100%;
+            height: 100%;
             border: none;
-            z-index: 1002;
-            color: #ff0000;
         }
 
         @media (max-width: 1024px) {
@@ -669,44 +400,16 @@
                 width: 84px;
                 height: 84px;
             }
-        }
 
-        @media (max-width: 480px) {
-            #candy-popup {
-                width: 100%;
-                height: 80%;
-                border-radius: 0;
-                box-shadow: none;
-                top: 10%;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-
-            #candy-popup .candy-iframe {
-                width: 100%;
-                height: 100%;
-            }
-
-            #candy-popup #close-candy-popup {
-                font-size: 30px;
-                top: 10px;
-                right: 10px;
-            }
-
-            .message {
-                width: 95%;
-                margin: 0 auto 15px auto;
-            }
-
-            #message-form {
-                width: 95%;
-                margin: 0 auto 20px auto;
+            #gallery-modal, #pet-popup, #candy-popup {
+                width: 90%;
+                height: 90%;
             }
         }
     </style>
 </head>
 <body>
-    <header id="header-toggle">
+    <header>
         <img src="cabecera.jpg" alt="Tablón de anuncios anónimos" id="header-image">
         <div id="slogan"></div>
         <div class="teletipo-wrapper">
@@ -727,14 +430,6 @@
         <div id="candy-game-link" class="candy-game-link" title="Jugar Candy">
             <img src="Candy.png" alt="Candy Game">
         </div>
-    </div>
-
-    <!-- Aquí agregamos el ranking -->
-    <div class="ranking-container">
-        <div class="ranking-title">🏆 Ranking Top 3 🏆</div>
-        <ul class="ranking-list" id="ranking-list">
-            <!-- Los puntajes se cargarán aquí -->
-        </ul>
     </div>
 
     <div class="main-container">
@@ -764,26 +459,24 @@
 
     <div id="pet-popup">
         <button id="close-popup">&times;</button>
-        <iframe class="pet-iframe" id="pet-iframe" src="about:blank" frameborder="0"></iframe>
+        <iframe id="pet-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
     <div id="candy-popup">
         <button id="close-candy-popup">&times;</button>
-        <iframe class="candy-iframe" id="candy-iframe" src="about:blank" frameborder="0"></iframe>
+        <iframe id="candy-iframe" src="about:blank" frameborder="0"></iframe>
     </div>
 
-    <!-- Configuración de Firebase -->
     <script>
-
-const firebaseConfig = {
-    apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
-    authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
-    projectId: "tablon-de-anuncios-d5dea",
-    storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
-    messagingSenderId: "67910184237",
-    appId: "1:67910184237:web:e43d424657a948ae5d77a4",
-    measurementId: "G-YL5W1VNM9Z"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
+            authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
+            projectId: "tablon-de-anuncios-d5dea",
+            storageBucket: "tablon-de-anuncios-d5dea.appspot.com",
+            messagingSenderId: "67910184237",
+            appId: "1:67910184237:web:e43d424657a948ae5d77a4",
+            measurementId: "G-YL5W1VNM9Z"
+        };
         
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -799,17 +492,6 @@ const firebaseConfig = {
         const petPopup = document.getElementById('pet-popup');
         const closePopup = document.getElementById('close-popup');
         const loadingElement = document.getElementById('loading');
-        const galleryLink = document.getElementById('gallery-link');
-        const galleryModal = document.getElementById('gallery-modal');
-        const closeGalleryBtn = document.getElementById('close-gallery');
-        const galleryContainer = document.getElementById('gallery-container');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const candyGameLink = document.getElementById('candy-game-link');
-        const candyPopup = document.getElementById('candy-popup');
-        const closeCandyPopup = document.getElementById('close-candy-popup');
-        const headerToggle = document.getElementById('header-toggle');
-        const headerImage = document.getElementById('header-image');
 
         const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
         const slogans = [
@@ -844,33 +526,6 @@ const firebaseConfig = {
         let isLoading = false;
         let displayedMessageIds = new Set();
         let petPopupOpen = false;
-        let candyPopupOpen = false;
-        let currentImageIndex = 0;
-
-        // Función para cargar el ranking
-        async function loadRanking() {
-            const rankingList = document.getElementById('ranking-list');
-            const highScoresCollection = db.collection('highscores');
-            const snapshot = await highScoresCollection
-                .orderBy('score', 'desc')
-                .limit(3)
-                .get();
-
-            rankingList.innerHTML = '';
-
-            let position = 1;
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `
-                    <span class="ranking-position">${position}.</span>
-                    <span class="ranking-initials">${data.initials}</span>
-                    <span class="ranking-score">${data.score}</span>
-                `;
-                rankingList.appendChild(listItem);
-                position++;
-            });
-        }
 
         function loadMessages(startAfter = null) {
             if (isLoading) return;
@@ -999,9 +654,6 @@ const firebaseConfig = {
             if (targetMessage) {
                 targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 targetMessage.style.animation = 'highlight 2s';
-                setTimeout(() => {
-                    targetMessage.style.animation = '';
-                }, 2000);
             }
         }
 
@@ -1048,7 +700,9 @@ const firebaseConfig = {
             };
 
             db.collection("messages").add(reply)
-                .then(() => {})
+                .then(() => {
+                    console.log("Respuesta añadida con éxito");
+                })
                 .catch((error) => {
                     console.error("Error al añadir la respuesta: ", error);
                     alert("Error al publicar la respuesta. Por favor, inténtalo de nuevo.");
@@ -1077,8 +731,6 @@ const firebaseConfig = {
         function showDeleteConfirmation(id) {
             const messageElement = document.querySelector(`[data-id="${id}"]`);
             const actions = messageElement.querySelector('.message-actions');
-            if (actions.querySelector('.delete-confirmation')) return;
-
             const deleteConfirmation = document.createElement('div');
             deleteConfirmation.className = 'delete-confirmation';
             deleteConfirmation.innerHTML = `
@@ -1215,131 +867,72 @@ const firebaseConfig = {
         }
 
         closePopup.addEventListener('click', () => {
-            closeModal(petPopup, 'pet');
+            petPopup.style.display = 'none';
+            document.getElementById('pet-iframe').src = 'about:blank';
+            petPopupOpen = false;
         });
 
-        closeCandyPopup.addEventListener('click', () => {
-            closeModal(candyPopup, 'candy');
-        });
-
-        closeGalleryBtn.addEventListener('click', () => {
-            closeModal(galleryModal, 'gallery');
-        });
-
-        function closeModal(modal, type) {
-            modal.style.display = 'none';
-            if (type === 'pet') {
-                document.getElementById('pet-iframe').src = 'about:blank';
-                petPopupOpen = false;
-            } else if (type === 'candy') {
-                document.getElementById('candy-iframe').src = 'about:blank';
-                candyPopupOpen = false;
-            }
-            document.body.style.overflow = '';
-            removeScrollLock();
+        function adjustPetPopupSize() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const popupWidth = windowWidth * 0.95;
+            const popupHeight = windowHeight * 0.95;
+            petPopup.style.width = `${popupWidth}px`;
+            petPopup.style.height = `${popupHeight}px`;
         }
 
-        function lockScroll() {
-            document.body.style.overflow = 'hidden';
-            document.addEventListener('touchmove', preventScroll, { passive: false });
-            document.addEventListener('wheel', preventScroll, { passive: false });
-        }
+        window.addEventListener('resize', adjustPetPopupSize);
 
-        function unlockScroll() {
-            document.body.style.overflow = '';
-            document.removeEventListener('touchmove', preventScroll);
-            document.removeEventListener('wheel', preventScroll);
-        }
-
-        function preventScroll(e) {
-            e.preventDefault();
-        }
-
-        function addScrollLock() {
-            lockScroll();
-        }
-
-        function removeScrollLock() {
-            unlockScroll();
-        }
-
-        function openGalleryModal() {
-            galleryModal.style.display = 'flex';
-            addScrollLock();
-            currentImageIndex = 0;
-            if (galleryContainer.children.length === 0) {
-                loadGalleryImages();
-            }
-            setTimeout(() => {
-                showImage(currentImageIndex);
-            }, 100);
-        }
-
-        function openPetPopup() {
-            petPopup.style.display = 'block';
-            addScrollLock();
-            if (!petPopupOpen) {
-                document.getElementById('pet-iframe').src = 'pet.html';
-                petPopupOpen = true;
-            }
-        }
-
-        function openCandyPopup() {
-            candyPopup.style.display = 'flex';
-            addScrollLock();
-            if (!candyPopupOpen) {
-                document.getElementById('candy-iframe').src = 'candy.html';
-                candyPopupOpen = true;
-            }
-        }
-
-        galleryLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            openGalleryModal();
-        });
-
-        petEmoji.addEventListener('click', (e) => {
-            e.preventDefault();
-            openPetPopup();
-        });
-
-        candyGameLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            openCandyPopup();
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === galleryModal) {
-                closeModal(galleryModal, 'gallery');
-            }
-            if (e.target === candyPopup) {
-                closeModal(candyPopup, 'candy');
-            }
-            if (e.target === petPopup) {
-                closeModal(petPopup, 'pet');
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoading) {
+                loadMessages(lastVisibleMessage);
             }
         });
 
-        let touchStartXGallery = 0;
-        let touchEndXGallery = 0;
+        function initApp() {
+            loadMessages();
+            changeSlogan();
 
-        galleryContainer.addEventListener('touchstart', (e) => {
-            touchStartXGallery = e.changedTouches[0].screenX;
-        }, false);
+            updateMessagesDeleted();
+            cargarTeletipo();
 
-        galleryContainer.addEventListener('touchend', (e) => {
-            touchEndXGallery = e.changedTouches[0].screenX;
-            handleGalleryGesture();
-        }, false);
+            adjustPetPopupSize();
 
-        function handleGalleryGesture() {
-            if (touchEndXGallery < touchStartXGallery - 50) {
-                nextImage();
-            }
-            if (touchEndXGallery > touchStartXGallery + 50) {
-                prevImage();
-            }
+            const startDate = new Date('2023-06-08');
+            const today = new Date();
+            const daysOperatingCount = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
+
+            setInterval(changeSlogan, 10000);
         }
+
+        function listenForNewMessages() {
+            db.collection("messages")
+                .orderBy("timestamp", "desc")
+                .limit(1)
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const newMessage = { ...change.doc.data(), id: change.doc.id };
+                            if (!displayedMessageIds.has(newMessage.id)) {
+                                const messageElement = createMessageElement(newMessage);
+                                bulletinBoard.insertBefore(messageElement, bulletinBoard.firstChild);
+                                displayedMessageIds.add(newMessage.id);
+                                updateMessagesPublished();
+                            }
+                        }
+                    });
+                });
+        }
+
+        const galleryLink = document.getElementById('gallery-link');
+        const galleryModal = document.getElementById('gallery-modal');
+        const closeGalleryBtn = document.getElementById('close-gallery');
+        const galleryContainer = document.getElementById('gallery-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        let currentImageIndex = 0;
 
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -1375,16 +968,65 @@ const firebaseConfig = {
 
         function nextImage() {
             const images = galleryContainer.querySelectorAll('img');
-            if (images.length === 0) return;
             currentImageIndex = (currentImageIndex + 1) % images.length;
             showImage(currentImageIndex);
         }
 
         function prevImage() {
             const images = galleryContainer.querySelectorAll('img');
-            if (images.length === 0) return;
             currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
             showImage(currentImageIndex);
+        }
+
+        galleryLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            galleryModal.style.display = 'flex';
+            if (galleryContainer.children.length === 0) {
+                loadGalleryImages();
+            }
+        });
+
+        closeGalleryBtn.addEventListener('click', () => {
+            galleryModal.style.display = 'none';
+        });
+
+        nextBtn.addEventListener('click', nextImage);
+        prevBtn.addEventListener('click', prevImage);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === galleryModal) {
+                galleryModal.style.display = 'none';
+            }
+        });
+
+        petEmoji.addEventListener('click', (e) => {
+            if (!petPopupOpen) {
+                e.preventDefault();
+                petPopup.style.display = 'block';
+                document.getElementById('pet-iframe').src = 'pet.html';
+                petPopupOpen = true;
+            }
+        });
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        galleryContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        galleryContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleGesture();
+        }, false);
+
+        function handleGesture() {
+            if (touchEndX < touchStartX - 50) {
+                nextImage();
+            }
+            if (touchEndX > touchStartX + 50) {
+                prevImage();
+            }
         }
 
         function getRandomGalleryImage() {
@@ -1398,58 +1040,39 @@ const firebaseConfig = {
             galleryLinkImg.src = getRandomGalleryImage();
         }
 
-        headerToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
+        const candyGameLink = document.getElementById('candy-game-link');
+        const candyPopup = document.getElementById('candy-popup');
+        const closeCandyPopup = document.getElementById('close-candy-popup');
+        let candyPopupOpen = false;
+
+        candyGameLink.addEventListener('click', (e) => {
+            if (!candyPopupOpen) {
+                e.preventDefault();
+                candyPopup.style.display = 'block';
+                document.getElementById('candy-iframe').src = 'candy.html';
+                candyPopupOpen = true;
+                document.body.style.overflow = 'hidden';
+            }
         });
 
-        function initApp() {
-            loadMessages();
-            changeSlogan();
-            updateMessagesDeleted();
-            cargarTeletipo();
-            setRandomGalleryImage();
+        closeCandyPopup.addEventListener('click', () => {
+            candyPopup.style.display = 'none';
+            document.getElementById('candy-iframe').src = 'about:blank';
+            candyPopupOpen = false;
+            document.body.style.overflow = '';
+        });
 
-            const startDate = new Date('2023-06-08');
-            const today = new Date();
-            const daysOperatingCount = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-            daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
-
-            setInterval(changeSlogan, 10000);
-
-            // Cargar el ranking
-            loadRanking();
+        function adjustCandyPopupSize() {
+            // No es necesario ajustar el tamaño aquí ya que usamos vmin para mantener el cuadrado
         }
 
-        function listenForNewMessages() {
-            db.collection("messages")
-                .orderBy("timestamp", "desc")
-                .limit(1)
-                .onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "added") {
-                            const newMessage = { ...change.doc.data(), id: change.doc.id };
-                            if (!displayedMessageIds.has(newMessage.id)) {
-                                const messageElement = createMessageElement(newMessage);
-                                bulletinBoard.insertBefore(messageElement, bulletinBoard.firstChild);
-                                displayedMessageIds.add(newMessage.id);
-                                updateMessagesPublished();
-                            }
-                        }
-                    });
-                });
-        }
+        window.addEventListener('resize', adjustCandyPopupSize);
 
         window.addEventListener('load', () => {
             initApp();
             listenForNewMessages();
-            prevBtn.addEventListener('click', prevImage);
-            nextBtn.addEventListener('click', nextImage);
-        });
-
-        window.addEventListener('scroll', () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading && lastVisibleMessage) {
-                loadMessages(lastVisibleMessage);
-            }
+            setRandomGalleryImage();
+            adjustPetPopupSize();
         });
     </script>
 </body>
