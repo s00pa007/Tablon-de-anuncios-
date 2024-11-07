@@ -1481,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         hintTimeout = setTimeout(() => {
             hintPossibleMatch();
-        }, 15000);
+        }, 9000);
     }
     function updateTargetScore() {
         targetScoreDisplay.textContent = targetScore;
@@ -1567,36 +1567,63 @@ document.addEventListener('DOMContentLoaded', () => {
         comboDisplay.style.opacity = '0';
         comboDisplay.classList.remove('show');
     }
-    function displayPlayTotalScore() {
-        if (lastMatchIndex === null) return;
-        playTotalScoreDisplay.textContent = `${playTotalScore}`;
-        const reactionText = getReactionText(matchCountThisMove);
-        reactionTextDisplay.textContent = reactionText;
-        const randomColor = Math.random() < 0.5 ? 'green-score' : 'purple-score';
-        playTotalScoreDisplay.classList.remove('green-score', 'purple-score');
-        playTotalScoreDisplay.classList.add(randomColor);
-        reactionTextDisplay.classList.remove('green-score', 'purple-score');
-        reactionTextDisplay.classList.add(randomColor === 'green-score' ? 'purple-score' : 'green-score');
-        const lastSquare = squares[lastMatchIndex];
-        const rect = lastSquare.getBoundingClientRect();
-        const gameRect = gameContainer.getBoundingClientRect();
-        const x = rect.left - gameRect.left + rect.width / 2;
-        const y = rect.top - gameRect.top + rect.height / 2;
-        playTotalScoreDisplay.style.left = `${x}px`;
-        playTotalScoreDisplay.style.top = `${y}px`;
-        reactionTextDisplay.style.left = `${x}px`;
-        reactionTextDisplay.style.top = `${y + 30}px`;
-        playTotalScoreDisplay.classList.add('show');
-        reactionTextDisplay.classList.add('show');
-        setTimeout(() => {
-            playTotalScoreDisplay.classList.remove('show');
-            reactionTextDisplay.classList.remove('show');
-            playTotalScore = 0;
-            updatePlayTotalScoreDisplay();
-            lastMatchIndex = null;
-            matchCountThisMove = 0;
-        }, 2250);
-    }
+function displayPlayTotalScore() {
+    if (lastMatchIndex === null) return;
+
+    // Actualizar el puntaje total en pantalla
+    playTotalScoreDisplay.textContent = `${playTotalScore}`;
+
+    // Obtener el texto de reacción basado en el combo actual
+    const reactionText = getReactionText(matchCountThisMove);
+
+    // Crear un nuevo elemento para cada texto de reacción
+    const newReactionText = document.createElement('div');
+    newReactionText.classList.add('reaction-text');
+    newReactionText.textContent = reactionText;
+
+    // Seleccionar un color aleatorio para el texto de reacción
+    const randomColor = Math.random() < 0.5 ? 'green-score' : 'purple-score';
+    newReactionText.classList.add(randomColor);
+
+    // Posicionar el nuevo texto de reacción
+    const lastSquare = squares[lastMatchIndex];
+    const rect = lastSquare.getBoundingClientRect();
+    const gameRect = gameContainer.getBoundingClientRect();
+    const x = rect.left - gameRect.left + rect.width / 2;
+    const y = rect.top - gameRect.top + rect.height / 2;
+
+    newReactionText.style.left = `${x}px`;
+    newReactionText.style.top = `${y + 30}px`; // Posicionar ligeramente debajo del puntaje total
+
+    // Agregar el nuevo texto de reacción al contenedor del juego
+    document.body.appendChild(newReactionText);
+
+    // Mostrar el nuevo texto de reacción con la animación
+    newReactionText.classList.add('show');
+
+    // Remover el texto de reacción después de un tiempo
+    setTimeout(() => {
+        newReactionText.classList.remove('show');
+        newReactionText.remove();
+    }, 2250);
+
+    // Actualizar y posicionar el puntaje total en pantalla
+    playTotalScoreDisplay.classList.remove('green-score', 'purple-score');
+    playTotalScoreDisplay.classList.add(randomColor);
+    playTotalScoreDisplay.style.left = `${x}px`;
+    playTotalScoreDisplay.style.top = `${y}px`;
+    playTotalScoreDisplay.classList.add('show');
+
+    // Limpiar el puntaje total después de que el texto desaparezca
+    setTimeout(() => {
+        playTotalScoreDisplay.classList.remove('show');
+        playTotalScore = 0;
+        updatePlayTotalScoreDisplay();
+        lastMatchIndex = null;
+        matchCountThisMove = 0;
+    }, 2250);
+}
+
     function getReactionText(comboCount) {
         if (comboCount >= 25) return '¡LO VAS A ROMPER!';
         if (comboCount >= 20) return 'EXCELENTE';
