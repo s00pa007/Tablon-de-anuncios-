@@ -553,7 +553,7 @@ body {
 
 .reaction-text {
     position: absolute;
-    font-size: 0.75rem;
+    font-size: 1.40rem;
     font-weight: bold;
     font-family: 'Arial', sans-serif;
     pointer-events: none;
@@ -621,7 +621,7 @@ body {
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-// Configuración de Firebase (reemplaza con tus propias credenciales)
+
 const firebaseConfig = {
     apiKey: "AIzaSyBlIRJVI1buU48SPp0ErpCXhnuBdBEp8rk",
     authDomain: "tablon-de-anuncios-d5dea.firebaseapp.com",
@@ -631,10 +631,12 @@ const firebaseConfig = {
     appId: "1:67910184237:web:e43d424657a948ae5d77a4",
     measurementId: "G-YL5W1VNM9Z"
 };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const highScoresCollection = db.collection('highscores');
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid');
@@ -787,14 +789,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const comboDisplay = document.getElementById('combo-text');
     const playTotalScoreDisplay = document.getElementById('play-total-score');
     const reactionTextDisplay = document.getElementById('reaction-text');
-
     let dragStartIndex;
     let dragEndIndex;
     let touchStartX = null;
     let touchStartY = null;
     let touchStartIdLocal = null;
     let emojiColors = {};
-
     function assignColorsToEmojis() {
         const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe'];
         let colorIndex = 0;
@@ -806,30 +806,28 @@ document.addEventListener('DOMContentLoaded', () => {
         emojiColors[dogEmoji] = '#ff9900';
     }
     assignColorsToEmojis();
-
     const softColors = ['#FFEBEE', '#F3E5F5', '#E3F2FD', '#E8F5E9', '#FFF3E0'];
-
-function getTargetScore(level) {
-    if (level === 1) return 600; // Puntuación para el primer nivel
-    return 400 * level; // A partir del segundo nivel, se suman 400 puntos adicionales
-}
-
+    function getTargetScore(level) {
+        if (level === 1) return 600;
+        return 400 * level;
+    }
     function initializeGame() {
         const randomColor = softColors[Math.floor(Math.random() * softColors.length)];
         grid.style.backgroundColor = randomColor;
         loadHighScore();
         loadStatistics();
-        setCurrentEmojis();
-        createBoard();
-        gameStartTime = Date.now();
-        targetScore = getTargetScore(level);
-        updateTargetScore();
-        stabilizeBoard();
-        playTotalScore = 0;
-        updatePlayTotalScoreDisplay();
-        resetIdleTimer();
+        if (!loadGameState()) {
+            setCurrentEmojis();
+            createBoard();
+            gameStartTime = Date.now();
+            targetScore = getTargetScore(level);
+            updateTargetScore();
+            stabilizeBoard();
+            playTotalScore = 0;
+            updatePlayTotalScoreDisplay();
+            resetIdleTimer();
+        }
     }
-
     function loadHighScore() {
         const storedHighScore = localStorage.getItem('highScore');
         if (storedHighScore) {
@@ -837,7 +835,6 @@ function getTargetScore(level) {
             highScoreDisplay.textContent = highScore;
         }
     }
-
     function updateHighScore() {
         if (score > highScore) {
             highScore = score;
@@ -845,7 +842,6 @@ function getTargetScore(level) {
             localStorage.setItem('highScore', highScore);
         }
     }
-
     function loadStatistics() {
         const storedGamesPlayed = localStorage.getItem('gamesPlayed');
         if (storedGamesPlayed) {
@@ -862,13 +858,11 @@ function getTargetScore(level) {
             destroyedEmojis = {};
         }
     }
-
     function saveStatistics() {
         localStorage.setItem('gamesPlayed', totalGamesPlayed);
         localStorage.setItem('timePlayed', totalTimePlayed);
         localStorage.setItem('destroyedEmojis', JSON.stringify(destroyedEmojis));
     }
-
     function setCurrentEmojis() {
         if (level === 1) {
             currentEmojis = [dogEmoji];
@@ -881,14 +875,12 @@ function getTargetScore(level) {
             }
         }
     }
-
     function addNewEmojiForLevel() {
         const newEmoji = getNewEmoji();
         if (newEmoji && !currentEmojis.includes(newEmoji)) {
             currentEmojis.push(newEmoji);
         }
     }
-
     async function fillEmptySpaces() {
         return new Promise(resolve => {
             for (let col = 0; col < width; col++) {
@@ -929,11 +921,11 @@ function getTargetScore(level) {
                 }
             }
             setTimeout(() => {
+                updatePowerUpPosition();
                 resolve();
             }, 600);
         });
     }
-
     function getRandomUniqueEmojis(array, number) {
         const filteredArray = array.filter(emoji =>
             emoji !== bombEmoji &&
@@ -947,7 +939,6 @@ function getTargetScore(level) {
         }
         return filteredArray.slice(0, number);
     }
-
     function getNewEmoji() {
         const availableEmojis = allEmojis.filter(emoji =>
             !currentEmojis.includes(emoji) &&
@@ -959,7 +950,6 @@ function getTargetScore(level) {
         const randomIndex = Math.floor(Math.random() * availableEmojis.length);
         return availableEmojis[randomIndex];
     }
-
     function createBoard() {
         grid.innerHTML = '';
         emojis = [];
@@ -974,7 +964,6 @@ function getTargetScore(level) {
         fillBoard();
         addEventListeners();
     }
-
     function fillBoard() {
         for (let i = 0; i < squares.length; i++) {
             if (emojis[i] === undefined || emojis[i] === '') {
@@ -987,7 +976,6 @@ function getTargetScore(level) {
             }
         }
     }
-
     function stabilizeBoard() {
         let matches = findAllMatches();
         while (matches.length > 0) {
@@ -1004,12 +992,10 @@ function getTargetScore(level) {
             matches = findAllMatches();
         }
     }
-
     function getRandomEmoji() {
         const rand = Math.floor(Math.random() * currentEmojis.length);
         return currentEmojis[rand];
     }
-
     function setSquareContent(square, emoji) {
         if (emoji === dogEmoji) {
             square.innerHTML = '<img src="dog.png" alt="Dog" class="dog-image">';
@@ -1020,13 +1006,11 @@ function getTargetScore(level) {
             square.style.textShadow = '0 0 2px #000';
         }
     }
-
     function clearSquareContent(square) {
         square.innerHTML = '';
         square.textContent = '';
         square.style.setProperty('--bg-color', 'transparent');
     }
-
     function addEventListeners() {
         squares.forEach(square => {
             square.addEventListener('dragstart', dragStart);
@@ -1044,16 +1028,13 @@ function getTargetScore(level) {
         document.addEventListener('mousedown', resetIdleTimer);
         document.addEventListener('touchstart', resetIdleTimer);
     }
-
     function dragStart(e) {
         dragStartIndex = parseInt(this.id);
         this.classList.add('dragging');
     }
-
     function dragOver(e) {
         e.preventDefault();
     }
-
     function dragDrop(e) {
         dragEndIndex = parseInt(this.id);
         if (isAdjacent(dragStartIndex, dragEndIndex)) {
@@ -1067,11 +1048,9 @@ function getTargetScore(level) {
             }
         }
     }
-
     function dragEnd() {
         squares.forEach(square => square.classList.remove('dragging'));
     }
-
     function handleTouchStart(e) {
         if (e.touches.length === 1) {
             touchStartX = e.touches[0].clientX;
@@ -1079,7 +1058,6 @@ function getTargetScore(level) {
             touchStartIdLocal = parseInt(this.id);
         }
     }
-
     function handleTouchEnd(e) {
         if (touchStartX === null || touchStartY === null) return;
         const touchEndX = e.changedTouches[0].clientX;
@@ -1115,7 +1093,6 @@ function getTargetScore(level) {
         touchStartY = null;
         touchStartIdLocal = null;
     }
-
     function handleSquareClick(e) {
         const index = parseInt(this.id);
         if (powerUpActive && index === blinkingIndex && emojis[index] === bombEmoji) {
@@ -1123,7 +1100,6 @@ function getTargetScore(level) {
             resetIdleTimer();
         }
     }
-
     function isAdjacent(index1, index2) {
         const row1 = Math.floor(index1 / width);
         const col1 = index1 % width;
@@ -1133,7 +1109,6 @@ function getTargetScore(level) {
         const colDiff = Math.abs(col1 - col2);
         return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
     }
-
     function swapEmojis(index1, index2) {
         const tempEmoji = emojis[index1];
         emojis[index1] = emojis[index2];
@@ -1142,23 +1117,27 @@ function getTargetScore(level) {
         setSquareContent(squares[index2], emojis[index2]);
         squares[index1].style.setProperty('--bg-color', emojiColors[emojis[index1]]);
         squares[index2].style.setProperty('--bg-color', emojiColors[emojis[index2]]);
-        updatePowerUpPosition(index1, index2);
+        updatePowerUpPosition();
+        saveGameState();
     }
-
-    function updatePowerUpPosition(oldIndex, newIndex) {
+    function updatePowerUpPosition() {
         if (powerUpActive) {
-            if (oldIndex === blinkingIndex) {
-                squares[blinkingIndex].classList.remove('blinking');
-                blinkingIndex = newIndex;
+            const newBlinkingIndex = emojis.findIndex(emoji => emoji === bombEmoji);
+            if (newBlinkingIndex !== -1) {
+                if (blinkingIndex !== null && blinkingIndex !== newBlinkingIndex) {
+                    squares[blinkingIndex].classList.remove('blinking');
+                }
+                blinkingIndex = newBlinkingIndex;
                 squares[blinkingIndex].classList.add('blinking');
-            } else if (newIndex === blinkingIndex) {
-                squares[blinkingIndex].classList.remove('blinking');
-                blinkingIndex = oldIndex;
-                squares[blinkingIndex].classList.add('blinking');
+            } else {
+                if (blinkingIndex !== null) {
+                    squares[blinkingIndex].classList.remove('blinking');
+                }
+                blinkingIndex = null;
+                powerUpActive = false;
             }
         }
     }
-
     function findAllMatches() {
         const matches = [];
         for (let row = 0; row < width; row++) {
@@ -1205,14 +1184,11 @@ function getTargetScore(level) {
         }
         return matches;
     }
-
     function findMatchesUserAction() {
         return findAllMatches();
     }
-
     async function checkMatches(isUserAction = false) {
         let matches = findAllMatches();
-
         if (isUserAction && matches.length > 0) {
             comboMultiplier = 1;
             playTotalScore = 0;
@@ -1221,12 +1197,10 @@ function getTargetScore(level) {
             comboMultiplier += 1;
             matchCountThisMove += matches.length;
         }
-
         while (matches.length > 0) {
             if (comboMultiplier > 1) {
                 showCombo(comboMultiplier);
             }
-
             for (let match of matches) {
                 const popupIndex = match[Math.floor(match.length / 2)];
                 const points = match.length * comboMultiplier;
@@ -1254,30 +1228,25 @@ function getTargetScore(level) {
                     activatePowerup();
                 }
             }
-
             updateHighScore();
             updateTargetScore();
-
             if (score >= targetScore) {
                 await checkLevelUp();
             }
-
             await fillEmptySpaces();
             matches = findAllMatches();
             if (matches.length > 0) {
                 comboMultiplier += 1;
                 matchCountThisMove += matches.length;
             }
+            saveGameState();
         }
-
         if (comboMultiplier > 1) {
             hideCombo();
         }
-
         if (isUserAction && matchCountThisMove >= 2) {
             displayPlayTotalScore();
         }
-
         if (!isUserAction) {
             comboMultiplier = 1;
             matchCountThisMove = 0;
@@ -1285,7 +1254,6 @@ function getTargetScore(level) {
         checkEndGame();
         resetIdleTimer();
     }
-
     function activatePowerup() {
         if (powerUpActive) return;
         const availableIndices = squares.map((_, idx) => idx).filter(idx => emojis[idx] !== bombEmoji && emojis[idx] !== dogEmoji);
@@ -1297,8 +1265,8 @@ function getTargetScore(level) {
         squares[blinkingIndex].classList.add('blinking');
         powerUpActive = true;
         emojisDestroyedSinceLastBomb = 0;
+        saveGameState();
     }
-
     async function triggerPowerUp(index) {
         const row = Math.floor(index / width);
         const col = index % width;
@@ -1323,8 +1291,8 @@ function getTargetScore(level) {
         }
         indicesToDestroy.push(index);
         await animateExplosion(index, indicesToDestroy);
+        saveGameState();
     }
-
     async function animateExplosion(centerIdx, indices) {
         powerUpActive = false;
         blinkingIndex = null;
@@ -1350,8 +1318,8 @@ function getTargetScore(level) {
         }, 500);
         await fillEmptySpaces();
         await checkMatches(false);
+        saveGameState();
     }
-
     function createParticles(count, color, x, y) {
         const maxParticles = 112;
         const actualCount = Math.min(count, maxParticles);
@@ -1380,7 +1348,6 @@ function getTargetScore(level) {
             }, 800);
         }
     }
-
     function createScorePopup(index, text) {
         const popup = document.createElement('div');
         popup.classList.add('score-popup');
@@ -1398,7 +1365,6 @@ function getTargetScore(level) {
         }, 500);
         lastMatchIndex = index;
     }
-
     function showLevelUpMessage() {
         const message = document.createElement('div');
         message.classList.add('level-up-message');
@@ -1408,7 +1374,6 @@ function getTargetScore(level) {
             message.remove();
         }, 1500);
     }
-
     async function checkLevelUp() {
         if (isLevelUpInProgress) return;
         isLevelUpInProgress = true;
@@ -1419,8 +1384,8 @@ function getTargetScore(level) {
             isLevelUpInProgress = false;
         }, 300);
         if (hintInterval) clearInterval(hintInterval);
+        saveGameState();
     }
-
     function levelUp() {
         level += 1;
         levelDisplay.textContent = level;
@@ -1428,8 +1393,8 @@ function getTargetScore(level) {
         updateTargetScore();
         setCurrentEmojis();
         powerUpRange += 1;
+        saveGameState();
     }
-
     function resetGame() {
         totalGamesPlayed += 1;
         totalTimePlayed += Date.now() - gameStartTime;
@@ -1467,8 +1432,8 @@ function getTargetScore(level) {
         stabilizeBoard();
         updateTargetScore();
         resetIdleTimer();
+        saveGameState();
     }
-
     function showInfo() {
         if (document.querySelector('.stats-popup')) return;
         const infoContainer = document.createElement('div');
@@ -1506,7 +1471,6 @@ function getTargetScore(level) {
         infoContainer.appendChild(closeButton);
         document.body.appendChild(infoContainer);
     }
-
     function resetIdleTimer() {
         comboMultiplier = 1;
         hideCombo();
@@ -1519,15 +1483,12 @@ function getTargetScore(level) {
             hintPossibleMatch();
         }, 15000);
     }
-
     function updateTargetScore() {
         targetScoreDisplay.textContent = targetScore;
     }
-
     function updatePlayTotalScoreDisplay() {
         playTotalScoreDisplay.textContent = `${playTotalScore}`;
     }
-
     function hintPossibleMatch() {
         const possibleMoves = findPossibleMoves();
         if (possibleMoves.length > 0) {
@@ -1544,7 +1505,6 @@ function getTargetScore(level) {
             }, 2000);
         }
     }
-
     function findPossibleMoves() {
         let possibleMoves = [];
         for (let i = 0; i < width * width; i++) {
@@ -1552,22 +1512,23 @@ function getTargetScore(level) {
             const col = i % width;
             if (col < width - 1) {
                 swapEmojis(i, i + 1);
-                if (findAllMatches().length > 0) {
+                const matches = findAllMatches();
+                swapEmojis(i, i + 1);
+                if (matches.length > 0) {
                     possibleMoves.push([i, i + 1]);
                 }
-                swapEmojis(i, i + 1);
             }
             if (row < width - 1) {
                 swapEmojis(i, i + width);
-                if (findAllMatches().length > 0) {
+                const matches = findAllMatches();
+                swapEmojis(i, i + width);
+                if (matches.length > 0) {
                     possibleMoves.push([i, i + width]);
                 }
-                swapEmojis(i, i + width);
             }
         }
         return possibleMoves;
     }
-
     function showCombo(multiplier) {
         if (multiplier < 2) return;
         const comboText = document.getElementById('combo-text');
@@ -1590,7 +1551,6 @@ function getTargetScore(level) {
             comboText.style.opacity = '0';
         }, 2000);
     }
-
     function interpolateColor(color1, color2, progress) {
         const r1 = parseInt(color1.slice(1, 3), 16);
         const g1 = parseInt(color1.slice(3, 5), 16);
@@ -1603,12 +1563,10 @@ function getTargetScore(level) {
         const b = Math.round(b1 + (b2 - b1) * progress);
         return `#${(r < 16 ? '0' : '') + r.toString(16)}${(g < 16 ? '0' : '') + g.toString(16)}${(b < 16 ? '0' : '') + b.toString(16)}`;
     }
-
     function hideCombo() {
         comboDisplay.style.opacity = '0';
         comboDisplay.classList.remove('show');
     }
-
     function displayPlayTotalScore() {
         if (lastMatchIndex === null) return;
         playTotalScoreDisplay.textContent = `${playTotalScore}`;
@@ -1639,7 +1597,6 @@ function getTargetScore(level) {
             matchCountThisMove = 0;
         }, 2250);
     }
-
     function getReactionText(comboCount) {
         if (comboCount >= 25) return '¡lo vas a romper!';
         if (comboCount >= 20) return 'excelente';
@@ -1649,7 +1606,6 @@ function getTargetScore(level) {
         if (comboCount >= 3) return 'meh';
         return '';
     }
-
     async function triggerExplosion(index) {
         const square = squares[index];
         square.classList.add('explode');
@@ -1658,11 +1614,9 @@ function getTargetScore(level) {
         clearSquareContent(square);
         square.classList.remove('explode');
     }
-
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
-
     async function checkEndGame() {
         const hasBomb = emojis.includes(bombEmoji);
         if (hasBomb) return;
@@ -1679,62 +1633,52 @@ function getTargetScore(level) {
                 square.removeEventListener('touchend', handleTouchEnd);
             });
             if (hintInterval) clearInterval(hintInterval);
-
-            await handleHighScore();
         }
     }
-
-    async function handleHighScore() {
-        const highScores = await getHighScores();
-
-        if (highScores.length < 3 || score > highScores[highScores.length - 1].score) {
-            const initials = prompt('¡Nuevo High Score! Ingresa tus iniciales (3 letras):', '').toUpperCase().slice(0, 3);
-
-            if (initials) {
-                await saveHighScore(initials, score);
-                alert('¡Tu puntaje ha sido guardado en el ranking!');
+    function saveGameState() {
+        const gameState = {
+            score,
+            level,
+            emojis,
+            currentEmojis,
+            powerUpActive,
+            blinkingIndex,
+            powerUpRange,
+            emojisDestroyedSinceLastBomb,
+            isLevelUpInProgress
+        };
+        localStorage.setItem('gameState', JSON.stringify(gameState));
+    }
+    function loadGameState() {
+        const savedState = localStorage.getItem('gameState');
+        if (savedState) {
+            const gameState = JSON.parse(savedState);
+            score = gameState.score;
+            level = gameState.level;
+            emojis = gameState.emojis;
+            currentEmojis = gameState.currentEmojis;
+            powerUpActive = gameState.powerUpActive;
+            blinkingIndex = gameState.blinkingIndex;
+            powerUpRange = gameState.powerUpRange;
+            emojisDestroyedSinceLastBomb = gameState.emojisDestroyedSinceLastBomb;
+            isLevelUpInProgress = gameState.isLevelUpInProgress;
+            scoreDisplay.textContent = score;
+            levelDisplay.textContent = level;
+            targetScore = getTargetScore(level);
+            updateTargetScore();
+            createBoard();
+            for (let i = 0; i < emojis.length; i++) {
+                setSquareContent(squares[i], emojis[i]);
+                squares[i].style.setProperty('--bg-color', emojiColors[emojis[i]]);
             }
+            if (powerUpActive && blinkingIndex !== null) {
+                squares[blinkingIndex].classList.add('blinking');
+            }
+            addEventListeners();
+            return true;
         }
+        return false;
     }
-
-    async function getHighScores() {
-        const snapshot = await highScoresCollection
-            .orderBy('score', 'desc')
-            .limit(3)
-            .get();
-
-        const highScores = [];
-        snapshot.forEach(doc => {
-            highScores.push({ id: doc.id, ...doc.data() });
-        });
-
-        return highScores;
-    }
-
-    async function saveHighScore(initials, score) {
-        await highScoresCollection.add({
-            initials: initials,
-            score: score
-        });
-
-        const snapshot = await highScoresCollection
-            .orderBy('score', 'desc')
-            .get();
-
-        const allHighScores = [];
-        snapshot.forEach(doc => {
-            allHighScores.push({ id: doc.id, ...doc.data() });
-        });
-
-        if (allHighScores.length > 3) {
-            const scoresToDelete = allHighScores.slice(3);
-            const deletePromises = scoresToDelete.map(scoreDoc => {
-                return highScoresCollection.doc(scoreDoc.id).delete();
-            });
-            await Promise.all(deletePromises);
-        }
-    }
-
     initializeGame();
 });
 </script>
