@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tablón de anuncios anónimos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -401,49 +401,6 @@
         border: none;
     }
 
-    /* Estilos para el ranking */
-    .ranking-container {
-        background-color: #ffffff;
-        color: #333333;
-        padding: 20px;
-        margin: 20px auto;
-        border: 2px solid #4caf50;
-        border-radius: 10px;
-        text-align: center;
-        max-width: 400px;
-    }
-
-    .ranking-title {
-        font-size: 24px;
-        margin-bottom: 10px;
-    }
-
-    .ranking-list {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .ranking-list li {
-        font-size: 18px;
-        margin: 5px 0;
-    }
-
-    .ranking-position {
-        display: inline-block;
-        width: 30px;
-    }
-
-    .ranking-initials {
-        display: inline-block;
-        width: 60px;
-    }
-
-    .ranking-score {
-        display: inline-block;
-        width: 80px;
-    }
-
     /* Media queries para dispositivos móviles */
     @media (max-width: 1024px) {
         .pet-status-container {
@@ -502,6 +459,117 @@
         width: 100%;
     }
 
+    /* Estilos específicos para el nuevo ranking */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&display=swap'); /* Fuente especial para los números */
+
+    .ranking-container {
+        display: flex;
+        align-items: flex-end;
+        width: auto;
+        position: relative;
+        justify-content: center;
+        margin: 20px auto;
+    }
+
+    .dog-image {
+        width: 40%;
+        max-width: 200px;
+        height: auto;
+        margin-right: -90px;
+        align-self: flex-end;
+    }
+
+    .ranking-content {
+        width: 25%;
+        max-width: 160px;
+        text-align: center;
+        color: #333;
+        background: linear-gradient(145deg, #f8e7d1, #e6c8a8);
+        padding: 10px 10px 15px;
+        border-radius: 8px;
+        border: 2px solid #8B4513;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2), inset 0 4px 6px rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ranking-content::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+        background-size: 5px 5px;
+        opacity: 0.3;
+        pointer-events: none;
+    }
+
+    .ranking-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.9em;
+        font-weight: bold;
+    }
+
+    .ranking-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px dashed #8B4513;
+    }
+
+    .ranking-number {
+        font-family: 'Roboto Slab', serif;
+        font-size: 1.2em;
+        color: #D2691E;
+        margin-right: 8px;
+    }
+
+    .first-place .ranking-number {
+        color: #FF4500;
+    }
+
+    .second-place .ranking-number {
+        color: #1E90FF;
+    }
+
+    .third-place .ranking-number {
+        color: #32CD32;
+    }
+
+    .points {
+        font-weight: normal;
+        color: #8B4513;
+        font-size: 0.8em;
+        opacity: 0.9;
+    }
+
+    .right-image {
+        width: 40%;
+        max-width: 200px;
+        height: auto;
+        margin-left: -30px;
+        margin-top: -10px;
+        align-self: flex-start;
+    }
+
+    @media (max-width: 600px) {
+        .ranking-container {
+            flex-direction: row;
+            width: 90vw;
+        }
+        .dog-image, .right-image {
+            width: 50%;
+        }
+        .ranking-list {
+            font-size: 2.5vw;
+        }
+    }
+
 </style>
 </head>
 <body>
@@ -528,12 +596,17 @@
         </div>
     </div>
 
-    <!-- Aquí agregamos el ranking -->
+    <!-- Aquí reemplazamos el ranking existente con el nuevo diseño -->
     <div class="ranking-container">
-        <div class="ranking-title">🏆 Ranking Top 3 🏆</div>
-        <ul class="ranking-list" id="ranking-list">
-            <!-- Los puntajes se cargarán aquí -->
-        </ul>
+        <img src="rankingdog.png" alt="Moncho junto al ranking" class="dog-image">
+        <div class="ranking-content">
+            <ul class="ranking-list">
+                <li class="first-place"><span class="ranking-number">1</span> FEO <span class="points">3000</span></li>
+                <li class="second-place"><span class="ranking-number">2</span> AI <span class="points">2000</span></li>
+                <li class="third-place"><span class="ranking-number">3</span> RO? <span class="points">1000</span></li>
+            </ul>
+        </div>
+        <img src="monchy.png" alt="Monchy a la derecha del ranking" class="right-image">
     </div>
 
     <div class="main-container">
@@ -599,10 +672,6 @@ const firebaseConfig = {
         const closePopup = document.getElementById('close-popup');
         const loadingElement = document.getElementById('loading');
 
-        // Variables para el ranking
-        const rankingList = document.getElementById('ranking-list');
-
-        // Resto del código existente...
         const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
         const slogans = [
             "Ahora más anónimo",
@@ -636,30 +705,6 @@ const firebaseConfig = {
         let isLoading = false;
         let displayedMessageIds = new Set();
         let petPopupOpen = false;
-
-        // Función para cargar el ranking
-        async function loadRanking() {
-            const highScoresCollection = db.collection('highscores');
-            const snapshot = await highScoresCollection
-                .orderBy('score', 'desc')
-                .limit(3)
-                .get();
-
-            rankingList.innerHTML = '';
-
-            let position = 1;
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `
-                    <span class="ranking-position">${position}.</span>
-                    <span class="ranking-initials">${data.initials}</span>
-                    <span class="ranking-score">${data.score}</span>
-                `;
-                rankingList.appendChild(listItem);
-                position++;
-            });
-        }
 
         function loadMessages(startAfter = null) {
             if (isLoading) return;
@@ -1034,7 +1079,6 @@ const firebaseConfig = {
             const daysOperatingCount = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
             daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
             setInterval(changeSlogan, 10000);
-            loadRanking(); // Carga el ranking al iniciar la aplicación
         }
 
         function listenForNewMessages() {
@@ -1057,7 +1101,6 @@ const firebaseConfig = {
         }
 
         // Código relacionado con la galería, mascota virtual y juego Candy
-        // ...
 
         // Código para la galería
         const galleryLink = document.getElementById('gallery-link');
