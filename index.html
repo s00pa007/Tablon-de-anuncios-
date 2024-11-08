@@ -1112,7 +1112,7 @@ const firebaseConfig = {
 
             rankingList.innerHTML = '';
 
-            snapshot.forEach((doc, index) => {
+            snapshot.docs.forEach((doc, index) => {
                 const data = doc.data();
                 const positionClass = ['first-place', 'second-place', 'third-place'][index] || '';
                 const listItem = document.createElement('li');
