@@ -1380,7 +1380,7 @@ function showLevelUpMessage() {
     document.body.appendChild(message);
     setTimeout(() => {
         message.remove();
-    }, 1500);
+    }, 3000); // Cambiado a 3 segundos
 }
     async function checkLevelUp() {
         if (isLevelUpInProgress) return;
