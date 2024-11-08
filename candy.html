@@ -154,7 +154,7 @@ body {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-size: 1.825rem;
+    font-size: 1.950rem;
     transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s;
     position: relative;
     overflow: hidden;
@@ -193,7 +193,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 5rem;
+    font-size: 15rem;
     color: #d32f2f;
     text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
     z-index: 10;
@@ -502,13 +502,13 @@ body {
 
 .combo-text.show {
     opacity: 1;
-    animation: fadeInOut 3s forwards;
+    animation: fadeInOut 5s forwards; /* Ajusta el tiempo total aquí */
 }
 
 @keyframes fadeInOut {
     0% { opacity: 0; }
     10% { opacity: 1; }
-    90% { opacity: 1; }
+    90% { opacity: 1; }  /* Mantiene la visibilidad por más tiempo */
     100% { opacity: 0; }
 }
 
@@ -521,12 +521,51 @@ body {
     transition: opacity 0.3s, transform 2.25s;
     pointer-events: none;
     z-index: 30;
-    text-shadow: 0 0 2px #000;
+    -webkit-text-stroke: 1px #FFFFFF; /* Perfil blanco */
+    text-shadow: 
+        0 0 5px #FFFFFF,
+        0 0 10px #FFFFFF, 
+        0 0 15px #FFFFFF, 
+        0 0 20px #FFFFFF;
 }
 
-.play-total-score.show {
+.play-total-score.green-score {
+    color: #32CD32; /* Verde */
+}
+
+.play-total-score.purple-score {
+    color: #9932CC; /* Morado */
+}
+
+.reaction-text {
+    position: absolute;
+    font-size: 1.6rem;
+    font-weight: 900;
+    font-family: 'Arial', sans-serif;
+    pointer-events: none;
+    z-index: 30;
+    opacity: 0;
+    transition: opacity 0.3s, transform 2.25s;
+    -webkit-text-stroke: 1.5px #FFFFFF; /* Perfil blanco */
+    text-shadow: 
+        0 0 7px #FFFFFF,
+        0 0 14px #FFFFFF,
+        0 0 21px #FFFFFF,
+        0 0 28px #FFFFFF,
+        0 0 35px #FFFFFF;
+}
+
+.reaction-text.green-score {
+    color: #32CD32; /* Verde */
+}
+
+.reaction-text.purple-score {
+    color: #9932CC; /* Morado */
+}
+
+.play-total-score.show, .reaction-text.show {
     opacity: 1;
-    animation: scaleUpFade 2.25s forwards;
+    animation: scaleUpFade 2.40s forwards;
 }
 
 @keyframes scaleUpFade {
@@ -535,38 +574,7 @@ body {
     100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
 }
 
-.play-total-score.green-score {
-    color: #32CD32;
-}
 
-.play-total-score.purple-score {
-    color: #9932CC;
-}
-
-.reaction-text.green-score {
-    color: #9932CC;
-}
-
-.reaction-text.purple-score {
-    color: #32CD32;
-}
-
-.reaction-text {
-    position: absolute;
-    font-size: 2.10rem;
-    font-weight: bold;
-    font-family: 'Arial', sans-serif;
-    pointer-events: none;
-    z-index: 30;
-    text-shadow: 0 0 2px #000;
-    opacity: 0;
-    transition: opacity 0.3s, transform 2.25s;
-}
-
-.reaction-text.show {
-    opacity: 1;
-    animation: reactionFade 2.25s forwards;
-}
 
 @keyframes reactionFade {
     0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
@@ -1365,15 +1373,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
         lastMatchIndex = index;
     }
-    function showLevelUpMessage() {
-        const message = document.createElement('div');
-        message.classList.add('level-up-message');
-        message.textContent = `🚀 Nivel ${level} 🚀`;
-        document.body.appendChild(message);
-        setTimeout(() => {
-            message.remove();
-        }, 1500);
-    }
+function showLevelUpMessage() {
+    const message = document.createElement('div');
+    message.classList.add('level-up-message');
+    message.innerHTML = `<img src="./levelup.png" alt="Cohete" style="width: 100px; height: 100px;"> Nivel ${level}`;
+    document.body.appendChild(message);
+    setTimeout(() => {
+        message.remove();
+    }, 1500);
+}
     async function checkLevelUp() {
         if (isLevelUpInProgress) return;
         isLevelUpInProgress = true;
@@ -1471,18 +1479,41 @@ document.addEventListener('DOMContentLoaded', () => {
         infoContainer.appendChild(closeButton);
         document.body.appendChild(infoContainer);
     }
-    function resetIdleTimer() {
-        comboMultiplier = 1;
-        hideCombo();
-        if (hintTimeout) clearTimeout(hintTimeout);
-        if (hintInterval) clearInterval(hintInterval);
-        squares.forEach(square => {
-            square.classList.remove('hint');
-        });
-        hintTimeout = setTimeout(() => {
-            hintPossibleMatch();
-        }, 9000);
-    }
+
+
+
+// Define comboResetTimeout como una variable global si aún no lo está
+let comboResetTimeout;
+
+function resetIdleTimer() {
+    // Oculta cualquier hint previo y reinicia los temporizadores de pista
+    if (hintTimeout) clearTimeout(hintTimeout);
+    if (hintInterval) clearInterval(hintInterval);
+    squares.forEach(square => {
+        square.classList.remove('hint');
+    });
+
+    // Muestra la pista (hint) a los 3 segundos
+    hintTimeout = setTimeout(() => {
+        hintPossibleMatch();
+    }, 3000);
+
+    // Limpiar cualquier timeout previo de combo reset para evitar reinicios innecesarios
+    if (comboResetTimeout) clearTimeout(comboResetTimeout);
+
+    // Configura el timeout para resetear el combo multiplier y ocultar "COMBO" después de 3 segundos sin actividad
+    comboResetTimeout = setTimeout(() => {
+        comboMultiplier = 1; // Resetea el comboMultiplier
+        hideCombo(); // Oculta "COMBO" cuando se resetea el combo
+    }, 3000); // Ajuste de tiempo para el reset del combo y ocultar "COMBO"
+}
+
+// Función para ocultar "COMBO" al finalizar el combo
+function hideCombo() {
+    const comboText = document.getElementById('combo-text');
+    comboText.classList.remove('show');
+    comboText.style.opacity = '0';
+}
     function updateTargetScore() {
         targetScoreDisplay.textContent = targetScore;
     }
@@ -1529,28 +1560,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return possibleMoves;
     }
-    function showCombo(multiplier) {
-        if (multiplier < 2) return;
-        const comboText = document.getElementById('combo-text');
-        comboText.textContent = `Combo x${multiplier}`;
-        let color;
-        if (multiplier <= 3) {
-            color = '#FFD700';
-        } else if (multiplier <= 10) {
-            const progress = (multiplier - 3) / 7;
-            color = interpolateColor('#FFD700', '#FFA500', progress);
-        } else {
-            const progress = Math.min((multiplier - 10) / 10, 1);
-            color = interpolateColor('#FFA500', '#FF0000', progress);
-        }
-        comboText.style.color = color;
-        comboText.style.opacity = '1';
-        comboText.classList.add('show');
-        setTimeout(() => {
-            comboText.classList.remove('show');
-            comboText.style.opacity = '0';
-        }, 2000);
+let comboInProgress = false; // Nueva variable para seguir el estado del combo
+
+function showCombo(multiplier) {
+    if (multiplier < 2) return;
+
+    comboInProgress = true; // Marca el inicio de un combo activo
+    const comboText = document.getElementById('combo-text');
+    comboText.textContent = `Combo x${multiplier}`;
+
+    let color;
+    if (multiplier <= 3) {
+        color = '#FFD700';
+    } else if (multiplier <= 10) {
+        const progress = (multiplier - 3) / 7;
+        color = interpolateColor('#FFD700', '#FFA500', progress);
+    } else {
+        const progress = Math.min((multiplier - 10) / 10, 1);
+        color = interpolateColor('#FFA500', '#FF0000', progress);
     }
+    comboText.style.color = color;
+    comboText.style.opacity = '1';
+    comboText.classList.add('show');
+
+    if (window.comboTimeout) clearTimeout(window.comboTimeout);
+
+    // Configura el timeout para permitir más tiempo antes de que desaparezca
+    window.comboTimeout = setTimeout(() => {
+        comboInProgress = false; // Combo ha terminado
+        comboText.classList.remove('show');
+        comboText.style.opacity = '0';
+    }, 7000);
+}
+
+// Función para reiniciar el combo solo si no hay combos activos
+function resetComboTimer() {
+    if (!comboInProgress) {
+        // Si no hay combo en progreso, resetea el multiplicador y oculta el texto
+        comboMultiplier = 1;
+        hideCombo();
+    }
+}
+
     function interpolateColor(color1, color2, progress) {
         const r1 = parseInt(color1.slice(1, 3), 16);
         const g1 = parseInt(color1.slice(3, 5), 16);
@@ -1570,8 +1621,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function displayPlayTotalScore() {
     if (lastMatchIndex === null) return;
 
-    // Actualizar el puntaje total en pantalla
-    playTotalScoreDisplay.textContent = `${playTotalScore}`;
+    // Crear un nuevo elemento para cada puntaje total de la jugada
+    const newPlayTotalScore = document.createElement('div');
+    newPlayTotalScore.classList.add('play-total-score');
+    newPlayTotalScore.textContent = `${playTotalScore}`;
 
     // Obtener el texto de reacción basado en el combo actual
     const reactionText = getReactionText(matchCountThisMove);
@@ -1581,56 +1634,53 @@ function displayPlayTotalScore() {
     newReactionText.classList.add('reaction-text');
     newReactionText.textContent = reactionText;
 
-    // Seleccionar un color aleatorio para el texto de reacción
-    const randomColor = Math.random() < 0.5 ? 'green-score' : 'purple-score';
-    newReactionText.classList.add(randomColor);
+    // Seleccionar un color aleatorio para el texto de reacción y puntaje
+    const colors = ['green-score', 'purple-score'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    newPlayTotalScore.classList.add(randomColor);
+    newReactionText.classList.add(randomColor === 'green-score' ? 'purple-score' : 'green-score');
 
-    // Posicionar el nuevo texto de reacción
+    // Posicionar el nuevo texto de reacción y el puntaje de la jugada en el centro del último match
     const lastSquare = squares[lastMatchIndex];
     const rect = lastSquare.getBoundingClientRect();
     const gameRect = gameContainer.getBoundingClientRect();
     const x = rect.left - gameRect.left + rect.width / 2;
     const y = rect.top - gameRect.top + rect.height / 2;
 
+    newPlayTotalScore.style.left = `${x}px`;
+    newPlayTotalScore.style.top = `${y}px`;
     newReactionText.style.left = `${x}px`;
-    newReactionText.style.top = `${y + 30}px`; // Posicionar ligeramente debajo del puntaje total
+    newReactionText.style.top = `${y + 30}px`; // Ajuste para colocar el texto de reacción ligeramente debajo
 
-    // Agregar el nuevo texto de reacción al contenedor del juego
+    // Agregar los nuevos elementos de puntaje total y reacción al contenedor del juego
+    document.body.appendChild(newPlayTotalScore);
     document.body.appendChild(newReactionText);
 
-    // Mostrar el nuevo texto de reacción con la animación
+    // Mostrar los elementos con la animación
+    newPlayTotalScore.classList.add('show');
     newReactionText.classList.add('show');
 
-    // Remover el texto de reacción después de un tiempo
+    // Remover los elementos después de un tiempo
     setTimeout(() => {
+        newPlayTotalScore.classList.remove('show');
+        newPlayTotalScore.remove();
         newReactionText.classList.remove('show');
         newReactionText.remove();
-    }, 2250);
+    }, 2250); // Ajuste del tiempo en pantalla si es necesario
 
-    // Actualizar y posicionar el puntaje total en pantalla
-    playTotalScoreDisplay.classList.remove('green-score', 'purple-score');
-    playTotalScoreDisplay.classList.add(randomColor);
-    playTotalScoreDisplay.style.left = `${x}px`;
-    playTotalScoreDisplay.style.top = `${y}px`;
-    playTotalScoreDisplay.classList.add('show');
-
-    // Limpiar el puntaje total después de que el texto desaparezca
-    setTimeout(() => {
-        playTotalScoreDisplay.classList.remove('show');
-        playTotalScore = 0;
-        updatePlayTotalScoreDisplay();
-        lastMatchIndex = null;
-        matchCountThisMove = 0;
-    }, 2250);
+    // Restablecer el puntaje total después de que el elemento desaparezca
+    playTotalScore = 0;
+    updatePlayTotalScoreDisplay();
+    lastMatchIndex = null;
+    matchCountThisMove = 0;
 }
-
     function getReactionText(comboCount) {
-        if (comboCount >= 25) return '¡LO VAS A ROMPER!';
+        if (comboCount >= 25) return '¡BoooOoM!';
         if (comboCount >= 20) return 'EXCELENTE';
         if (comboCount >= 15) return 'GUAU!';
         if (comboCount >= 10) return 'ÑOS!';
         if (comboCount >= 5) return 'CHACHI';
-        if (comboCount >= 3) return 'MEH';
+        if (comboCount >= 3) return 'BIEN';
         return '';
     }
     async function triggerExplosion(index) {
