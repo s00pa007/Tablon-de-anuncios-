@@ -596,14 +596,12 @@
         </div>
     </div>
 
-    <!-- Aquí reemplazamos el ranking existente con el nuevo diseño -->
+    <!-- Aquí reemplazamos el ranking existente con el nuevo diseño y funcionalidades -->
     <div class="ranking-container">
         <img src="rankingdog.png" alt="Moncho junto al ranking" class="dog-image">
         <div class="ranking-content">
-            <ul class="ranking-list">
-                <li class="first-place"><span class="ranking-number">1</span> FEO <span class="points">3000</span></li>
-                <li class="second-place"><span class="ranking-number">2</span> AI <span class="points">2000</span></li>
-                <li class="third-place"><span class="ranking-number">3</span> RO? <span class="points">1000</span></li>
+            <ul class="ranking-list" id="ranking-list">
+                <!-- Los puntajes se cargarán aquí dinámicamente -->
             </ul>
         </div>
         <img src="monchy.png" alt="Monchy a la derecha del ranking" class="right-image">
@@ -671,6 +669,9 @@ const firebaseConfig = {
         const petPopup = document.getElementById('pet-popup');
         const closePopup = document.getElementById('close-popup');
         const loadingElement = document.getElementById('loading');
+
+        // Variables para el ranking
+        const rankingList = document.getElementById('ranking-list');
 
         const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🦂', '🦀', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🐳', '🐬', '🐟', '🐠', '🐡', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
         const slogans = [
@@ -1079,6 +1080,7 @@ const firebaseConfig = {
             const daysOperatingCount = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
             daysOperating.textContent = `Días en funcionamiento: ${daysOperatingCount}`;
             setInterval(changeSlogan, 10000);
+            loadRanking(); // Cargar el ranking al iniciar la aplicación
         }
 
         function listenForNewMessages() {
@@ -1098,6 +1100,28 @@ const firebaseConfig = {
                         }
                     });
                 });
+        }
+
+        // Función para cargar el ranking desde Firebase
+        async function loadRanking() {
+            const highScoresCollection = db.collection('highscores');
+            const snapshot = await highScoresCollection
+                .orderBy('score', 'desc')
+                .limit(3)
+                .get();
+
+            rankingList.innerHTML = '';
+
+            snapshot.forEach((doc, index) => {
+                const data = doc.data();
+                const positionClass = ['first-place', 'second-place', 'third-place'][index] || '';
+                const listItem = document.createElement('li');
+                listItem.className = positionClass;
+                listItem.innerHTML = `
+                    <span class="ranking-number">${index + 1}</span> ${data.initials} <span class="points">${data.score}</span>
+                `;
+                rankingList.appendChild(listItem);
+            });
         }
 
         // Código relacionado con la galería, mascota virtual y juego Candy
