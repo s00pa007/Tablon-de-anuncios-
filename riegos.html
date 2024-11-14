@@ -36,7 +36,7 @@
         .header {
             flex: 0 0 auto;
             height: 40px;
-            padding: 0 16px;
+            padding: 0 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -47,11 +47,71 @@
         .header-title {
             font-size: 9px;
             color: var(--gb-lightest);
+            flex: 1;
+            text-align: center;
         }
 
         .score {
             font-size: 9px;
             color: var(--gb-lightest);
+        }
+
+        .settings-container {
+            position: relative;
+        }
+
+        .settings-button {
+            background-color: var(--gb-medium);
+            border: 2px solid var(--gb-lightest);
+            border-radius: var(--border-radius);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .gear-icon {
+            font-size: 14px;
+            filter: grayscale(1) brightness(1.5) contrast(1.2);
+            mix-blend-mode: screen;
+        }
+
+        .settings-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--gb-medium);
+            border: 2px solid var(--gb-lightest);
+            border-radius: var(--border-radius);
+            padding: 4px;
+            width: 120px;
+            margin-top: 8px;
+            z-index: 1000;
+        }
+
+        .settings-menu.active {
+            display: block;
+        }
+
+        .settings-menu-item {
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            background-color: var(--gb-dark);
+            color: var(--gb-lightest);
+            border-radius: var(--border-radius);
+            font-size: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .settings-menu-item:active {
+            opacity: 0.8;
         }
 
         .monitor {
@@ -259,79 +319,6 @@
             background-color: var(--gb-medium);
         }
 
-        .footer {
-            flex: 0 0 auto;
-            height: 40px;
-            padding: 0 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--gb-dark);
-            border-top: 2px solid var(--gb-medium);
-        }
-
-        .footer-title {
-            font-size: 9px;
-            color: var(--gb-lightest);
-        }
-
-        .settings-container {
-            position: relative;
-        }
-
-        .settings-button {
-            background-color: var(--gb-medium);
-            border: 2px solid var(--gb-lightest);
-            border-radius: var(--border-radius);
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .gear-icon {
-            font-size: 14px;
-            filter: grayscale(1) brightness(1.5) contrast(1.2);
-            mix-blend-mode: screen;
-        }
-
-        .settings-menu {
-            display: none;
-            position: absolute;
-            bottom: 100%;
-            right: 0;
-            background-color: var(--gb-medium);
-            border: 2px solid var(--gb-lightest);
-            border-radius: var(--border-radius);
-            padding: 4px;
-            width: 120px;
-            margin-bottom: 8px;
-        }
-
-        .settings-menu.active {
-            display: block;
-        }
-
-        .settings-menu-item {
-            padding: 8px;
-            text-align: center;
-            cursor: pointer;
-            background-color: var(--gb-dark);
-            color: var(--gb-lightest);
-            border-radius: var(--border-radius);
-            font-size: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .settings-menu-item:active {
-            opacity: 0.8;
-        }
-
         .modal {
             display: none;
             position: fixed;
@@ -412,6 +399,14 @@
 </head>
 <body>
     <div class="header">
+        <div class="settings-container">
+            <button class="settings-button" id="settingsButton">
+                <div class="gear-icon">⚙️</div>
+            </button>
+            <div class="settings-menu" id="settingsMenu">
+                <div class="settings-menu-item" id="resetButton">Resetear Todo</div>
+            </div>
+        </div>
         <div class="header-title">SuperRiegos3000</div>
         <div class="score">Puntos: <span id="score">0</span></div>
     </div>
@@ -438,18 +433,7 @@
         </div>
     </div>
 
-    <div class="footer">
-        <div class="footer-title">SuperRiegos3000</div>
-        <div class="settings-container">
-            <button class="settings-button" id="settingsButton">
-                <div class="gear-icon">⚙️</div>
-            </button>
-            <div class="settings-menu" id="settingsMenu">
-                <div class="settings-menu-item" id="resetButton">Resetear Todo</div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Irrigation Control Modal -->
     <div class="modal" id="irrigationModal">
         <div class="modal-content">
             <div class="irrigation-controls">
@@ -461,6 +445,7 @@
         </div>
     </div>
 
+    <!-- Message Popup -->
     <div class="message-popup" id="messagePopup">
         <div id="messageText"></div>
         <button class="modal-button" id="closeMessageButton">OK</button>
