@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>SuperRiegos3000</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Enlace corregido a la fuente retro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
     <style>
         :root {
             --gb-lightest: #9bbc0f;
@@ -73,11 +74,14 @@
             justify-content: center;
             cursor: pointer;
             padding: 0;
+            overflow: hidden;
         }
 
         .gear-icon {
             font-size: var(--icon-size);
             color: var(--gb-lightest);
+            filter: grayscale(100%);
+            line-height: 1;
         }
 
         .settings-menu {
@@ -106,9 +110,8 @@
             color: var(--gb-lightest);
             border-radius: var(--border-radius);
             font-size: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            /* Ajustes para mostrar el texto completo */
+            white-space: normal;
         }
 
         .settings-menu-item:active {
@@ -144,6 +147,8 @@
         .empty-state-text {
             font-size: 9px;
             line-height: 1.5;
+            /* Ajustes para mostrar el texto completo */
+            white-space: normal;
         }
 
         .irrigation-box {
@@ -175,6 +180,8 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            /* Ajustes para mostrar el texto completo */
+            white-space: normal;
         }
 
         .irrigation-box.active .irrigation-zone {
@@ -184,9 +191,8 @@
         .irrigation-name {
             font-size: 9px;
             margin: 4px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            /* Ajustes para mostrar el texto completo */
+            white-space: normal;
         }
 
         .irrigation-time {
@@ -273,9 +279,8 @@
             color: var(--gb-lightest);
             cursor: pointer;
             font-size: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            /* Ajustes para mostrar el texto completo */
+            white-space: normal;
         }
 
         .menu-category.active {
@@ -305,12 +310,11 @@
             padding: 6px;
             cursor: pointer;
             font-size: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             display: flex;
             align-items: center;
             gap: 8px;
+            /* Ajustes para mostrar el texto completo */
+            white-space: normal;
         }
 
         .submenu-items {
@@ -328,12 +332,11 @@
             color: var(--gb-lightest);
             cursor: pointer;
             font-size: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             display: flex;
             align-items: center;
             gap: 8px;
+            /* Ajustes para mostrar el texto completo */
+            white-space: normal;
         }
 
         .submenu-item:active {
@@ -365,6 +368,8 @@
             min-width: 180px;
             border: 2px solid var(--gb-dark);
             font-size: 8px;
+            /* Ajustes para mostrar el texto completo */
+            white-space: normal;
         }
 
         .message-popup.active {
@@ -379,6 +384,7 @@
         .retro-emoji {
             font-size: var(--icon-size);
             filter: grayscale(100%);
+            line-height: 1;
         }
 
         .retro-emoji-small {
@@ -416,7 +422,7 @@
     <div class="header">
         <div class="settings-container">
             <button class="settings-button" id="settingsButton">
-                <div class="gear-icon">⚙️</div>
+                <div class="gear-icon retro-emoji">⚙️</div>
             </button>
             <div class="settings-menu" id="settingsMenu">
                 <div class="settings-menu-item" id="resetButton">Resetear Todo</div>
@@ -458,6 +464,7 @@
         <div id="messageText"></div>
         <button class="modal-button" id="closeMessageButton">OK</button>
     </div>
+
 
     <script>
     let eventListenersInitialized = false;
@@ -750,8 +757,9 @@
     function renderIrrigationBoxes() {
         const monitor = document.getElementById('monitor');
 
+        // Eliminar las cajas existentes
         const boxes = monitor.querySelectorAll('.irrigation-box');
-        boxes.forEach(box => monitor.removeChild(box));
+        boxes.forEach(box => box.remove());
 
         let hasActiveIrrigations = false;
 
@@ -764,6 +772,7 @@
         });
 
         const emptyState = document.getElementById('emptyState');
+
         if (hasActiveIrrigations) {
             emptyState.style.display = 'none';
         } else {
