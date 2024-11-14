@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>SuperRiegos3000</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- Enlace corregido a la fuente retro -->
+    <!-- Enlace a la fuente retro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
     <style>
         :root {
@@ -12,6 +12,8 @@
             --gb-light: #8bac0f;
             --gb-medium: #306230;
             --gb-dark: #0f380f;
+            --gb-gray-light: #e0e0e0;
+            --gb-gray-dark: #707070;
             --border-radius: 4px;
             --icon-size: 20px;
             --icon-size-small: 14px;
@@ -64,7 +66,7 @@
         }
 
         .settings-button {
-            background-color: var(--gb-medium);
+            background-color: var(--gb-dark);
             border: 2px solid var(--gb-lightest);
             border-radius: var(--border-radius);
             width: 32px;
@@ -77,11 +79,13 @@
             overflow: hidden;
         }
 
+        /* Ícono de engranaje retro */
         .gear-icon {
-            font-size: var(--icon-size);
-            color: var(--gb-lightest);
-            filter: grayscale(100%);
-            line-height: 1;
+            width: 20px;
+            height: 20px;
+            background-color: var(--gb-gray-light);
+            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000000" d="M12 1.75a1 1 0 0 0-1 1v1.061a6.958 6.958 0 0 0-2.193.908l-.75-.75a1 1 0 0 0-1.415 1.415l.75.75A6.958 6.958 0 0 0 6.811 8H5.75a1 1 0 1 0 0 2h1.061a6.958 6.958 0 0 0 .908 2.193l-.75.75a1 1 0 0 0 1.415 1.415l.75-.75A6.958 6.958 0 0 0 11 17.189V18.25a1 1 0 1 0 2 0v-1.061a6.958 6.958 0 0 0 2.193-.908l.75.75a1 1 0 0 0 1.415-1.415l-.75-.75A6.958 6.958 0 0 0 17.189 13H18.25a1 1 0 1 0 0-2h-1.061a6.958 6.958 0 0 0-.908-2.193l.75-.75a1 1 0 0 0-1.415-1.415l-.75.75A6.958 6.958 0 0 0 13 5.811V4.75a1 1 0 0 0-1-1zM12 9a3 3 0 1 1 0 6a3 3 0 0 1 0-6z"/></svg>') no-repeat center;
+            mask-size: contain;
         }
 
         .settings-menu {
@@ -110,7 +114,6 @@
             color: var(--gb-lightest);
             border-radius: var(--border-radius);
             font-size: 8px;
-            /* Ajustes para mostrar el texto completo */
             white-space: normal;
         }
 
@@ -147,7 +150,6 @@
         .empty-state-text {
             font-size: 9px;
             line-height: 1.5;
-            /* Ajustes para mostrar el texto completo */
             white-space: normal;
         }
 
@@ -180,7 +182,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            /* Ajustes para mostrar el texto completo */
             white-space: normal;
         }
 
@@ -191,7 +192,6 @@
         .irrigation-name {
             font-size: 9px;
             margin: 4px 0;
-            /* Ajustes para mostrar el texto completo */
             white-space: normal;
         }
 
@@ -223,20 +223,21 @@
             margin-top: 4px;
         }
 
-        .control-button-small {
-            background-color: var(--gb-medium);
-            border: 2px solid black;
-            color: var(--gb-lightest);
-            padding: 6px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: var(--icon-size-small);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-        }
+.control-button-small {
+    background-color: var(--gb-dark);
+    border: 2px solid var(--gb-lightest);
+    color: var(--gb-medium); /* Verde oscuro Game Boy */
+    padding: 6px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--icon-size-small);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    filter: grayscale(100%) brightness(0.6); /* Estilo retro Game Boy */
+}
 
         .control-button-small:active {
             opacity: 0.8;
@@ -279,7 +280,6 @@
             color: var(--gb-lightest);
             cursor: pointer;
             font-size: 8px;
-            /* Ajustes para mostrar el texto completo */
             white-space: normal;
         }
 
@@ -313,7 +313,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            /* Ajustes para mostrar el texto completo */
             white-space: normal;
         }
 
@@ -335,7 +334,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            /* Ajustes para mostrar el texto completo */
             white-space: normal;
         }
 
@@ -353,7 +351,7 @@
             background-color: var(--gb-medium);
         }
 
-        .message-popup {
+        .message-popup, .confirmation-popup {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -368,16 +366,35 @@
             min-width: 180px;
             border: 2px solid var(--gb-dark);
             font-size: 8px;
-            /* Ajustes para mostrar el texto completo */
             white-space: normal;
         }
 
-        .message-popup.active {
+        .message-popup.active, .confirmation-popup.active {
             display: block;
         }
 
-        #messageText {
+        #messageText, #confirmationText {
             margin-bottom: 6px;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .modal-button {
+            background-color: var(--gb-dark);
+            border: 2px solid var(--gb-lightest);
+            color: var(--gb-lightest);
+            padding: 6px 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 8px;
+        }
+
+        .modal-button:active {
+            opacity: 0.8;
         }
 
         /* Estilo retro para los emojis */
@@ -406,7 +423,8 @@
                 height: 40px;
             }
             .gear-icon {
-                font-size: 24px;
+                width: 24px;
+                height: 24px;
             }
             .control-button, .modal-button {
                 font-size: 10px;
@@ -422,7 +440,7 @@
     <div class="header">
         <div class="settings-container">
             <button class="settings-button" id="settingsButton">
-                <div class="gear-icon retro-emoji">⚙️</div>
+                <div class="gear-icon"></div>
             </button>
             <div class="settings-menu" id="settingsMenu">
                 <div class="settings-menu-item" id="resetButton">Resetear Todo</div>
@@ -465,203 +483,273 @@
         <button class="modal-button" id="closeMessageButton">OK</button>
     </div>
 
+    <!-- Confirmation Popup -->
+    <div class="confirmation-popup" id="confirmationPopup">
+        <div id="confirmationText"></div>
+        <div class="confirmation-buttons">
+            <button class="modal-button" id="confirmYesButton">Sí</button>
+            <button class="modal-button" id="confirmNoButton">No</button>
+        </div>
+    </div>
 
-    <script>
-    let eventListenersInitialized = false;
+<script>
+let eventListenersInitialized = false;
 
-    const gameState = {
-        irrigations: {},
-        score: 0,
-        activeCategory: null,
-        activeGroups: new Set(),
-        settingsMenuOpen: false
-    };
+const gameState = {
+    irrigations: {},
+    score: 0,
+    activeCategory: null,
+    activeGroups: new Set(),
+    settingsMenuOpen: false
+};
 
-    const irrigationConfig = {
-        superior: {
-            groups: {
-                'Musical': {
-                    name: 'Musical',
-                    items: {
-                        'Riego 1': 30 * 60,
-                        'Riego 2': 30 * 60,
-                        'Frutal': 30 * 60
-                    }
-                },
-                'Patos': {
-                    name: 'Patos',
-                    items: {
-                        'Riego 1': 30 * 60,
-                        'Riego 2 y 3': 30 * 60,
-                        'Difusores': 15 * 60
-                    }
+const irrigationConfig = {
+    superior: {
+        groups: {
+            'Musical': {
+                name: 'Musical',
+                items: {
+                    'Riego 1': 30 * 60,
+                    'Riego 2': 30 * 60,
+                    'Frutal': 30 * 60
+                }
+            },
+            'Patos': {
+                name: 'Patos',
+                items: {
+                    'Riego 1': 30 * 60,
+                    'Riego 2 y 3': 30 * 60,
+                    'Difusores': 15 * 60
                 }
             }
-        },
-        inferior: {
-            groups: {
-                'Arriba': {
-                    name: 'Arriba',
-                    items: {
-                        'Parque Infantil': 30 * 60,
-                        'Minigolf': 30 * 60,
-                        'Petanca': 30 * 60,
-                        'Talud': 30 * 60
-                    }
-                },
-                'Abajo': {
-                    name: 'Abajo',
-                    items: {
-                        'Cancha de Tenis': 30 * 60,
-                        'Aguacatero 1': 30 * 60,
-                        'Aguacatero 2': 30 * 60,
-                        'Aguacatero 3': 30 * 60
-                    }
+        }
+    },
+    inferior: {
+        groups: {
+            'Arriba': {
+                name: 'Arriba',
+                items: {
+                    'Parque Infantil': 30 * 60,
+                    'Minigolf': 30 * 60,
+                    'Petanca': 30 * 60,
+                    'Talud': 30 * 60
+                }
+            },
+            'Abajo': {
+                name: 'Abajo',
+                items: {
+                    'Cancha de Tenis': 30 * 60,
+                    'Aguacatero 1': 30 * 60,
+                    'Aguacatero 2': 30 * 60,
+                    'Aguacatero 3': 30 * 60
                 }
             }
-        },
-        mano: {
-            items: ['Punta del Barco', 'Cactus', 'Rejilla', 'Rotonda'],
-            times: {
-                'Punta del Barco': 20 * 60,
-                'Cactus': 20 * 60,
-                'Rejilla': 20 * 60,
-                'Rotonda': 80 * 60
-            }
         }
-    };
-
-    const emojiMap = {
-        'Parte Superior': '',
-        'Parte Inferior': '',
-        'A Mano': '',
-        'Musical': '🎵',
-        'Patos': '🦆',
-        'Arriba': '⬆️',
-        'Abajo': '⬇️',
-        'Riego 1': '💧',
-        'Riego 2': '💧',
-        'Riego 2 y 3': '💧',
-        'Frutal': '🍎',
-        'Difusores': '💦',
-        'Parque Infantil': '🏞️',
-        'Minigolf': '⛳',
-        'Petanca': '🎱',
-        'Talud': '🌳',
-        'Cancha de Tenis': '🎾',
-        'Aguacatero 1': '🥑',
-        'Aguacatero 2': '🥑',
-        'Aguacatero 3': '🥑',
-        'Punta del Barco': '🚢',
-        'Cactus': '🌵',
-        'Rejilla': '🕳️',
-        'Rotonda': '⭕️'
-    };
-
-    function initGame() {
-        loadGameState();
-        setupEventListeners();
-        renderIrrigationBoxes();
-        updateScore();
-        startGameLoop();
-    }
-
-    function loadGameState() {
-        const savedState = localStorage.getItem('superRiegos3000State');
-        if (savedState) {
-            const parsed = JSON.parse(savedState);
-            gameState.irrigations = parsed.irrigations || {};
-            gameState.score = parsed.score || 0;
-            gameState.activeCategory = null;
-            gameState.activeGroups = new Set(parsed.activeGroups || []);
+    },
+    mano: {
+        items: ['Punta del Barco', 'Cactus', 'Rejilla', 'Rotonda'],
+        times: {
+            'Punta del Barco': 20 * 60,
+            'Cactus': 20 * 60,
+            'Rejilla': 20 * 60,
+            'Rotonda': 80 * 60
         }
     }
+};
 
-    function saveGameState() {
-        localStorage.setItem('superRiegos3000State', JSON.stringify({
-            irrigations: gameState.irrigations,
-            score: gameState.score,
-            activeGroups: Array.from(gameState.activeGroups)
-        }));
+const emojiMap = {
+    'Parte Superior': '',
+    'Parte Inferior': '',
+    'A Mano': '',
+    'Musical': '🎵',
+    'Patos': '🦆',
+    'Arriba': '⬆️',
+    'Abajo': '⬇️',
+    'Riego 1': '💧',
+    'Riego 2': '💧',
+    'Riego 2 y 3': '💧',
+    'Frutal': '🍎',
+    'Difusores': '💦',
+    'Parque Infantil': '🏞️',
+    'Minigolf': '⛳',
+    'Petanca': '🎱',
+    'Talud': '🌳',
+    'Cancha de Tenis': '🎾',
+    'Aguacatero 1': '🥑',
+    'Aguacatero 2': '🥑',
+    'Aguacatero 3': '🥑',
+    'Punta del Barco': '🚢',
+    'Cactus': '🌵',
+    'Rejilla': '🕳️',
+    'Rotonda': '⭕️'
+};
+
+function initGame() {
+    loadGameState();
+    setupEventListeners();
+    renderIrrigationBoxes();
+    updateScore();
+    startGameLoop();
+}
+
+function loadGameState() {
+    const savedState = localStorage.getItem('superRiegos3000State');
+    if (savedState) {
+        const parsed = JSON.parse(savedState);
+        gameState.irrigations = parsed.irrigations || {};
+        gameState.score = parsed.score || 0;
+        gameState.activeCategory = null;
+        gameState.activeGroups = new Set(parsed.activeGroups || []);
     }
+}
 
-    function setupEventListeners() {
-        if (eventListenersInitialized) return;
+function saveGameState() {
+    localStorage.setItem('superRiegos3000State', JSON.stringify({
+        irrigations: gameState.irrigations,
+        score: gameState.score,
+        activeGroups: Array.from(gameState.activeGroups)
+    }));
+}
 
-        document.querySelectorAll('.menu-category').forEach(category => {
-            category.addEventListener('click', () => toggleCategory(category.dataset.category));
-        });
+function setupEventListeners() {
+    if (eventListenersInitialized) return;
 
-        document.getElementById('settingsButton').addEventListener('click', toggleSettingsMenu);
-        document.getElementById('resetButton').addEventListener('click', resetGame);
-        document.getElementById('closeMessageButton').addEventListener('click', hideMessage);
+    document.querySelectorAll('.menu-category').forEach(category => {
+        category.addEventListener('click', () => toggleCategory(category.dataset.category));
+    });
 
-        document.addEventListener('click', (e) => {
-            const settingsButton = document.getElementById('settingsButton');
-            const settingsMenu = document.getElementById('settingsMenu');
+    document.getElementById('settingsButton').addEventListener('click', toggleSettingsMenu);
+    document.getElementById('resetButton').addEventListener('click', resetGame);
+    document.getElementById('closeMessageButton').addEventListener('click', hideMessage);
 
-            if (!settingsButton.contains(e.target) && !settingsMenu.contains(e.target)) {
-                settingsMenu.classList.remove('active');
-                gameState.settingsMenuOpen = false;
-            }
-        });
+    // Eventos para la confirmación
+    document.getElementById('confirmYesButton').addEventListener('click', () => {
+        if (confirmationCallback) {
+            confirmationCallback();
+        }
+        hideConfirmation();
+    });
 
-        eventListenersInitialized = true;
-    }
+    document.getElementById('confirmNoButton').addEventListener('click', hideConfirmation);
 
-    function toggleSettingsMenu(event) {
-        event.stopPropagation();
+    document.addEventListener('click', (e) => {
+        const settingsButton = document.getElementById('settingsButton');
         const settingsMenu = document.getElementById('settingsMenu');
-        gameState.settingsMenuOpen = !gameState.settingsMenuOpen;
-        settingsMenu.classList.toggle('active', gameState.settingsMenuOpen);
-    }
 
-    function toggleCategory(category) {
-        const allCategories = document.querySelectorAll('.menu-category');
-        const allSubmenus = document.querySelectorAll('.submenu');
-        const selectedCategory = document.querySelector(`.menu-category[data-category="${category}"]`);
-        const submenu = document.getElementById(`menu-${category}`);
-
-        allCategories.forEach(cat => cat.classList.remove('active'));
-        allSubmenus.forEach(sub => sub.classList.remove('active'));
-
-        if (gameState.activeCategory === category) {
-            gameState.activeCategory = null;
-        } else {
-            selectedCategory.classList.add('active');
-            submenu.classList.add('active');
-            gameState.activeCategory = category;
-            renderSubmenuItems(category);
+        if (!settingsButton.contains(e.target) && !settingsMenu.contains(e.target)) {
+            settingsMenu.classList.remove('active');
+            gameState.settingsMenuOpen = false;
         }
+    });
+
+    eventListenersInitialized = true;
+}
+
+function toggleSettingsMenu(event) {
+    event.stopPropagation();
+    const settingsMenu = document.getElementById('settingsMenu');
+    gameState.settingsMenuOpen = !gameState.settingsMenuOpen;
+    settingsMenu.classList.toggle('active', gameState.settingsMenuOpen);
+}
+
+function toggleCategory(category) {
+    const allCategories = document.querySelectorAll('.menu-category');
+    const allSubmenus = document.querySelectorAll('.submenu');
+    const selectedCategory = document.querySelector(`.menu-category[data-category="${category}"]`);
+    const submenu = document.getElementById(`menu-${category}`);
+
+    allCategories.forEach(cat => cat.classList.remove('active'));
+    allSubmenus.forEach(sub => sub.classList.remove('active'));
+
+    if (gameState.activeCategory === category) {
+        gameState.activeCategory = null;
+    } else {
+        selectedCategory.classList.add('active');
+        submenu.classList.add('active');
+        gameState.activeCategory = category;
+        renderSubmenuItems(category);
     }
+}
 
-    function toggleGroup(groupName) {
-        const items = document.querySelector(`.submenu-group[data-group="${groupName}"] .submenu-items`);
-        if (gameState.activeGroups.has(groupName)) {
-            gameState.activeGroups.delete(groupName);
-            items.classList.remove('active');
-        } else {
-            gameState.activeGroups.add(groupName);
-            items.classList.add('active');
-        }
-        saveGameState();
+function toggleGroup(groupName) {
+    const items = document.querySelector(`.submenu-group[data-group="${groupName}"] .submenu-items`);
+    if (gameState.activeGroups.has(groupName)) {
+        gameState.activeGroups.delete(groupName);
+        items.classList.remove('active');
+    } else {
+        gameState.activeGroups.add(groupName);
+        items.classList.add('active');
     }
+    saveGameState();
+}
 
-    function renderSubmenuItems(category) {
-        const submenu = document.getElementById(`menu-${category}`);
-        submenu.innerHTML = '';
+function renderSubmenuItems(category) {
+    const submenu = document.getElementById(`menu-${category}`);
+    submenu.innerHTML = '';
 
-        if (category === 'mano') {
-            irrigationConfig[category].items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'submenu-item';
+    if (category === 'mano') {
+        irrigationConfig[category].items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'submenu-item';
+
+            const encenderBtn = document.createElement('button');
+            encenderBtn.className = 'control-button-small';
+            encenderBtn.innerHTML = '▶️';
+            encenderBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                startIrrigationDirect(item);
+            });
+
+            const apagarBtn = document.createElement('button');
+            apagarBtn.className = 'control-button-small';
+            apagarBtn.innerHTML = '⏹️';
+            apagarBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                stopIrrigationDirect(item);
+            });
+
+            const itemText = document.createElement('span');
+            itemText.textContent = item;
+
+            div.appendChild(encenderBtn);
+            div.appendChild(apagarBtn);
+            div.appendChild(itemText);
+            submenu.appendChild(div);
+        });
+    } else {
+        Object.entries(irrigationConfig[category].groups).forEach(([groupName, group]) => {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'submenu-group';
+            groupDiv.dataset.group = groupName;
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'submenu-group-title';
+            const emoji = document.createElement('span');
+            emoji.className = 'retro-emoji-small';
+            emoji.textContent = emojiMap[groupName] || '';
+            const text = document.createElement('span');
+            text.textContent = groupName;
+            titleDiv.appendChild(emoji);
+            titleDiv.appendChild(text);
+            titleDiv.addEventListener('click', () => toggleGroup(groupName));
+            groupDiv.appendChild(titleDiv);
+
+            const itemsDiv = document.createElement('div');
+            itemsDiv.className = 'submenu-items';
+            if (gameState.activeGroups.has(groupName)) {
+                itemsDiv.classList.add('active');
+            }
+
+            Object.entries(group.items).forEach(([itemName, time]) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'submenu-item';
 
                 const encenderBtn = document.createElement('button');
                 encenderBtn.className = 'control-button-small';
                 encenderBtn.innerHTML = '▶️';
                 encenderBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    startIrrigationDirect(item);
+                    startIrrigationDirect(itemName);
                 });
 
                 const apagarBtn = document.createElement('button');
@@ -669,338 +757,306 @@
                 apagarBtn.innerHTML = '⏹️';
                 apagarBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    stopIrrigationDirect(item);
+                    stopIrrigationDirect(itemName);
                 });
 
                 const itemText = document.createElement('span');
-                itemText.textContent = item;
+                itemText.textContent = itemName;
 
-                div.appendChild(encenderBtn);
-                div.appendChild(apagarBtn);
-                div.appendChild(itemText);
-                submenu.appendChild(div);
+                itemDiv.appendChild(encenderBtn);
+                itemDiv.appendChild(apagarBtn);
+                itemDiv.appendChild(itemText);
+                itemsDiv.appendChild(itemDiv);
             });
-        } else {
-            Object.entries(irrigationConfig[category].groups).forEach(([groupName, group]) => {
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'submenu-group';
-                groupDiv.dataset.group = groupName;
 
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'submenu-group-title';
-                const emoji = document.createElement('span');
-                emoji.className = 'retro-emoji-small';
-                emoji.textContent = emojiMap[groupName] || '';
-                const text = document.createElement('span');
-                text.textContent = groupName;
-                titleDiv.appendChild(emoji);
-                titleDiv.appendChild(text);
-                titleDiv.addEventListener('click', () => toggleGroup(groupName));
-                groupDiv.appendChild(titleDiv);
+            groupDiv.appendChild(itemsDiv);
+            submenu.appendChild(groupDiv);
+        });
+    }
+}
 
-                const itemsDiv = document.createElement('div');
-                itemsDiv.className = 'submenu-items';
-                if (gameState.activeGroups.has(groupName)) {
-                    itemsDiv.classList.add('active');
-                }
-
-                Object.entries(group.items).forEach(([itemName, time]) => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'submenu-item';
-
-                    const encenderBtn = document.createElement('button');
-                    encenderBtn.className = 'control-button-small';
-                    encenderBtn.innerHTML = '▶️';
-                    encenderBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        startIrrigationDirect(itemName);
-                    });
-
-                    const apagarBtn = document.createElement('button');
-                    apagarBtn.className = 'control-button-small';
-                    apagarBtn.innerHTML = '⏹️';
-                    apagarBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        stopIrrigationDirect(itemName);
-                    });
-
-                    const itemText = document.createElement('span');
-                    itemText.textContent = itemName;
-
-                    itemDiv.appendChild(encenderBtn);
-                    itemDiv.appendChild(apagarBtn);
-                    itemDiv.appendChild(itemText);
-                    itemsDiv.appendChild(itemDiv);
-                });
-
-                groupDiv.appendChild(itemsDiv);
-                submenu.appendChild(groupDiv);
-            });
-        }
+function getParentZone(name) {
+    if (irrigationConfig.mano.times[name]) {
+        return 'A Mano';
     }
 
-    function getParentZone(name) {
-        if (irrigationConfig.mano.times[name]) {
-            return 'A Mano';
-        }
-
-        for (const category of ['superior', 'inferior']) {
-            for (const [groupName, group] of Object.entries(irrigationConfig[category].groups)) {
-                if (group.items && group.items[name] !== undefined) {
-                    return groupName;
-                }
+    for (const category of ['superior', 'inferior']) {
+        for (const [groupName, group] of Object.entries(irrigationConfig[category].groups)) {
+            if (group.items && group.items[name] !== undefined) {
+                return groupName;
             }
         }
-        return '';
     }
+    return '';
+}
 
-    function renderIrrigationBoxes() {
-        const monitor = document.getElementById('monitor');
+function renderIrrigationBoxes() {
+    const monitor = document.getElementById('monitor');
 
-        // Eliminar las cajas existentes
-        const boxes = monitor.querySelectorAll('.irrigation-box');
-        boxes.forEach(box => box.remove());
+    // Eliminar las cajas existentes
+    const boxes = monitor.querySelectorAll('.irrigation-box');
+    boxes.forEach(box => box.remove());
 
-        let hasActiveIrrigations = false;
+    let hasActiveIrrigations = false;
 
-        Object.entries(gameState.irrigations).forEach(([name, irrigation]) => {
-            if (irrigation.active || irrigation.paused || irrigation.timeLeft <= 0) {
-                hasActiveIrrigations = true;
-                const box = createIrrigationBox(name, irrigation);
-                monitor.appendChild(box);
-            }
-        });
-
-        const emptyState = document.getElementById('emptyState');
-
-        if (hasActiveIrrigations) {
-            emptyState.style.display = 'none';
-        } else {
-            emptyState.style.display = 'block';
+    Object.entries(gameState.irrigations).forEach(([name, irrigation]) => {
+        if (irrigation.active || irrigation.paused || irrigation.timeLeft <= 0) {
+            hasActiveIrrigations = true;
+            const box = createIrrigationBox(name, irrigation);
+            monitor.appendChild(box);
         }
+    });
+
+    const emptyState = document.getElementById('emptyState');
+
+    if (hasActiveIrrigations) {
+        emptyState.style.display = 'none';
+    } else {
+        emptyState.style.display = 'block';
+    }
+}
+
+function createIrrigationBox(name, irrigation) {
+    const box = document.createElement('div');
+    box.className = 'irrigation-box';
+    if (irrigation.active) {
+        box.classList.add('active');
+    }
+    if (irrigation.timeLeft <= 0) {
+        box.classList.add('finished');
     }
 
-    function createIrrigationBox(name, irrigation) {
-        const box = document.createElement('div');
-        box.className = 'irrigation-box';
-        if (irrigation.active) {
-            box.classList.add('active');
-        }
-        if (irrigation.timeLeft <= 0) {
-            box.classList.add('finished');
-        }
+    const zone = document.createElement('div');
+    zone.className = 'irrigation-zone';
+    const zoneEmoji = document.createElement('span');
+    zoneEmoji.className = 'retro-emoji';
+    zoneEmoji.textContent = emojiMap[getParentZone(name)] || '';
+    const zoneText = document.createElement('span');
+    zoneText.textContent = getParentZone(name);
+    zone.appendChild(zoneEmoji);
+    zone.appendChild(zoneText);
+    box.appendChild(zone);
 
-        const zone = document.createElement('div');
-        zone.className = 'irrigation-zone';
-        const zoneEmoji = document.createElement('span');
-        zoneEmoji.className = 'retro-emoji';
-        zoneEmoji.textContent = emojiMap[getParentZone(name)] || '';
-        const zoneText = document.createElement('span');
-        zoneText.textContent = getParentZone(name);
-        zone.appendChild(zoneEmoji);
-        zone.appendChild(zoneText);
-        box.appendChild(zone);
+    const nameElement = document.createElement('div');
+    nameElement.className = 'irrigation-name';
+    const nameEmoji = document.createElement('span');
+    nameEmoji.className = 'retro-emoji';
+    nameEmoji.textContent = emojiMap[name] || '';
+    const nameText = document.createElement('span');
+    nameText.textContent = name;
+    nameElement.appendChild(nameEmoji);
+    nameElement.appendChild(nameText);
+    box.appendChild(nameElement);
 
-        const nameElement = document.createElement('div');
-        nameElement.className = 'irrigation-name';
-        const nameEmoji = document.createElement('span');
-        nameEmoji.className = 'retro-emoji';
-        nameEmoji.textContent = emojiMap[name] || '';
-        const nameText = document.createElement('span');
-        nameText.textContent = name;
-        nameElement.appendChild(nameEmoji);
-        nameElement.appendChild(nameText);
-        box.appendChild(nameElement);
-
-        const timeElement = document.createElement('div');
-        timeElement.className = 'irrigation-time';
-        timeElement.textContent = formatTime(Math.abs(irrigation.timeLeft));
-        if (irrigation.timeLeft <= 0) {
-            timeElement.textContent = '⏳ +' + timeElement.textContent;
-        }
-        box.appendChild(timeElement);
-
-        const waterDrops = document.createElement('div');
-        waterDrops.className = 'water-drops';
-        waterDrops.textContent = '💧';
-        box.appendChild(waterDrops);
-
-        // Botones Play, Pausa y Stop
-        const controlButtons = document.createElement('div');
-        controlButtons.className = 'control-buttons';
-
-        const playBtn = document.createElement('button');
-        playBtn.className = 'control-button-small';
-        playBtn.innerHTML = '▶️';
-        playBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            startIrrigationDirect(name);
-        });
-
-        const pauseBtn = document.createElement('button');
-        pauseBtn.className = 'control-button-small';
-        pauseBtn.innerHTML = '⏸️';
-        pauseBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            pauseIrrigationDirect(name);
-        });
-
-        const stopBtn = document.createElement('button');
-        stopBtn.className = 'control-button-small';
-        stopBtn.innerHTML = '⏹️';
-        stopBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            stopIrrigationDirect(name);
-        });
-
-        controlButtons.appendChild(playBtn);
-        controlButtons.appendChild(pauseBtn);
-        controlButtons.appendChild(stopBtn);
-
-        box.appendChild(controlButtons);
-
-        return box;
+    const timeElement = document.createElement('div');
+    timeElement.className = 'irrigation-time';
+    timeElement.textContent = formatTime(Math.abs(irrigation.timeLeft));
+    if (irrigation.timeLeft <= 0) {
+        timeElement.textContent = '⏳ +' + timeElement.textContent;
     }
+    box.appendChild(timeElement);
 
-    function formatTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
+    const waterDrops = document.createElement('div');
+    waterDrops.className = 'water-drops';
+    waterDrops.textContent = '💧';
+    box.appendChild(waterDrops);
 
-    function showMessage(text) {
-        const popup = document.getElementById('messagePopup');
-        document.getElementById('messageText').textContent = text;
-        popup.classList.add('active');
-        setTimeout(hideMessage, 3000);
-    }
+    // Botones Play, Pausa y Stop
+    const controlButtons = document.createElement('div');
+    controlButtons.className = 'control-buttons';
 
-    function hideMessage() {
-        document.getElementById('messagePopup').classList.remove('active');
-    }
+    const playBtn = document.createElement('button');
+    playBtn.className = 'control-button-small';
+    playBtn.innerHTML = '▶️';
+    playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startIrrigationDirect(name);
+    });
 
-    function updateGame() {
-        let updated = false;
+    const pauseBtn = document.createElement('button');
+    pauseBtn.className = 'control-button-small';
+    pauseBtn.innerHTML = '⏸️';
+    pauseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        pauseIrrigationDirect(name);
+    });
 
-        Object.entries(gameState.irrigations).forEach(([name, irrigation]) => {
-            if (irrigation.active && !irrigation.paused) {
-                if (irrigation.timeLeft > 0) {
-                    irrigation.timeLeft--;
-                    if (irrigation.timeLeft === 300) {
-                        showMessage(`¡5 minutos restantes en ${name}!`);
-                    }
-                    updated = true;
-                } else if (irrigation.timeLeft === 0) {
-                    showMessage(`¡Riego completado en ${name}!`);
-                    irrigation.timeLeft = -1;
-                    irrigation.active = false;
-                    updated = true;
+    const stopBtn = document.createElement('button');
+    stopBtn.className = 'control-button-small';
+    stopBtn.innerHTML = '⏹️';
+    stopBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        stopIrrigationDirect(name);
+    });
+
+    controlButtons.appendChild(playBtn);
+    controlButtons.appendChild(pauseBtn);
+    controlButtons.appendChild(stopBtn);
+
+    box.appendChild(controlButtons);
+
+    return box;
+}
+
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function showMessage(text) {
+    const popup = document.getElementById('messagePopup');
+    document.getElementById('messageText').textContent = text;
+    popup.classList.add('active');
+    setTimeout(hideMessage, 3000);
+}
+
+function hideMessage() {
+    document.getElementById('messagePopup').classList.remove('active');
+}
+
+let confirmationCallback = null;
+
+function showConfirmation(message, callback) {
+    const popup = document.getElementById('confirmationPopup');
+    document.getElementById('confirmationText').textContent = message;
+    popup.classList.add('active');
+    confirmationCallback = callback;
+}
+
+function hideConfirmation() {
+    const popup = document.getElementById('confirmationPopup');
+    popup.classList.remove('active');
+    confirmationCallback = null;
+}
+
+function updateGame() {
+    let updated = false;
+
+    Object.entries(gameState.irrigations).forEach(([name, irrigation]) => {
+        if (irrigation.active && !irrigation.paused) {
+            if (irrigation.timeLeft > 0) {
+                irrigation.timeLeft--;
+                if (irrigation.timeLeft === 300) {
+                    showMessage(`¡5 minutos restantes en ${name}!`);
                 }
-            }
-        });
-
-        if (updated) {
-            saveGameState();
-            renderIrrigationBoxes();
-        }
-    }
-
-    function startGameLoop() {
-        setInterval(updateGame, 1000);
-    }
-
-    // Funciones para controles directos desde el monitor
-    function startIrrigationDirect(name) {
-        let irrigation = gameState.irrigations[name];
-        if (!irrigation) {
-            // Si el riego no existe, inicializarlo
-            irrigation = gameState.irrigations[name] = {
-                active: true,
-                paused: false,
-                timeLeft: getDefaultTime(name),
-                startTime: Date.now()
-            };
-        } else {
-            if (!irrigation.active || irrigation.paused) {
-                irrigation.active = true;
-                irrigation.paused = false;
-                // Si estaba pausado, continuar desde el tiempo restante
-                if (irrigation.pausedTimeLeft !== undefined) {
-                    irrigation.timeLeft = irrigation.pausedTimeLeft;
-                    delete irrigation.pausedTimeLeft;
-                }
+                updated = true;
+            } else if (irrigation.timeLeft === 0) {
+                showMessage(`¡Riego completado en ${name}!`);
+                irrigation.timeLeft = -1;
+                irrigation.active = false;
+                updated = true;
             }
         }
+    });
+
+    if (updated) {
         saveGameState();
         renderIrrigationBoxes();
-        showMessage(`¡Riego ${name} encendido!`);
     }
+}
 
-    function stopIrrigationDirect(name) {
-        const irrigation = gameState.irrigations[name];
-        if (irrigation && (irrigation.active || irrigation.paused)) {
+function startGameLoop() {
+    setInterval(updateGame, 1000);
+}
+
+// Funciones para controles directos desde el monitor
+function startIrrigationDirect(name) {
+    let irrigation = gameState.irrigations[name];
+    if (!irrigation) {
+        // Si el riego no existe, inicializarlo
+        irrigation = gameState.irrigations[name] = {
+            active: true,
+            paused: false,
+            timeLeft: getDefaultTime(name),
+            startTime: Date.now()
+        };
+    } else {
+        if (!irrigation.active || irrigation.paused) {
+            irrigation.active = true;
+            irrigation.paused = false;
+            // Si estaba pausado, continuar desde el tiempo restante
+            if (irrigation.pausedTimeLeft !== undefined) {
+                irrigation.timeLeft = irrigation.pausedTimeLeft;
+                delete irrigation.pausedTimeLeft;
+            }
+        }
+    }
+    // Añadir 25 puntos al encender un riego
+    gameState.score += 25;
+    updateScore();
+    saveGameState();
+    renderIrrigationBoxes();
+    showMessage(`¡Riego ${name} encendido!`);
+}
+
+function stopIrrigationDirect(name) {
+    const irrigation = gameState.irrigations[name];
+    if (irrigation && (irrigation.active || irrigation.paused)) {
+        showConfirmation(`¿Estás seguro de que quieres apagar el riego ${name}?`, () => {
             irrigation.active = false;
             irrigation.paused = false;
             irrigation.startTime = null;
             showMessage(`¡Riego ${name} apagado!`);
             saveGameState();
             renderIrrigationBoxes();
-        }
+        });
+    }
+}
+
+function pauseIrrigationDirect(name) {
+    const irrigation = gameState.irrigations[name];
+    if (irrigation && irrigation.active && !irrigation.paused) {
+        irrigation.paused = true;
+        irrigation.active = false;
+        irrigation.pausedTimeLeft = irrigation.timeLeft;
+        irrigation.startTime = null;
+        showMessage(`¡Riego ${name} pausado!`);
+        saveGameState();
+        renderIrrigationBoxes();
+    }
+}
+
+function getDefaultTime(name) {
+    if (irrigationConfig.mano.times[name]) {
+        return irrigationConfig.mano.times[name];
     }
 
-    function pauseIrrigationDirect(name) {
-        const irrigation = gameState.irrigations[name];
-        if (irrigation && irrigation.active && !irrigation.paused) {
-            irrigation.paused = true;
-            irrigation.active = false;
-            irrigation.pausedTimeLeft = irrigation.timeLeft;
-            irrigation.startTime = null;
-            showMessage(`¡Riego ${name} pausado!`);
-            saveGameState();
-            renderIrrigationBoxes();
-        }
-    }
-
-    function getDefaultTime(name) {
-        if (irrigationConfig.mano.times[name]) {
-            return irrigationConfig.mano.times[name];
-        }
-
-        for (const category of ['superior', 'inferior']) {
-            for (const [groupName, group] of Object.entries(irrigationConfig[category].groups)) {
-                if (group.items[name] !== undefined) {
-                    return group.items[name];
-                }
+    for (const category of ['superior', 'inferior']) {
+        for (const [groupName, group] of Object.entries(irrigationConfig[category].groups)) {
+            if (group.items[name] !== undefined) {
+                return group.items[name];
             }
         }
-
-        return 30 * 60;
     }
 
-    function updateScore() {
-        document.getElementById('score').textContent = gameState.score;
-    }
+    return 30 * 60;
+}
 
-    function resetGame() {
-        if (confirm('¿Estás seguro de que quieres reiniciar todo el sistema?')) {
-            gameState.irrigations = {};
-            gameState.score = 0;
-            gameState.activeCategory = null;
-            gameState.activeGroups.clear();
-            gameState.settingsMenuOpen = false;
-            document.getElementById('settingsMenu').classList.remove('active');
-            document.querySelectorAll('.menu-category').forEach(cat => cat.classList.remove('active'));
-            document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('active'));
-            document.querySelectorAll('.submenu-items').forEach(item => item.classList.remove('active'));
-            saveGameState();
-            renderIrrigationBoxes();
-            updateScore();
-            showMessage('¡Sistema reiniciado!');
-        }
-    }
+function updateScore() {
+    document.getElementById('score').textContent = gameState.score;
+}
 
-    window.addEventListener('load', initGame);
-    </script>
+function resetGame() {
+    if (confirm('¿Estás seguro de que quieres reiniciar todo el sistema?')) {
+        gameState.irrigations = {};
+        gameState.score = 0;
+        gameState.activeCategory = null;
+        gameState.activeGroups.clear();
+        gameState.settingsMenuOpen = false;
+        document.getElementById('settingsMenu').classList.remove('active');
+        document.querySelectorAll('.menu-category').forEach(cat => cat.classList.remove('active'));
+        document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('active'));
+        document.querySelectorAll('.submenu-items').forEach(item => item.classList.remove('active'));
+        saveGameState();
+        renderIrrigationBoxes();
+        updateScore();
+        showMessage('¡Sistema reiniciado!');
+    }
+}
+
+window.addEventListener('load', initGame);
+</script>
 </body>
 </html>
