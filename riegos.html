@@ -12,6 +12,8 @@
             --gb-medium: #306230;
             --gb-dark: #0f380f;
             --border-radius: 4px;
+            --icon-size: 20px;
+            --icon-size-small: 14px;
         }
 
         * {
@@ -64,8 +66,8 @@
             background-color: var(--gb-medium);
             border: 2px solid var(--gb-lightest);
             border-radius: var(--border-radius);
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -74,9 +76,8 @@
         }
 
         .gear-icon {
-            font-size: 14px;
-            filter: grayscale(1) brightness(1.5) contrast(1.2);
-            mix-blend-mode: screen;
+            font-size: var(--icon-size);
+            color: var(--gb-lightest);
         }
 
         .settings-menu {
@@ -88,7 +89,7 @@
             border: 2px solid var(--gb-lightest);
             border-radius: var(--border-radius);
             padding: 4px;
-            width: 120px;
+            width: 160px;
             margin-top: 8px;
             z-index: 1000;
         }
@@ -123,6 +124,9 @@
             background-color: var(--gb-medium);
             position: relative;
             overflow-y: auto;
+            background-image: url('riego.png');
+            background-size: cover;
+            background-position: center;
         }
 
         .empty-state {
@@ -133,18 +137,12 @@
             text-align: center;
             width: 100%;
             padding: 16px;
-        }
-
-        .empty-state-emoji {
-            font-size: 24px;
-            margin-bottom: 8px;
-            filter: grayscale(1) brightness(1.5) contrast(1.2);
-            mix-blend-mode: screen;
+            color: var(--gb-lightest);
+            background-color: rgba(15, 56, 15, 0.8);
         }
 
         .empty-state-text {
-            color: var(--gb-lightest);
-            font-size: 7px;
+            font-size: 9px;
             line-height: 1.5;
         }
 
@@ -154,10 +152,10 @@
             border-radius: var(--border-radius);
             padding: 6px;
             position: relative;
-            min-height: 70px;
+            min-height: 100px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 8px;
         }
 
         .irrigation-box.active {
@@ -172,8 +170,11 @@
         }
 
         .irrigation-zone {
-            font-size: 6px;
+            font-size: 8px;
             color: var(--gb-medium);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .irrigation-box.active .irrigation-zone {
@@ -181,7 +182,7 @@
         }
 
         .irrigation-name {
-            font-size: 7px;
+            font-size: 9px;
             margin: 4px 0;
             white-space: nowrap;
             overflow: hidden;
@@ -190,17 +191,16 @@
 
         .irrigation-time {
             margin-top: auto;
-            font-size: 9px;
+            font-size: 10px;
         }
 
         .water-drops {
             position: absolute;
             top: 4px;
             right: 4px;
-            font-size: 12px;
+            font-size: 16px;
             opacity: 0;
-            filter: grayscale(1) brightness(1.5) contrast(1.2);
-            mix-blend-mode: screen;
+            filter: grayscale(100%);
         }
 
         .irrigation-box.active .water-drops {
@@ -209,6 +209,31 @@
 
         @keyframes dropBlink {
             50% { opacity: 1; }
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .control-button-small {
+            background-color: var(--gb-medium);
+            border: 2px solid black;
+            color: var(--gb-lightest);
+            padding: 6px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: var(--icon-size-small);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+
+        .control-button-small:active {
+            opacity: 0.8;
         }
 
         .menu {
@@ -247,7 +272,7 @@
             text-align: center;
             color: var(--gb-lightest);
             cursor: pointer;
-            font-size: 7px;
+            font-size: 8px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -279,10 +304,13 @@
             color: var(--gb-lightest);
             padding: 6px;
             cursor: pointer;
-            font-size: 7px;
+            font-size: 8px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .submenu-items {
@@ -299,10 +327,13 @@
             border-top: 1px solid var(--gb-dark);
             color: var(--gb-lightest);
             cursor: pointer;
-            font-size: 7px;
+            font-size: 8px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .submenu-item:active {
@@ -319,58 +350,6 @@
             background-color: var(--gb-medium);
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(15, 56, 15, 0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: var(--gb-light);
-            padding: 4px;
-            border-radius: var(--border-radius);
-            border: 2px solid var(--gb-lightest);
-            max-width: 80%;
-            width: 220px;
-        }
-
-        .irrigation-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .control-button, .modal-button {
-            background-color: var(--gb-dark);
-            border: none;
-            color: var(--gb-lightest);
-            padding: 4px;
-            border-radius: var(--border-radius);
-            margin: 1px 0;
-            width: 100%;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 6px;
-            cursor: pointer;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .control-button:active, .modal-button:active {
-            opacity: 0.8;
-        }
-
         .message-popup {
             position: fixed;
             top: 50%;
@@ -385,7 +364,7 @@
             z-index: 2000;
             min-width: 180px;
             border: 2px solid var(--gb-dark);
-            font-size: 7px;
+            font-size: 8px;
         }
 
         .message-popup.active {
@@ -394,6 +373,42 @@
 
         #messageText {
             margin-bottom: 6px;
+        }
+
+        /* Estilo retro para los emojis */
+        .retro-emoji {
+            font-size: var(--icon-size);
+            filter: grayscale(100%);
+        }
+
+        .retro-emoji-small {
+            font-size: var(--icon-size-small);
+            filter: grayscale(100%);
+        }
+
+        @media (max-width: 600px) {
+            .retro-emoji {
+                font-size: 18px;
+            }
+            .retro-emoji-small {
+                font-size: 12px;
+            }
+            .control-button-small {
+                font-size: 14px;
+                padding: 8px;
+                width: 40px;
+                height: 40px;
+            }
+            .gear-icon {
+                font-size: 24px;
+            }
+            .control-button, .modal-button {
+                font-size: 10px;
+                padding: 12px;
+            }
+            .empty-state-text {
+                font-size: 10px;
+            }
         }
     </style>
 </head>
@@ -413,7 +428,6 @@
 
     <div class="monitor" id="monitor">
         <div class="empty-state" id="emptyState">
-            <div class="empty-state-emoji">🌴</div>
             <div class="empty-state-text">No hay riegos activos</div>
         </div>
     </div>
@@ -421,26 +435,20 @@
     <div class="menu">
         <div class="menu-columns">
             <div class="menu-left">
-                <div class="menu-category" data-category="superior">Parte Superior</div>
-                <div class="menu-category" data-category="inferior">Parte Inferior</div>
-                <div class="menu-category" data-category="mano">A Mano</div>
+                <div class="menu-category" data-category="superior">
+                    Parte Superior
+                </div>
+                <div class="menu-category" data-category="inferior">
+                    Parte Inferior
+                </div>
+                <div class="menu-category" data-category="mano">
+                    A Mano
+                </div>
             </div>
             <div class="menu-right">
                 <div class="submenu" id="menu-superior"></div>
                 <div class="submenu" id="menu-inferior"></div>
                 <div class="submenu" id="menu-mano"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Irrigation Control Modal -->
-    <div class="modal" id="irrigationModal">
-        <div class="modal-content">
-            <div class="irrigation-controls">
-                <button class="control-button" id="startButton">Encender</button>
-                <button class="control-button" id="stopButton">Apagar</button>
-                <button class="control-button" id="pauseButton">Pausar</button>
-                <button class="control-button" id="customizeButton">Definir</button>
             </div>
         </div>
     </div>
@@ -516,6 +524,33 @@
         }
     };
 
+    const emojiMap = {
+        'Parte Superior': '',
+        'Parte Inferior': '',
+        'A Mano': '',
+        'Musical': '🎵',
+        'Patos': '🦆',
+        'Arriba': '⬆️',
+        'Abajo': '⬇️',
+        'Riego 1': '💧',
+        'Riego 2': '💧',
+        'Riego 2 y 3': '💧',
+        'Frutal': '🍎',
+        'Difusores': '💦',
+        'Parque Infantil': '🏞️',
+        'Minigolf': '⛳',
+        'Petanca': '🎱',
+        'Talud': '🌳',
+        'Cancha de Tenis': '🎾',
+        'Aguacatero 1': '🥑',
+        'Aguacatero 2': '🥑',
+        'Aguacatero 3': '🥑',
+        'Punta del Barco': '🚢',
+        'Cactus': '🌵',
+        'Rejilla': '🕳️',
+        'Rotonda': '⭕️'
+    };
+
     function initGame() {
         loadGameState();
         setupEventListeners();
@@ -552,10 +587,6 @@
 
         document.getElementById('settingsButton').addEventListener('click', toggleSettingsMenu);
         document.getElementById('resetButton').addEventListener('click', resetGame);
-        document.getElementById('startButton').addEventListener('click', startIrrigation);
-        document.getElementById('stopButton').addEventListener('click', stopIrrigation);
-        document.getElementById('pauseButton').addEventListener('click', pauseIrrigation);
-        document.getElementById('customizeButton').addEventListener('click', customizeIrrigation);
         document.getElementById('closeMessageButton').addEventListener('click', hideMessage);
 
         document.addEventListener('click', (e) => {
@@ -565,10 +596,6 @@
             if (!settingsButton.contains(e.target) && !settingsMenu.contains(e.target)) {
                 settingsMenu.classList.remove('active');
                 gameState.settingsMenuOpen = false;
-            }
-
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('active');
             }
         });
 
@@ -621,8 +648,29 @@
             irrigationConfig[category].items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'submenu-item';
-                div.textContent = item;
-                div.addEventListener('click', () => startNewIrrigation(item));
+
+                const encenderBtn = document.createElement('button');
+                encenderBtn.className = 'control-button-small';
+                encenderBtn.innerHTML = '▶️';
+                encenderBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    startIrrigationDirect(item);
+                });
+
+                const apagarBtn = document.createElement('button');
+                apagarBtn.className = 'control-button-small';
+                apagarBtn.innerHTML = '⏹️';
+                apagarBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    stopIrrigationDirect(item);
+                });
+
+                const itemText = document.createElement('span');
+                itemText.textContent = item;
+
+                div.appendChild(encenderBtn);
+                div.appendChild(apagarBtn);
+                div.appendChild(itemText);
                 submenu.appendChild(div);
             });
         } else {
@@ -633,7 +681,13 @@
 
                 const titleDiv = document.createElement('div');
                 titleDiv.className = 'submenu-group-title';
-                titleDiv.textContent = groupName;
+                const emoji = document.createElement('span');
+                emoji.className = 'retro-emoji-small';
+                emoji.textContent = emojiMap[groupName] || '';
+                const text = document.createElement('span');
+                text.textContent = groupName;
+                titleDiv.appendChild(emoji);
+                titleDiv.appendChild(text);
                 titleDiv.addEventListener('click', () => toggleGroup(groupName));
                 groupDiv.appendChild(titleDiv);
 
@@ -646,8 +700,29 @@
                 Object.entries(group.items).forEach(([itemName, time]) => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'submenu-item';
-                    itemDiv.textContent = itemName;
-                    itemDiv.addEventListener('click', () => startNewIrrigation(itemName));
+
+                    const encenderBtn = document.createElement('button');
+                    encenderBtn.className = 'control-button-small';
+                    encenderBtn.innerHTML = '▶️';
+                    encenderBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        startIrrigationDirect(itemName);
+                    });
+
+                    const apagarBtn = document.createElement('button');
+                    apagarBtn.className = 'control-button-small';
+                    apagarBtn.innerHTML = '⏹️';
+                    apagarBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        stopIrrigationDirect(itemName);
+                    });
+
+                    const itemText = document.createElement('span');
+                    itemText.textContent = itemName;
+
+                    itemDiv.appendChild(encenderBtn);
+                    itemDiv.appendChild(apagarBtn);
+                    itemDiv.appendChild(itemText);
                     itemsDiv.appendChild(itemDiv);
                 });
 
@@ -678,14 +753,22 @@
         const boxes = monitor.querySelectorAll('.irrigation-box');
         boxes.forEach(box => monitor.removeChild(box));
 
+        let hasActiveIrrigations = false;
+
         Object.entries(gameState.irrigations).forEach(([name, irrigation]) => {
-            const box = createIrrigationBox(name, irrigation);
-            monitor.appendChild(box);
+            if (irrigation.active || irrigation.paused || irrigation.timeLeft <= 0) {
+                hasActiveIrrigations = true;
+                const box = createIrrigationBox(name, irrigation);
+                monitor.appendChild(box);
+            }
         });
 
         const emptyState = document.getElementById('emptyState');
-        const hasIrrigations = Object.keys(gameState.irrigations).length > 0;
-        emptyState.style.display = hasIrrigations ? 'none' : 'block';
+        if (hasActiveIrrigations) {
+            emptyState.style.display = 'none';
+        } else {
+            emptyState.style.display = 'block';
+        }
     }
 
     function createIrrigationBox(name, irrigation) {
@@ -700,12 +783,24 @@
 
         const zone = document.createElement('div');
         zone.className = 'irrigation-zone';
-        zone.textContent = getParentZone(name);
+        const zoneEmoji = document.createElement('span');
+        zoneEmoji.className = 'retro-emoji';
+        zoneEmoji.textContent = emojiMap[getParentZone(name)] || '';
+        const zoneText = document.createElement('span');
+        zoneText.textContent = getParentZone(name);
+        zone.appendChild(zoneEmoji);
+        zone.appendChild(zoneText);
         box.appendChild(zone);
 
         const nameElement = document.createElement('div');
         nameElement.className = 'irrigation-name';
-        nameElement.textContent = name;
+        const nameEmoji = document.createElement('span');
+        nameEmoji.className = 'retro-emoji';
+        nameEmoji.textContent = emojiMap[name] || '';
+        const nameText = document.createElement('span');
+        nameText.textContent = name;
+        nameElement.appendChild(nameEmoji);
+        nameElement.appendChild(nameText);
         box.appendChild(nameElement);
 
         const timeElement = document.createElement('div');
@@ -721,7 +816,40 @@
         waterDrops.textContent = '💧';
         box.appendChild(waterDrops);
 
-        box.addEventListener('click', () => showIrrigationModal(name));
+        // Botones Play, Pausa y Stop
+        const controlButtons = document.createElement('div');
+        controlButtons.className = 'control-buttons';
+
+        const playBtn = document.createElement('button');
+        playBtn.className = 'control-button-small';
+        playBtn.innerHTML = '▶️';
+        playBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            startIrrigationDirect(name);
+        });
+
+        const pauseBtn = document.createElement('button');
+        pauseBtn.className = 'control-button-small';
+        pauseBtn.innerHTML = '⏸️';
+        pauseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            pauseIrrigationDirect(name);
+        });
+
+        const stopBtn = document.createElement('button');
+        stopBtn.className = 'control-button-small';
+        stopBtn.innerHTML = '⏹️';
+        stopBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            stopIrrigationDirect(name);
+        });
+
+        controlButtons.appendChild(playBtn);
+        controlButtons.appendChild(pauseBtn);
+        controlButtons.appendChild(stopBtn);
+
+        box.appendChild(controlButtons);
+
         return box;
     }
 
@@ -730,16 +858,6 @@
         const minutes = Math.floor((seconds % 3600) / 60);
         const secs = seconds % 60;
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function showIrrigationModal(name) {
-        const modal = document.getElementById('irrigationModal');
-        modal.dataset.irrigationName = name;
-        modal.classList.add('active');
-    }
-
-    function hideIrrigationModal() {
-        document.getElementById('irrigationModal').classList.remove('active');
     }
 
     function showMessage(text) {
@@ -753,91 +871,86 @@
         document.getElementById('messagePopup').classList.remove('active');
     }
 
-    function startIrrigation() {
-        const modal = document.getElementById('irrigationModal');
-        const name = modal.dataset.irrigationName;
-        const irrigation = gameState.irrigations[name];
+    function updateGame() {
+        let updated = false;
 
-        if (irrigation && !irrigation.active) {
-            irrigation.active = true;
-            irrigation.paused = false;
-            irrigation.startTime = Date.now();
+        Object.entries(gameState.irrigations).forEach(([name, irrigation]) => {
+            if (irrigation.active && !irrigation.paused) {
+                if (irrigation.timeLeft > 0) {
+                    irrigation.timeLeft--;
+                    if (irrigation.timeLeft === 300) {
+                        showMessage(`¡5 minutos restantes en ${name}!`);
+                    }
+                    updated = true;
+                } else if (irrigation.timeLeft === 0) {
+                    showMessage(`¡Riego completado en ${name}!`);
+                    irrigation.timeLeft = -1;
+                    irrigation.active = false;
+                    updated = true;
+                }
+            }
+        });
+
+        if (updated) {
             saveGameState();
             renderIrrigationBoxes();
-            showMessage('¡Riego encendido!');
         }
-        hideIrrigationModal();
     }
 
-    function stopIrrigation() {
-        const modal = document.getElementById('irrigationModal');
-        const name = modal.dataset.irrigationName;
-        const irrigation = gameState.irrigations[name];
+    function startGameLoop() {
+        setInterval(updateGame, 1000);
+    }
 
+    // Funciones para controles directos desde el monitor
+    function startIrrigationDirect(name) {
+        let irrigation = gameState.irrigations[name];
+        if (!irrigation) {
+            // Si el riego no existe, inicializarlo
+            irrigation = gameState.irrigations[name] = {
+                active: true,
+                paused: false,
+                timeLeft: getDefaultTime(name),
+                startTime: Date.now()
+            };
+        } else {
+            if (!irrigation.active || irrigation.paused) {
+                irrigation.active = true;
+                irrigation.paused = false;
+                // Si estaba pausado, continuar desde el tiempo restante
+                if (irrigation.pausedTimeLeft !== undefined) {
+                    irrigation.timeLeft = irrigation.pausedTimeLeft;
+                    delete irrigation.pausedTimeLeft;
+                }
+            }
+        }
+        saveGameState();
+        renderIrrigationBoxes();
+        showMessage(`¡Riego ${name} encendido!`);
+    }
+
+    function stopIrrigationDirect(name) {
+        const irrigation = gameState.irrigations[name];
         if (irrigation && (irrigation.active || irrigation.paused)) {
             irrigation.active = false;
             irrigation.paused = false;
             irrigation.startTime = null;
-            showMessage('Riego apagado');
+            showMessage(`¡Riego ${name} apagado!`);
             saveGameState();
             renderIrrigationBoxes();
         }
-        hideIrrigationModal();
     }
 
-    function pauseIrrigation() {
-        const modal = document.getElementById('irrigationModal');
-        const name = modal.dataset.irrigationName;
+    function pauseIrrigationDirect(name) {
         const irrigation = gameState.irrigations[name];
-
         if (irrigation && irrigation.active && !irrigation.paused) {
             irrigation.paused = true;
             irrigation.active = false;
             irrigation.pausedTimeLeft = irrigation.timeLeft;
-            showMessage('Riego pausado');
+            irrigation.startTime = null;
+            showMessage(`¡Riego ${name} pausado!`);
             saveGameState();
             renderIrrigationBoxes();
         }
-        hideIrrigationModal();
-    }
-
-    function customizeIrrigation() {
-        const modal = document.getElementById('irrigationModal');
-        const name = modal.dataset.irrigationName;
-        const currentTime = Math.ceil(gameState.irrigations[name]?.timeLeft / 60) || 30;
-        const time = prompt('Ingrese el tiempo en minutos:', currentTime);
-
-        if (time && !isNaN(time)) {
-            const irrigation = gameState.irrigations[name];
-            if (irrigation) {
-                irrigation.timeLeft = parseInt(time) * 60;
-                irrigation.active = false;
-                irrigation.paused = false;
-                irrigation.startTime = null;
-                saveGameState();
-                renderIrrigationBoxes();
-                showMessage('Tiempo personalizado configurado');
-            }
-        }
-        hideIrrigationModal();
-    }
-
-    function startNewIrrigation(name) {
-        if (gameState.irrigations[name]) {
-            showIrrigationModal(name);
-            return;
-        }
-
-        gameState.irrigations[name] = {
-            active: false,
-            paused: false,
-            timeLeft: getDefaultTime(name),
-            startTime: null
-        };
-
-        saveGameState();
-        renderIrrigationBoxes();
-        showIrrigationModal(name);
     }
 
     function getDefaultTime(name) {
@@ -854,12 +967,6 @@
         }
 
         return 30 * 60;
-    }
-
-    function addScore(points) {
-        gameState.score += points;
-        updateScore();
-        saveGameState();
     }
 
     function updateScore() {
@@ -881,38 +988,6 @@
             renderIrrigationBoxes();
             updateScore();
             showMessage('¡Sistema reiniciado!');
-        }
-    }
-
-    function startGameLoop() {
-        setInterval(updateGame, 1000);
-    }
-
-    function updateGame() {
-        let updated = false;
-
-        Object.entries(gameState.irrigations).forEach(([name, irrigation]) => {
-            if (irrigation.active) {
-                if (irrigation.timeLeft > 0) {
-                    irrigation.timeLeft--;
-                    if (irrigation.timeLeft === 300) {
-                        showMessage(`¡5 minutos restantes en ${name}!`);
-                    }
-                    updated = true;
-                } else if (irrigation.timeLeft === 0) {
-                    showMessage(`¡Riego completado en ${name}!`);
-                    irrigation.timeLeft = -1;
-                    updated = true;
-                } else {
-                    irrigation.timeLeft--;
-                    updated = true;
-                }
-            }
-        });
-
-        if (updated) {
-            saveGameState();
-            renderIrrigationBoxes();
         }
     }
 
