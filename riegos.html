@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SuperRiegos3000</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gb-lightest: #9bbc0f;
+            --gb-light: #8bac0f;
+            --gb-medium: #306230;
+            --gb-dark: #0f380f;
+            --border-radius: 4px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Press Start 2P', cursive;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--gb-dark);
+            color: var(--gb-lightest);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 8px;
+        }
+
+        .monitor {
+            height: 50vh;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            overflow-y: auto;
+            background-color: var(--gb-medium);
+        }
+
+        .irrigation-box {
+            background-color: var(--gb-light);
+            border: 2px solid var(--gb-lightest);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            position: relative;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .irrigation-box.active {
+            background-color: var(--gb-dark);
+            color: var(--gb-lightest);
+            border-color: var(--gb-light);
+        }
+
+        .irrigation-box.finished {
+            opacity: 0.7;
+            background-color: var(--gb-medium);
+        }
+
+        .irrigation-zone {
+            font-size: 6px;
+            color: var(--gb-medium);
+        }
+
+        .irrigation-box.active .irrigation-zone {
+            color: var(--gb-light);
+        }
+
+        .irrigation-name {
+            font-size: 8px;
+            margin: 4px 0;
+        }
+
+        .irrigation-time {
+            margin-top: auto;
+            font-size: 10px;
+        }
+
+        .water-drops {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 12px;
+            opacity: 0;
+        }
+
+        .irrigation-box.active .water-drops {
+            animation: dropBlink 1s step-start infinite;
+        }
+
+        @keyframes dropBlink {
+            50% { opacity: 1; }
+        }
+
+        .menu {
+            flex-grow: 1;
+            padding: 8px;
+            background-color: var(--gb-light);
+            overflow: hidden;
+        }
+
+        .menu-columns {
+            display: flex;
+            height: 100%;
+            gap: 8px;
+        }
+
+        .menu-left {
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-right {
+            width: 60%;
+            border-left: 2px solid var(--gb-dark);
+            padding-left: 8px;
+            overflow-y: auto;
+        }
+
+        .menu-category {
+            background-color: var(--gb-dark);
+            padding: 12px 8px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            color: var(--gb-lightest);
+            cursor: pointer;
+        }
+
+        .menu-category.active {
+            background-color: var(--gb-medium);
+            border: 2px solid var(--gb-lightest);
+        }
+
+        .submenu {
+            display: none;
+            height: 100%;
+        }
+
+        .submenu.active {
+            display: block;
+        }
+
+        .submenu-group {
+            margin: 4px 0;
+            border: 2px solid var(--gb-dark);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .submenu-group-title {
+            background-color: var(--gb-dark);
+            color: var(--gb-lightest);
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .submenu-items {
+            display: none;
+            background-color: var(--gb-medium);
+        }
+
+        .submenu-items.active {
+            display: block;
+        }
+
+        .submenu-item {
+            padding: 8px;
+            border-top: 1px solid var(--gb-dark);
+            color: var(--gb-lightest);
+            cursor: pointer;
+        }
+
+        .submenu-item:active {
+            background-color: var(--gb-dark);
+        }
+
+        .footer {
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--gb-dark);
+            border-top: 2px solid var(--gb-medium);
+            font-size: 10px;
+        }
+
+        .settings-button {
+            background: none;
+            border: none;
+            color: var(--gb-lightest);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 56, 15, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--gb-light);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--gb-lightest);
+            max-width: 80%;
+            width: 300px;
+        }
+
+        .modal-content h2 {
+            color: var(--gb-dark);
+            margin-bottom: 16px;
+            font-size: 12px;
+        }
+
+        .irrigation-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-button, .modal-button {
+            background-color: var(--gb-dark);
+            border: none;
+            color: var(--gb-lightest);
+            padding: 8px;
+            border-radius: var(--border-radius);
+            margin: 4px 0;
+            width: 100%;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+        }
+
+        .score {
+            position: fixed;
+            top: 8px;
+            right: 8px;
+            background-color: var(--gb-dark);
+            padding: 4px 8px;
+            border-radius: var(--border-radius);
+            font-size: 10px;
+            z-index: 100;
+        }
+
+        .message-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--gb-light);
+            color: var(--gb-dark);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            display: none;
+            z-index: 2000;
+            min-width: 200px;
+            border: 2px solid var(--gb-dark);
+            font-size: 8px;
+        }
+
+        .message-popup.active {
+            display: block;
+        }
+
+        #messageText {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="score">Puntos: <span id="score">0</span></div>
+    
+    <div class="monitor" id="monitor">
+        <!-- Irrigation boxes will be added here dynamically -->
+    </div>
+
+    <div class="menu">
+        <div class="menu-columns">
+            <div class="menu-left">
+                <div class="menu-category" data-category="superior">Parte Superior</div>
+                <div class="menu-category" data-category="inferior">Parte Inferior</div>
+                <div class="menu-category" data-category="mano">A Mano</div>
+            </div>
+            <div class="menu-right">
+                <div class="submenu" id="menu-superior"></div>
+                <div class="submenu" id="menu-inferior"></div>
+                <div class="submenu" id="menu-mano"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div>SuperRiegos3000</div>
+        <button class="settings-button" id="settingsButton">⚙️</button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h2>Opciones</h2>
+            <button class="modal-button" id="resetButton">Reset Completo</button>
+            <button class="modal-button" id="closeSettingsButton">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Irrigation Control Modal -->
+    <div class="modal" id="irrigationModal">
+        <div class="modal-content">
+            <div class="irrigation-controls">
+                <button class="control-button" id="startButton">Encendido</button>
+                <button class="control-button" id="stopButton">Apagado</button>
+                <button class="control-button" id="resetIrrigationButton">Resetear</button>
+                <button class="control-button" id="customizeButton">Definir</button>
+                <button class="control-button" id="closeIrrigationButton">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Popup -->
+    <div class="message-popup" id="messagePopup">
+        <div id="messageText"></div>
+        <button class="modal-button" id="closeMessageButton">Cerrar</button>
+    </div>
+
+<script>
+    // Game state
+    const gameState = {
+        irrigations: {},
+        score: 0,
+        activeCategory: null,
+        activeGroups: new Set()
+    };
+
+    // Updated irrigation configurations with new structure
+    const irrigationConfig = {
+        superior: {
+            groups: {
+                'Musical': {
+                    name: 'Musical',
+                    items: {
+                        'Riego 1': 30 * 60,
+                        'Riego 2': 30 * 60,
+                        'Frutal': 30 * 60
+                    }
+                },
+                'Patos': {
+                    name: 'Patos',
+                    items: {
+                        'Riego 1': 30 * 60,
+                        'Riego 2 y 3': 30 * 60,
+                        'Difusores': 15 * 60
+                    }
+                }
+            }
+        },
+        inferior: {
+            groups: {
+                'Arriba': {
+                    name: 'Arriba',
+                    items: {
+                        'Parque Infantil': 30 * 60,
+                        'Minigolf': 30 * 60,
+                        'Petanca': 30 * 60,
+                        'Talud': 30 * 60
+                    }
+                },
+                'Abajo': {
+                    name: 'Abajo',
+                    items: {
+                        'Cancha de Tenis': 30 * 60
+                    }
+                },
+                'Aguacatero': {
+                    name: 'Aguacatero',
+                    items: {
+                        'Aguacatero 1': 30 * 60,
+                        'Aguacatero 2': 30 * 60,
+                        'Aguacatero 3': 30 * 60
+                    }
+                }
+            }
+        },
+        mano: {
+            items: ['Punta del Barco', 'Cactus', 'Rejilla', 'Rotonda'],
+            times: {
+                'Punta del Barco': 20 * 60,
+                'Cactus': 20 * 60,
+                'Rejilla': 20 * 60,
+                'Rotonda': 80 * 60  // 1 hora 20 minutos
+            }
+        }
+    };
+
+    // Initialize game
+    function initGame() {
+        loadGameState();
+        setupEventListeners();
+        renderIrrigationBoxes();
+        updateScore();
+        startGameLoop();
+    }
+
+    // Load game state from localStorage
+    function loadGameState() {
+        const savedState = localStorage.getItem('superRiegos3000State');
+        if (savedState) {
+            const parsed = JSON.parse(savedState);
+            gameState.irrigations = parsed.irrigations || {};
+            gameState.score = parsed.score || 0;
+            gameState.activeCategory = null;
+            gameState.activeGroups = new Set(parsed.activeGroups || []);
+        }
+    }
+
+    // Save game state to localStorage
+    function saveGameState() {
+        localStorage.setItem('superRiegos3000State', JSON.stringify({
+            irrigations: gameState.irrigations,
+            score: gameState.score,
+            activeGroups: Array.from(gameState.activeGroups)
+        }));
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+        document.querySelectorAll('.menu-category').forEach(category => {
+            category.addEventListener('click', () => toggleCategory(category.dataset.category));
+        });
+
+        document.getElementById('settingsButton').addEventListener('click', showSettingsModal);
+        document.getElementById('closeSettingsButton').addEventListener('click', hideSettingsModal);
+        document.getElementById('resetButton').addEventListener('click', resetGame);
+
+        document.getElementById('closeIrrigationButton').addEventListener('click', hideIrrigationModal);
+        document.getElementById('startButton').addEventListener('click', startIrrigation);
+        document.getElementById('stopButton').addEventListener('click', stopIrrigation);
+        document.getElementById('resetIrrigationButton').addEventListener('click', resetIrrigation);
+        document.getElementById('customizeButton').addEventListener('click', customizeIrrigation);
+
+        document.getElementById('closeMessageButton').addEventListener('click', hideMessage);
+
+        // Handle clicks outside modals
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+    }
+
+    // Toggle category
+    function toggleCategory(category) {
+        const allCategories = document.querySelectorAll('.menu-category');
+        const allSubmenus = document.querySelectorAll('.submenu');
+        const selectedCategory = document.querySelector(`.menu-category[data-category="${category}"]`);
+        const submenu = document.getElementById(`menu-${category}`);
+
+        // Remove active class from all categories and submenus
+        allCategories.forEach(cat => cat.classList.remove('active'));
+        allSubmenus.forEach(sub => sub.classList.remove('active'));
+
+        // If clicking the same category, deactivate it
+        if (gameState.activeCategory === category) {
+            gameState.activeCategory = null;
+        } else {
+            // Activate the selected category and its submenu
+            selectedCategory.classList.add('active');
+            submenu.classList.add('active');
+            gameState.activeCategory = category;
+            renderSubmenuItems(category);
+        }
+    }
+
+    // Render submenu items
+    function renderSubmenuItems(category) {
+        const submenu = document.getElementById(`menu-${category}`);
+        submenu.innerHTML = '';
+        
+        if (category === 'mano') {
+            irrigationConfig[category].items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'submenu-item';
+                div.textContent = item;
+                div.addEventListener('click', () => startNewIrrigation(item));
+                submenu.appendChild(div);
+            });
+        } else {
+            Object.entries(irrigationConfig[category].groups).forEach(([groupName, group]) => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'submenu-group';
+                groupDiv.dataset.group = groupName;
+
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'submenu-group-title';
+                titleDiv.textContent = groupName;
+                titleDiv.addEventListener('click', () => toggleGroup(groupName));
+                groupDiv.appendChild(titleDiv);
+
+                const itemsDiv = document.createElement('div');
+                itemsDiv.className = 'submenu-items';
+                if (gameState.activeGroups.has(groupName)) {
+                    itemsDiv.classList.add('active');
+                }
+
+                Object.entries(group.items).forEach(([itemName, time]) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'submenu-item';
+                    itemDiv.textContent = itemName;
+                    itemDiv.addEventListener('click', () => startNewIrrigation(itemName));
+                    itemsDiv.appendChild(itemDiv);
+                });
+
+                groupDiv.appendChild(itemsDiv);
+                submenu.appendChild(groupDiv);
+            });
+        }
+    }
+
+    // Toggle group
+    function toggleGroup(groupName) {
+        const items = document.querySelector(`.submenu-group[data-group="${groupName}"] .submenu-items`);
+        if (gameState.activeGroups.has(groupName)) {
+            gameState.activeGroups.delete(groupName);
+            items.classList.remove('active');
+        } else {
+            gameState.activeGroups.add(groupName);
+            items.classList.add('active');
+        }
+        saveGameState();
+    }
+
+    // Get parent zone
+    function getParentZone(name) {
+        if (irrigationConfig.mano.times[name]) {
+            return 'A Mano';
+        }
+
+        for (const category of ['superior', 'inferior']) {
+            for (const [groupName, group] of Object.entries(irrigationConfig[category].groups)) {
+                if (group.items && group.items[name] !== undefined) {
+                    return groupName;
+                }
+            }
+        }
+        return '';
+    }
+
+    // Render irrigation boxes
+    function renderIrrigationBoxes() {
+        const monitor = document.getElementById('monitor');
+        monitor.innerHTML = '';
+
+        Object.entries(gameState.irrigations).forEach(([name, irrigation]) => {
+            const box = createIrrigationBox(name, irrigation);
+            monitor.appendChild(box);
+        });
+    }
+
+    // Create irrigation box
+    function createIrrigationBox(name, irrigation) {
+        const box = document.createElement('div');
+        box.className = 'irrigation-box';
+        if (irrigation.active) {
+            box.classList.add('active');
+        }
+        if (irrigation.timeLeft <= 0) {
+            box.classList.add('finished');
+        }
+
+        const zone = document.createElement('div');
+        zone.className = 'irrigation-zone';
+        zone.textContent = getParentZone(name);
+        box.appendChild(zone);
+
+        const nameElement = document.createElement('div');
+        nameElement.className = 'irrigation-name';
+        nameElement.textContent = name;
+        box.appendChild(nameElement);
+
+        const timeElement = document.createElement('div');
+        timeElement.className = 'irrigation-time';
+        timeElement.textContent = formatTime(Math.abs(irrigation.timeLeft));
+        if (irrigation.timeLeft <= 0) {
+            timeElement.textContent = '⏳ +' + timeElement.textContent;
+        }
+        box.appendChild(timeElement);
+
+        const waterDrops = document.createElement('div');
+        waterDrops.className = 'water-drops';
+        waterDrops.textContent = '💧';
+        box.appendChild(waterDrops);
+
+        box.addEventListener('click', () => showIrrigationModal(name));
+        return box;
+    }
+
+    // Format time
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Show/hide modals and messages
+    function showIrrigationModal(name) {
+        const modal = document.getElementById('irrigationModal');
+        modal.dataset.irrigationName = name;
+        modal.classList.add('active');
+    }
+
+    function hideIrrigationModal() {
+        document.getElementById('irrigationModal').classList.remove('active');
+    }
+
+    function showSettingsModal() {
+        document.getElementById('settingsModal').classList.add('active');
+    }
+
+    function hideSettingsModal() {
+        document.getElementById('settingsModal').classList.remove('active');
+    }
+
+    function showMessage(text) {
+        const popup = document.getElementById('messagePopup');
+        document.getElementById('messageText').textContent = text;
+        popup.classList.add('active');
+        setTimeout(hideMessage, 3000);
+    }
+
+    function hideMessage() {
+        document.getElementById('messagePopup').classList.remove('active');
+    }
+
+    // Irrigation control functions
+    function startIrrigation() {
+        const modal = document.getElementById('irrigationModal');
+        const name = modal.dataset.irrigationName;
+        const irrigation = gameState.irrigations[name];
+        
+        if (irrigation && !irrigation.active) {
+            irrigation.active = true;
+            irrigation.startTime = Date.now();
+            saveGameState();
+            renderIrrigationBoxes();
+            showMessage('¡Riego iniciado!');
+        }
+        hideIrrigationModal();
+    }
+
+    function stopIrrigation() {
+        const modal = document.getElementById('irrigationModal');
+        const name = modal.dataset.irrigationName;
+        const irrigation = gameState.irrigations[name];
+        
+        if (irrigation && irrigation.active) {
+            irrigation.active = false;
+            
+            if (irrigation.timeLeft === 0) {
+                addScore(50);
+                showMessage('¡Riego perfecto! +50 puntos');
+            } else if (irrigation.timeLeft < 0) {
+                addScore(-25);
+                showMessage('Riego tardío: -25 puntos');
+            } else {
+                showMessage('Riego detenido');
+            }
+            
+            saveGameState();
+            renderIrrigationBoxes();
+        }
+        hideIrrigationModal();
+    }
+
+    function resetIrrigation() {
+        const modal = document.getElementById('irrigationModal');
+        const name = modal.dataset.irrigationName;
+        const irrigation = gameState.irrigations[name];
+        
+        if (irrigation) {
+            irrigation.active = false;
+            irrigation.timeLeft = getDefaultTime(name);
+            irrigation.startTime = null;
+            saveGameState();
+            renderIrrigationBoxes();
+            showMessage('Riego reiniciado');
+        }
+        hideIrrigationModal();
+    }
+
+    function customizeIrrigation() {
+        const modal = document.getElementById('irrigationModal');
+        const name = modal.dataset.irrigationName;
+        const currentTime = Math.ceil(gameState.irrigations[name]?.timeLeft / 60) || 30;
+        const time = prompt('Ingrese el tiempo en minutos:', currentTime);
+        
+        if (time && !isNaN(time)) {
+            const irrigation = gameState.irrigations[name];
+            if (irrigation) {
+                irrigation.timeLeft = parseInt(time) * 60;
+                irrigation.active = false;
+                irrigation.startTime = null;
+                saveGameState();
+                renderIrrigationBoxes();
+                showMessage('Tiempo personalizado configurado');
+            }
+        }
+        hideIrrigationModal();
+    }
+
+    // Start new irrigation
+    function startNewIrrigation(name) {
+        if (!gameState.irrigations[name]) {
+            gameState.irrigations[name] = {
+                active: false,
+                timeLeft: getDefaultTime(name),
+                startTime: null
+            };
+            renderIrrigationBoxes();
+            saveGameState();
+        }
+        showIrrigationModal(name);
+    }
+
+    // Get default time
+    function getDefaultTime(name) {
+        if (irrigationConfig.mano.times[name]) {
+            return irrigationConfig.mano.times[name];
+        }
+        
+        for (const category of ['superior', 'inferior']) {
+            for (const [groupName, group] of Object.entries(irrigationConfig[category].groups)) {
+                if (group.items[name] !== undefined) {
+                    return group.items[name];
+                }
+            }
+        }
+        
+        return 30 * 60; // Default: 30 minutes
+    }
+
+    // Score functions
+    function addScore(points) {
+        gameState.score += points;
+        updateScore();
+        saveGameState();
+    }
+
+    function updateScore() {
+        document.getElementById('score').textContent = gameState.score;
+    }
+
+    // Reset game
+    function resetGame() {
+        if (confirm('¿Estás seguro de que quieres reiniciar todo el sistema?')) {
+            gameState.irrigations = {};
+            gameState.score = 0;
+            gameState.activeCategory = null;
+            gameState.activeGroups.clear();
+            saveGameState();
+            renderIrrigationBoxes();
+            updateScore();
+            showMessage('¡Sistema reiniciado!');
+        }
+        hideSettingsModal();
+    }
+
+// Game loop
+    function startGameLoop() {
+        setInterval(updateGame, 1000);
+    }
+
+    // Update game state
+    function updateGame() {
+        let updated = false;
+        
+        Object.entries(gameState.irrigations).forEach(([name, irrigation]) => {
+            if (irrigation.active) {
+                if (irrigation.timeLeft > 0) {
+                    irrigation.timeLeft--;
+                    if (irrigation.timeLeft === 300) { // 5 minutes warning
+                        showMessage(`¡5 minutos restantes en ${name}!`);
+                    }
+                    updated = true;
+                } else if (irrigation.timeLeft === 0) {
+                    showMessage(`¡Riego completado en ${name}!`);
+                    irrigation.timeLeft = -1;
+                    updated = true;
+                } else {
+                    irrigation.timeLeft--;
+                    updated = true;
+                }
+            }
+        });
+        
+        if (updated) {
+            saveGameState();
+            renderIrrigationBoxes();
+        }
+    }
+
+    // Initialize game when page loads
+    window.addEventListener('load', initGame);
+</script>
+
+
+</body>
+</html>
