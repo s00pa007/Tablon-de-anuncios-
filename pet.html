@@ -1,1998 +1,1277 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐾 Neonpet Deluxe 🐾</title>
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(45deg, #ff00ff, #00ffff);
-            --secondary-gradient: linear-gradient(45deg, #ff8a00, #e52e71);
-            --neon-blue: #00ffff;
-            --neon-pink: #ff00ff;
-            --neon-yellow: #ffff00;
-            --neon-green: #39ff14;
-            --background-color: #1a0b2e;
-            --overlay-color: rgba(0, 0, 0, 0.6);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--background-color);
-            color: white;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .game-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            position: relative;
-            overflow: hidden;
-            min-height: 100vh;
-        user-select: none;
-        -webkit-user-select: none; /* Para Safari */
-        -moz-user-select: none; /* Para Firefox */
-        -ms-user-select: none; /* Para Internet Explorer y Edge */
-        -o-user-select: none;
-        }
-
-        /* Overlay para atenuar la pantalla al morir */
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--overlay-color);
-            display: none;
-            z-index: 15;
-            transition: opacity 0.5s ease;
-        }
-
-        /* Clase para mostrar la overlay */
-        .overlay.active {
-            display: block;
-            opacity: 1;
-        }
-
-        /* Clase para aplicar desenfoque cuando la luz está apagada */
-        .blurred .game-container {
-            filter: blur(5px);
-            transition: filter 0.5s ease;
-        }
-
-        .frame {
-            border: 2px solid var(--neon-blue);
-            border-radius: 20px;
-            padding: 10px;
-            margin-bottom: 10px;
-            box-shadow: 0 0 10px var(--neon-blue);
-        }
-
-.info-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  flex-wrap: nowrap;
-  padding: 2px;
-  background-color: #222;
+<meta charset="UTF-8">
+<title>Cafetería Retro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+body, html { 
+    margin: 0; 
+    padding: 0; 
+    height: 100%; 
+    font-family: 'Press Start 2P', monospace; 
+    background-color: #9bbc0f; /* Color de fondo Game Boy */
+    color: #ffffff; 
 }
-
-.currency, .xp, .level, .weather {
-  font-size: 0.5em;
-  font-weight: bold;
-  color: var(--neon-yellow);
-  text-shadow: 0 0 5px var(--neon-yellow);
-  margin: 0 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: center;
-  padding: 0;
+#game { 
+    display: flex; 
+    flex-direction: column; 
+    height: 100%; 
 }
-
-.currency {
-  width: 150px;
+#header { 
+    height: 5%; 
+    background-color: #8bac0f; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-around; 
+    font-size: 8px; 
+    position: relative;
+    border: 4px solid #333333;
+    box-sizing: border-box;
+    z-index: 200;
 }
-
-.xp {
-  width: 120px;
+#header div { 
+    display: flex; 
+    align-items: center; 
 }
-
-.level {
-  width: 100px;
+#header .money, #header .weather, #header .time { 
+    margin: 0 5px; 
 }
-
-.weather {
-  width: 50px;
+.bar-container { 
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    margin: 0 2px;
 }
-
-.xp span, .currency span, .level span {
-  font-size: 0.5em;
+.bar { 
+    width: 80px; 
+    height: 8px; 
+    background-color: #333333; 
+    margin: 0 1px; 
+    position: relative; 
+    border-radius: 4px;
 }
-
-        .status-bars {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .status-bar {
-            width: 30%;
-            min-width: 80px;
-            text-align: center;
-        }
-
-        .bar-container {
-            height: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 5px;
-        }
-
-        .status-fill {
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
-        #hunger-fill { background: var(--primary-gradient); }
-        #fun-fill { background: var(--secondary-gradient); }
-        #hygiene-fill { background: linear-gradient(45deg, #4facfe, #00f2fe); }
-
-        .status-emoji {
-            font-size: 1.5em;
-        }
-
-.display-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
+.benefits-bar { 
+    width: 0%; 
+    height: 100%; 
+    background-color: #00ff00; /* Verde Game Boy */
+    position: absolute; 
+    left: 0; 
+    border-radius: 4px 0 0 4px;
+    transition: width 0.3s ease-in-out;
+    z-index: 150;
 }
-
-.display-left {
-    width: 75%; /* Aumentamos el tamaño del display */
-    border: 2px solid var(--neon-blue);
-    border-radius: 10px;
-    padding: 5px;
-    height: 70px;
-    overflow-y: auto;
+.satisfaction-bar { 
+    width: 0%; 
+    height: 100%; 
+    background-color: #ff0000; /* Rojo para la satisfacción */
+    position: absolute; 
+    left: 0; 
+    border-radius: 4px 0 0 4px;
+    transition: width 0.3s ease-in-out;
+    z-index: 150;
 }
-
-.display-right {
-    width: 20%; /* Reducimos el tamaño del contenedor derecho (solo para la tienda) */
-    display: flex;
-    justify-content: center; /* Centramos el icono horizontalmente */
-    align-items: center; /* Centramos el icono verticalmente */
-    border: 2px solid var(--neon-blue); /* Marco solo para la tienda */
-    border-radius: 10px; /* Bordes redondeados */
-    padding: 5px;
-    height: 70px; /* Aseguramos que tenga la misma altura que el display izquierdo */
+.bar-icon {
+    margin-left: 2px;
+    font-size: 8px;
+    z-index: 150;
 }
-
-.shop-icon {
-    font-size: 2em; /* Tamaño del icono */
-    text-align: center;
+#monitor { 
+    flex: 1; 
+    background: url('coffee.png') no-repeat center center; 
+    background-size: cover; 
+    position: relative; 
+    z-index: 1;
+    overflow: hidden; 
 }
-
-.event-icon {
-    font-size: 0.9em;
-    margin-bottom: 5px;
-    color: var(--neon-yellow);
-    text-shadow: 0 0 5px var(--neon-yellow);
-    opacity: 1;
-    transition: opacity 0.5s ease;
-}
-
-/* Eliminamos el cofre */
-.chest {
-    display: none;
-}
-
-        .pet-frame {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        /* Clase para simetría en la cuadrícula */
-        .mini-game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 5px;
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-        }
-
-        .mini-game-cell {
-            width: 100%;
-            height: 100%;
-            background-color: var(--neon-blue);
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5em;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .mini-game-cell:active {
-            transform: scale(0.95);
-        }
-
-        .pet-container {
-            position: absolute;
-            width: 30vh;
-            height: 30vh;
-            transition: transform 0.5s ease;
-        }
-
-.pet {
-  font-size: 15vh;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 0 5px var(--neon-yellow));
-  user-select: none;            /* Deshabilitar selección en navegadores actuales */
-  -webkit-user-select: none;     /* Deshabilitar selección en Safari y Chrome */
-  -moz-user-select: none;        /* Deshabilitar selección en Firefox */
-  -ms-user-select: none;         /* Deshabilitar selección en Internet Explorer */
-  -o-user-select: none;
-  -webkit-touch-callout: none;   /* Prevenir menú contextual en móviles */
-  touch-action: none;            /* Prevenir gestos que puedan interferir con toques */
-  -webkit-tap-highlight-color: transparent;  /* Elimina el resalte azul en móviles */
-  transition: all 0.5s ease;
-  cursor: pointer;
-  z-index: 10;
-}
-
-
-
-
-
-        .pet-accessory {
-            position: absolute;
-            font-size: 10vh;
-            z-index: 11;
-            cursor: move;
-            transition: all 0.5s ease;
-        }
-
-        .accessory-crown { top: -5vh; left: 50%; transform: translateX(-50%); }
-        .accessory-glasses { top: 4vh; left: 50%; transform: translateX(-50%); font-size: 11vh; }
-.accessory-hat {
-    top: -3vh;
+#waiter {
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    bottom: 50%;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 6vh; /* Ajusta este valor para reducir el tamaño */
+    transition: left 0.5s linear;
+    z-index: 100;
 }
-
-.action-buttons {
-    display: flex;
-    justify-content: center;  /* Centramos los botones */
-    align-items: center;
-    padding: 10px;
-    margin-bottom: 10px;
-    flex-wrap: nowrap; /* Mantiene los botones en una sola línea */
-    position: sticky;
-    bottom: 0;
-    background-color: var(--background-color);
+#waiter img {
     width: 100%;
-    z-index: 10;  /* Asegura que los botones estén siempre visibles */
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
 }
-
-.action-buttons {
-    display: flex;
-    justify-content: center;  /* Centramos los botones */
-    align-items: center;
-    padding: 10px;
-    margin-bottom: 20px; /* Aumentamos el margen inferior para alejarlos del borde */
-    flex-wrap: nowrap; /* Mantiene los botones en una sola línea */
-    position: sticky;
-    bottom: 20px;  /* Ajustamos para que los botones estén un poco más arriba */
-    background-color: var(--background-color);
-    width: 100%;
-    z-index: 10;  /* Asegura que los botones estén siempre visibles */
+.customer { 
+    position: absolute; 
+    top: 40%;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    transition: left 2s ease-out, top 0.5s ease-out; 
+    font-size: 32px; 
+    width: 50px;
+    left: 50%;
+    transform: translateX(calc(-50% - 10px));
+    z-index: 200;
 }
-
-.action-btn {
-    font-size: 1.5em;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid var(--neon-blue);
-    border-radius: 10px;
-    padding: 10px;
-    color: white;
-    text-shadow: 0 0 5px var(--neon-blue);
-    margin: 5px;
-    flex: 1 1 auto;  /* Ajuste dinámico de tamaño */
-    max-width: 80px;  /* Ajusta el ancho máximo */
-    text-align: center;
-    cursor: pointer;
-}
-
-@media (max-width: 600px) {
-    .action-btn {
-        font-size: 1.2em;  /* Reduce el tamaño de los botones en pantallas más pequeñas */
-        padding: 5px;      /* Ajuste del padding */
-        flex: 1 1 60px;    /* Ajuste dinámico de tamaño en pantallas pequeñas */
-        max-width: 60px;   /* Ancho máximo ajustado para móviles */
-    }
-    .action-buttons {
-        justify-content: center;  /* Asegura que los botones también se centren en pantallas pequeñas */
-        bottom: 30px;  /* Ajusta el "bottom" en pantallas pequeñas para más separación */
-    }
-}
-
-
-.follow-emoji {
+.customer .order-name {
     position: absolute;
-    font-size: 2em;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 5px;
+    color: #00ff00;
+    text-shadow: 1px 1px 2px #000;
+    white-space: normal;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 2px 4px;
+    border-radius: 3px;
+    z-index: 300; /* Por encima de la taza */
+}
+.customer-emoji {
+    position: absolute;
+    top: 50px; 
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 32px;
+    z-index: 200;
+}
+.large-cup { 
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px; 
+    background-color: transparent; 
+    border: none; 
+    z-index: 100; /* Debajo de order-name */
+}
+
+#bottom { 
+    height: 45%; 
+    display: flex; 
+    font-size: 6px; 
+    padding: 10px;
+}
+#left, #right { 
+    flex: 1; 
+    padding: 10px; 
+    background-color: #8bac0f; 
+    border: 4px solid #333333; 
+    box-shadow: inset 0 0 10px #333333;
+    box-sizing: border-box;
+}
+#left {
+    margin-right: 2px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+#right {
+    margin-left: 2px;
+    overflow-y: auto;
+}
+#left .section { 
+    margin-bottom: 5px;
+}
+#left .section h3 { 
+    margin-bottom: 3px;
+    font-size: 6px;
+}
+#left .inventory {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    margin-bottom: 5px;
+}
+#recipe-board {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px;
+    background-color: rgba(51,51,51,0.8);
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 3px;
+    font-size: 5px;
+}
+.recipe {
+    background-color: #333333;
+    border: 1px solid #ffffff;
+    border-radius: 3px;
+    padding: 2px;
+    text-align: center;
+}
+.recipe-name {
+    font-size: 3px;
+    font-weight: bold;
+    color: #00ff00;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    z-index: 200;
+}
+.ingredients {
+    font-size: 1px;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    color: #ffffff;
+    white-space: nowrap;
+}
+#left .inventory button { 
+    margin: 1px; 
+    padding: 3px 6px; 
+    font-size: 6px; 
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #555555, #777777);
+    color: #ffffff;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    box-shadow: 2px 2px 4px #222222;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Press Start 2P', monospace;
 }
-        .action-btn {
-            font-size: 2em;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid var(--neon-blue);
-            border-radius: 10px;
-            padding: 10px;
-            color: white;
-            text-shadow: 0 0 5px var(--neon-blue);
-            transition: transform 0.2s ease;
-            margin: 5px;
-            flex: 1 1 80px;
-            max-width: 100px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .action-btn:active {
-            transform: scale(0.9);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 20;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            background-color: rgba(0,0,0,0.8);
-        }
-
-        .modal-content {
-            background: var(--background-color);
-            margin: 10% auto;
-            padding: 20px;
-            border: 2px solid var(--neon-blue);
-            width: 90%;
-            max-height: 80%;
-            overflow-y: auto;
-            border-radius: 20px;
-            box-shadow: 0 0 15px var(--neon-blue);
-            position: relative;
-        }
-
-        .close, .close-chest {
-            color: var(--neon-pink);
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.5em;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover, .close-chest:hover,
-        .close:focus, .close-chest:focus {
-            color: var(--neon-yellow);
-            text-decoration: none;
-        }
-
-        .chest-modal {
-            display: none;
-            position: fixed;
-            z-index: 20;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            background-color: rgba(0,0,0,0.7);
-        }
-
-        .chest-content {
-            background-color: var(--background-color);
-            margin: 15% auto;
-            padding: 20px;
-            border: 2px solid var(--neon-blue);
-            width: 80%;
-            max-width: 300px;
-            border-radius: 10px;
-            position: relative;
-        }
-
-        .chest-item {
-            display: inline-block;
-            font-size: 1.5em;
-            margin: 5px;
-            cursor: pointer;
-        }
-
-        .shop-items, .food-items {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .shop-item, .food-item {
-            font-size: 1.2em;
-            text-align: center;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .shop-item:active, .food-item:active {
-            transform: scale(0.95);
-        }
-
-        .chest, .shop-icon {
-            font-size: 2em;
-            cursor: pointer;
-            margin: 0 15px;
-        }
-
-        .light-switch {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.5em;
-            cursor: pointer;
-            z-index: 12;
-        }
-
-        .poop {
-            position: absolute;
-            font-size: 3em;
-            cursor: pointer;
-            z-index: 9;
-        }
-
-        .background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            transition: opacity 1s ease;
-            z-index: 5;
-        }
-
-        /* Nuevas clases para los fondos */
-        .background1 {
-            background: linear-gradient(to bottom, #87CEEB, #E0F6FF); /* Azul cielo a azul claro */
-        }
-
-        .background2 {
-            background: linear-gradient(to bottom, #FF7F50, #FFB6C1); /* Coral a rosa claro */
-        }
-
-        .background3 {
-            background: linear-gradient(to bottom, #191970, #000000); /* Azul medianoche a negro */
-        }
-
-        .grid-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            z-index: 1;
-        }
-
-        .grid-cell {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-sizing: border-box;
-        }
-       .emoji-sick-green {
-       filter: none;  /* Desactiva el brillo para mostrar el color verde natural */
-       transition: filter 0.5s ease;
-       }
-       
-
-        /* Estilos para bonus de caricia */
-        .caress-bonus {
-            position: absolute;
-            bottom: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            border-radius: 20px;
-            color: var(--neon-yellow);
-            font-size: 1em;
-            animation: fadeOut 3s forwards;
-            z-index: 20;
-        }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { opacity: 0; display: none; }
-        }
-
-        @media (max-width: 600px) {
-            .currency, .xp, .weather {
-                font-size: 1em;
-            }
-            .action-btn {
-                font-size: 1.5em;
-                padding: 8px;
-                max-width: 80px;
-            }
-            .pet {
-                font-size: 12vh;
-            }
-            .pet-container {
-                width: 25vh;
-                height: 25vh;
-            }
-            .event-icon {
-                font-size: 0.8em;
-            }
-            .action-buttons {
-                justify-content: center;
-            }
-            .action-btn {
-                flex: 1 1 70px;
-                margin: 5px;
-            }
-            .close, .close-chest {
-                font-size: 1.2em;
-            }
-        }
-    
-#pet-container {
-  position: relative;
+#price-setting {
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
 }
-
-#pet-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-  background: transparent;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
+#price-setting label {
+    font-size: 5px;
 }
-    
-    
-    </style>
+#price-setting input {
+    width: 30px;
+    padding: 1px;
+    border: 2px solid #333333;
+    border-radius: 4px;
+    background-color: #555555;
+    color: #ffffff;
+    font-size: 5px;
+    text-align: center;
+    font-family: 'Press Start 2P', monospace;
+}
+#price-setting .adjust-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+#price-setting .adjust-buttons button {
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    font-size: 5px;
+    background: linear-gradient(145deg, #555555, #777777);
+}
+#right h3 { 
+    margin-bottom: 5px;
+    font-size: 6px;
+}
+.order-list { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 4px;
+}
+.order { 
+    background-color: rgba(51,51,51,0.8); 
+    border: 1px solid #333333; 
+    padding: 4px; 
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: height 0.3s ease;
+    overflow: hidden;
+}
+.order-header { 
+    display: flex; 
+    flex-direction: column;
+    gap: 2px;
+    cursor: pointer;
+}
+.coffee-name {
+    font-size: 6px;
+    text-align: center;
+    color: #00ff00;
+}
+.timer {
+    font-size: 5px;
+    text-align: center;
+}
+.ingredients-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 2px;
+}
+.ingredient-button {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    font-size: 24px;
+    border: none;
+    border-radius: 4px;
+    background: linear-gradient(145deg, #555555, #777777);
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 2px 2px 4px #222222;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.ingredient-counter {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    font-size: 4px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #00ff00;
+    padding: 1px;
+    border-radius: 2px;
+    min-width: 8px;
+    text-align: center;
+}
+.serve-button {
+    align-self: center;
+    margin-top: 2px;
+    padding: 3px 6px;
+    font-size: 6px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #555555, #777777);
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 2px 2px 4px #222222;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Press Start 2P', monospace;
+}
+.serve-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+#summary { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(51,51,51,0.95); 
+    color: #ffffff; 
+    display: none; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 10px; 
+    text-align: center; 
+    z-index: 1000;
+}
+#summary h2 { 
+    margin-bottom: 10px; 
+    color: #00ff00; /* Verde Game Boy */
+}
+#summary p { 
+    margin: 5px 0; 
+}
+#summary button { 
+    margin-top: 10px; 
+    padding: 5px 10px; 
+    font-size: 8px; 
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #555555, #777777);
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 3px 3px 6px #222222;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Press Start 2P', monospace;
+}
+#summary .graph-container {
+    width: 80%;
+    margin-top: 10px;
+    border: 2px solid #00ff00; /* Borde verde */
+    padding: 5px;
+    background-color: #333333; /* Fondo oscuro */
+    border-radius: 5px;
+}
+#summary canvas {
+    width: 100%;
+    height: 150px; /* Más pequeña */
+}
+/* Clase para las imágenes de ingredientes */
+.ingredient-img {
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
+}
+</style>
 </head>
 <body>
-    <div class="game-container">
-        <!-- Overlay para la muerte de la mascota -->
-        <div class="overlay" id="deathOverlay"></div>
-
- <div class="frame info-bar">
- <div class="currency" id="currency">💰 2000</div>
- <div class="xp" id="xp">⭐ 0</div>
- <div class="level" id="level">🔺 Nivel 1</div>
- <div class="weather" id="weather">☀️</div>
- </div>
-        <div class="frame status-bars">
-            <div class="status-bar">
-                <div class="bar-container"><div id="hunger-fill" class="status-fill"></div></div>
-                <div class="status-emoji">🍔</div>
+<div id="game">
+    <div id="header">
+        <div class="weather">☀️</div>
+        <div class="money">Dinero: $100</div>
+        <div class="time">07:00</div>
+        <div class="bar-container">
+            <div class="bar">
+                <div class="benefits-bar"></div>
             </div>
-            <div class="status-bar">
-                <div class="bar-container"><div id="fun-fill" class="status-fill"></div></div>
-                <div class="status-emoji">🎉</div>
-            </div>
-            <div class="status-bar">
-                <div class="bar-container"><div id="hygiene-fill" class="status-fill"></div></div>
-                <div class="status-emoji">🚿</div>
-            </div>
-           
-          
-          
+            <div class="bar-icon">💰</div>
         </div>
-        <div class="display-container">
-            <div class="display-left" id="eventBar"></div>
-            <div class="display-right">
-                <div class="shop-icon" id="shopIcon">🏪</div>
-                <div class="chest" id="chest">📦</div>
+        <div class="bar-container">
+            <div class="bar">
+                <div class="satisfaction-bar"></div>
+            </div>
+            <div class="bar-icon">❤️</div>
+        </div>
+    </div>
+    <div id="monitor">
+        <div id="waiter">
+            <img src="./waiter1.png" alt="Waiter" style="display: block;">
+        </div>
+    </div>
+    <div id="bottom">
+        <div id="left">
+            <div class="section">
+                <h3>Inventario</h3>
+                <div class="inventory">
+                    <div>
+                        <img src="cof.png" alt="Coffee" class="ingredient-img">: 
+                        <span id="coffee">10</span> 
+                        <button data-item="coffee">+10</button>
+                    </div>
+                    <div>
+                        <img src="mil.png" alt="Milk" class="ingredient-img">: 
+                        <span id="milk">10</span> 
+                        <button data-item="milk">+10</button>
+                    </div>
+                    <div>
+                        <img src="sug.png" alt="Sugar" class="ingredient-img">: 
+                        <span id="sugar">10</span> 
+                        <button data-item="sugar">+10</button>
+                    </div>
+                </div>
+                <div id="recipe-board">
+                    <div class="recipe">
+                        <div class="recipe-name">Solo</div>
+                        <div class="ingredients">
+                            <img src="cof.png" alt="Coffee" class="ingredient-img">x1 
+                            <img src="sug.png" alt="Sugar" class="ingredient-img">x1
+                        </div>
+                    </div>
+                    <div class="recipe">
+                        <div class="recipe-name">Cortado</div>
+                        <div class="ingredients">
+                            <img src="cof.png" alt="Coffee" class="ingredient-img">x1 
+                            <img src="mil.png" alt="Milk" class="ingredient-img">x1 
+                            <img src="sug.png" alt="Sugar" class="ingredient-img">x1
+                        </div>
+                    </div>
+                    <div class="recipe">
+                        <div class="recipe-name">Leche<br/>Y<br/>Leche</div>
+                        <div class="ingredients">
+                            <img src="cof.png" alt="Coffee" class="ingredient-img">x1 
+                            <img src="mil.png" alt="Milk" class="ingredient-img">x2 
+                            <img src="sug.png" alt="Sugar" class="ingredient-img">x1
+                        </div>
+                    </div>
+                </div>
+                <div id="price-setting">
+                    <label for="coffee-price">Precio:</label>
+                    <input type="number" id="coffee-price" value="5" min="1">
+                    <div class="adjust-buttons">
+                        <button id="increase-price">+</button>
+                        <button id="decrease-price">-</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="frame pet-frame">
-            <!-- Clase inicial para el fondo -->
-            <div class="background background1" id="background"></div>
-            <div class="grid-container" id="gridContainer"></div>
-            <div class="pet-container">
-                   <div id="pet-overlay"></div>
-                <div class="pet" id="pet" draggable="true">😊</div>
-                <div id="crown" class="pet-accessory accessory-crown" draggable="true"></div>
-                <div id="glasses" class="pet-accessory accessory-glasses" draggable="true"></div>
-                <div id="hat" class="pet-accessory accessory-hat" draggable="true"></div>
-            </div>
-            <div class="light-switch" id="lightSwitch">💡</div>
+        <div id="right">
+            <h3>Pedidos</h3>
+            <div class="order-list"></div>
         </div>
-       
-      
-      
-<div class="action-buttons">
-    <button class="action-btn" id="feed-btn">🍽️</button>
-    <button class="action-btn" id="play-btn">🎮</button>
-    <button class="action-btn" id="clean-btn">🧼</button>
-    <!-- Botón para usar medicina, inicialmente oculto -->
-    <button class="action-btn" id="use-medicine-btn" style="display: none;">💊</button>
+    </div>
+</div>
+<div id="summary">
+    <h2>Resumen Semanal</h2>
+    <div style="text-align: left; padding: 20px;">
+        <p>💰 Beneficios Totales: $<span id="total-benefits">0</span></p>
+        <p>🍽️ Gastos Totales: $<span id="total-expenses">0</span></p>
+        <p>💵 Beneficios Netos: $<span id="net-benefits">0</span></p>
+        <p>☕️ Cafés Vendidos: <span id="total-sold">0</span></p>
+        <p>👥 Clientes Totales: <span id="total-customers">0</span></p>
+        <p>😊 Clientes Satisfechos: <span id="satisfied-customers">0</span></p>
+        <p>😞 Clientes Insatisfechos: <span id="unsatisfied-customers">0</span></p>
+        <p>⭐️ Satisfacción Promedio: <span id="average-satisfaction">0</span>%</p>
+        <h3>Ingredientes Utilizados:</h3>
+        <p>
+            <img src="cof.png" alt="Coffee" class="ingredient-img"> Café: 
+            <span id="used-coffee">0</span>
+        </p>
+        <p>
+            <img src="mil.png" alt="Milk" class="ingredient-img"> Leche: 
+            <span id="used-milk">0</span>
+        </p>
+        <p>
+            <img src="sug.png" alt="Sugar" class="ingredient-img"> Azúcar: 
+            <span id="used-sugar">0</span>
+        </p>
+        <p>🏆 Café Más Vendido: <span id="most-popular">ninguno</span></p>
+    </div>
+    <div class="graph-container">
+        <canvas id="benefitsGraph"></canvas>
+    </div>
+    <button onclick="startNextDay()">Siguiente Nivel</button>
 </div>
 
-        <!-- Bonus por caricia -->
-        <div class="caress-bonus" id="caressBonus" style="display: none;">
-            🎉 ¡Bonus por caricias activado! 🎉
-        </div>
-    </div>
-<!-- Modal de Minijuego Único -->
-<div id="miniGameModal" class="modal">
-    <div class="modal-content">
-        <span class="close">❌</span>
-        <h2>🎮 Minijuego</h2>
-        <div id="mini-game-board" class="mini-game-board"></div>
-        <!-- Contenedor para mensajes -->
-        <div id="mini-game-message"></div>
-    </div>
-</div>
-    <!-- Modales -->
-    <div id="shopModal" class="modal">
-        <div class="modal-content">
-            <span class="close">❌</span>
-            <h2>🛍️ Tienda</h2>
-            <div class="shop-items" id="shop-items"></div>
-        </div>
-    </div>
-    
-    <div id="foodModal" class="modal">
-        <div class="modal-content">
-            <span class="close">❌</span>
-            <h2>🍽️ Comida</h2>
-            <div class="food-items" id="food-items"></div>
-        </div>
-    </div>
-    
+<!-- Incluir Chart.js para la gráfica -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Selección de elementos del DOM
+const moneyDisplay = document.querySelector('.money');
+const weatherDisplay = document.querySelector('.weather');
+const timeDisplay = document.querySelector('.time');
+const benefitsBar = document.querySelector('.benefits-bar');
+const satisfactionBar = document.querySelector('.satisfaction-bar');
+const monitor = document.getElementById('monitor');
+const inventoryButtons = document.querySelectorAll('.inventory button');
+const coffeeSpan = document.getElementById('coffee');
+const milkSpan = document.getElementById('milk');
+const sugarSpan = document.getElementById('sugar');
+const orderList = document.querySelector('.order-list');
+const summary = document.getElementById('summary');
+const totalBenefits = document.getElementById('total-benefits');
+const totalExpenses = document.getElementById('total-expenses');
+const netBenefits = document.getElementById('net-benefits');
+const totalSold = document.getElementById('total-sold');
+const totalCustomers = document.getElementById('total-customers');
+const satisfiedCustomers = document.getElementById('satisfied-customers');
+const unsatisfiedCustomers = document.getElementById('unsatisfied-customers');
+const averageSatisfaction = document.getElementById('average-satisfaction');
+const usedCoffee = document.getElementById('used-coffee');
+const usedMilk = document.getElementById('used-milk');
+const usedSugar = document.getElementById('used-sugar');
+const mostPopular = document.getElementById('most-popular');
+const coffeePriceInput = document.getElementById('coffee-price');
+const increasePriceBtn = document.getElementById('increase-price');
+const decreasePriceBtn = document.getElementById('decrease-price');
+const waiter = document.getElementById('waiter');
+const waiterImg = waiter.querySelector('img');
+const benefitsGraphCtx = document.getElementById('benefitsGraph').getContext('2d');
 
-    
-    <div id="chestModal" class="chest-modal">
-        <div class="chest-content">
-            <span class="close-chest" id="closeChest">❌</span>
-            <h2>📦 Cofre</h2>
-            <div id="chestItems"></div>
-        </div>
-    </div>
-   
-  
-  
-    <script>
-// Variables globales
-let petState = {
-  hunger: 99,
-  fun: 100,
-  hygiene: 100,
-  currency: 5000,
-  xp: 0,
-  level: 1,
-  isSick: false,
-  isDead: false,
-  isPaused: false,
-  caressCount: 0,
-  shampooCount: 0,
-  medicineCount: 0,
-  accessories: {
-    crown: '',
-    glasses: '',
-    hat: ''
-  },
-  expression: '😊',
-  currentBackground: 1,
-  achievements: {},
-  startTime: null,
-  weatherTimer: 0,
-  weatherInterval: 60,
-  lastExpressionChangeTime: 0,
-  expressionChangeInterval: 2000, // Reducimos el intervalo para cambiar expresiones más frecuentemente
-  caressTimeout: null,
-  poopsCleaned: 0 // Añadido para el logro de limpieza
+let chart;
+
+// Función para obtener la ruta de la imagen según el nombre del ingrediente
+function getIngredientImg(name) {
+    switch(name) {
+        case 'coffee': return 'cof.png';
+        case 'milk': return 'mil.png';
+        case 'sugar': return 'sug.png';
+        default: return '';
+    }
+}
+
+// Función para capitalizar la primera letra (usada para alt text)
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Estados y configuración del camarero
+let currentWaiterState = 'waiting';
+let waiterWaitInterval = null;
+let isPreparingOrder = false;
+
+// Define las rutas de las imágenes del camarero
+const WAITER_STATES = {
+    RIGHT: './waiter1.png',
+    LEFT: './waiter2.png',
+    WAIT1: './waiterwait.png',
+    WAIT2: './waiterwait2.png',
+    PREP: './waiterprep.png'
 };
 
-// Elementos del DOM
-let pet, petContainer, crown, glasses, hat;
-let hungerFill, funFill, hygieneFill, currencyElement;
-let xpElement, levelElement, weatherElement, eventBar;
-let lightSwitch, background, deathOverlay;
-let useMedicineBtn; // Botón para usar medicina
-
-// Botones de acción
-let feedBtn, playBtn, cleanBtn, shopIcon;
-
-// Modales
-let shopModal, foodModal, miniGameModal;
-
-// Constantes
-const DECREASE_INTERVAL = 5000;
-const HUNGER_DECREASE_RATE = 1;
-const FUN_DECREASE_RATE = 0.8;
-const HYGIENE_DECREASE_RATE = 0.7;
-const SICKNESS_PROBABILITY = 0.01; // Incrementamos la probabilidad de enfermedad
-const SPECIAL_EVENT_PROBABILITY = 0.05; // Incrementamos la probabilidad de eventos especiales
-
-// Emojis para diferentes estados (añadidos más emojis)
-const lowStateEmojis = [
-  '😢', '😭', '😞', '😔', '🙁', '😕', '😖', '😟', '😣', '😩', '😫', '🥺', 
-  '😥', '😰', '😨', '😧', '😓', '😱', '☹️', '😤', '😖', '😷', '😵'
-];
-
-const mediumStateEmojis = [
-  '😐', '🙂', '😌', '😑', '😒', '😶', '😏', '😬', '😗', '🤔', '😯', '😴', 
-  '🤨', '😑', '😕', '😦', '😟', '😳', '🙄', '😬', '🤥', '🤫',
-];
-
-const highStateEmojis = [
-  '😄', '😍', '😁', '😃', '😀', '😊', '😆', '🥰', '🤩', '😎', '😚', '😙', 
-  '😜', '🤗', '😝', '😇', '🤠', '🥳', '🤪', '😋', '🤓', '😹'
-];
-
-const caressEmojis = [
-  '😊', '😌', '😃', '😄', '😁', '😆', '🥰', '😇', '🤗', '😘', '😻', '💖'
-];const weatherEmojis = ['☀️', '🌧️', '❄️', '🌤️', '🌈', '⛈️', '🌪️', '🌙'];
-let currentWeatherIndex = 0;
-
-// Items
-const shopItems = [
-  { emoji: '👑', price: 500, type: 'crown', requiredLevel: 5 },
-  { emoji: '👓', price: 300, type: 'glasses', requiredLevel: 3 },
-  { emoji: '🧢', price: 200, type: 'hat', requiredLevel: 2 },
-  { emoji: '🧴', price: 50, type: 'shampoo', requiredLevel: 1 },
-  { emoji: '💊', price: 100, type: 'medicine', requiredLevel: 1 },
-  { emoji: '🎩', price: 1000, type: 'crown', requiredLevel: 10 },
-  { emoji: '🥽', price: 800, type: 'glasses', requiredLevel: 8 },
-  { emoji: '🎓', price: 600, type: 'hat', requiredLevel: 7 }
-];
-
-const foodItems = [
-  { emoji: '🍎', hunger: 10, price: 50, requiredLevel: 1 },
-  { emoji: '🍔', hunger: 25, price: 100, requiredLevel: 2 },
-  { emoji: '🍕', hunger: 20, price: 150, requiredLevel: 3 },
-  { emoji: '🍦', hunger: 5, price: 80, requiredLevel: 1 },
-  { emoji: '🥗', hunger: 15, price: 120, requiredLevel: 2 },
-  { emoji: '🍩', hunger: 8, price: 60, requiredLevel: 1 },
-  { emoji: '🍣', hunger: 22, price: 160, requiredLevel: 4 },
-  { emoji: '🍗', hunger: 28, price: 180, requiredLevel: 3 },
-  { emoji: '🍰', hunger: 18, price: 140, requiredLevel: 2 },
-  { emoji: '🍛', hunger: 30, price: 200, requiredLevel: 5 },
-  { emoji: '🍜', hunger: 20, price: 150, requiredLevel: 3 },
-  { emoji: '🌭', hunger: 15, price: 100, requiredLevel: 2 }
-];
-
-// Frases variadas para la interfaz
-const phrases = {
-  feed: [
-    "¡Toma jeroma, pastillas de goma! 😋",
-    "¡Qué nivel, Maribel! 🍽️",
-    "¡Esto es un festín, vaya vaya! 🤤",
-    "¡Qué me estás container, qué banquete! 🍴",
-    "¡Parece menterio de bueno! 😍",
-    "¡Me siento hacendado! 🥰",
-    "¡Esto sabe a gloria bendita! 😊",
-    "¡Comida de cracks! 🏆",
-    "¡Es verdura, tremendo plato! 🍗",
-    "¡Más por favor, que esto está que te sales, minerales! 🍰"
-  ],
-  clean: [
-    "¡Echa el freno, Madaleno, qué limpio estoy! 🛁",
-    "¡Me siento fresco como una lechuga! 🌸",
-    "¡A brillar, parece que estoy recién encerado! ✨",
-    "¡Ahora huelo mejor que las rosas de mi abuela! 🌺",
-    "¡Estoy listo para reventar la pista! 🏃‍♂️",
-    "¡Reluciente, parece un espejo! 💎",
-    "¡Nada como estar limpio! 🧽",
-    "¡Esto es vida, estar así de limpio! 😊",
-    "¡Adiós mugre, te meo de Janeiro! 🧼",
-    "¡Gracias por dejarme como nuevo! ❤️",
-    "¡Me has dejado como los chorros del oro! 🚿"
-  ],
-  overfed: [
-    "¡Uf, comí más de la cuenta! 🤢",
-    "¡Qué empacho, me da esgrima! 😣",
-    "¡Estoy como un barril, no puedo más! 😓",
-    "¡Ay, qué dolor de tripa, qué risa, María Luisa! 🥴",
-    "¡Necesito tumbarme, que esto no lo cura ni un milagro! 😅"
-  ],
-  sick: [
-    "¡Estoy más pachucho que un guiri en agosto! 🤒",
-    "¡Aquí andamios, fatal de lo mío! 😷",
-    "¡Estoy de testículo, qué bajón! 😓",
-    "¡Me ha pegado un virus, esto es demigrante! 🤢",
-    "¡Uf, necesito unas vacaciones! 🏖️"
-  ],
-  random: [
-    "¡Hoy es un día cualquiera... pero no para mí! 🎉",
-    "¡Qué día más guapo, vámonos de fiesta! 🎊",
-    "¡Esto sí que es vida, compañero! 🎈",
-    "¡A disfrutar, que la vida son dos días! 😎",
-    "¡Vamos a ver Chi-cago, que la cosa está buena hoy! 🌞"
-  ]
+// Recetas de café
+const RECIPES = {
+    'Solo': { coffee: 1, milk: 0, sugar: 1 },
+    'Cortado': { coffee: 1, milk: 1, sugar: 1 },
+    'Leche y Leche': { coffee: 1, milk: 2, sugar: 1 }
 };
 
-// Función para obtener una frase aleatoria
-function getRandomPhrase(category) {
-  let phrasesArray = phrases[category];
-  return phrasesArray[Math.floor(Math.random() * phrasesArray.length)];
-}
+// Variables del juego
+let money = 100;
+let weather = '☀️';
+let time = 7;
+let benefits = 0;
+let satisfaction = 50; // Inicialmente 50% en cada nuevo nivel
+let inventory = { coffee: 10, milk: 10, sugar: 10 };
+let orders = [];
+let sold = 0;
+let satisfactionTotal = 0;
+let totalExpense = 0;
+const satisfactionEmojis = ['😄','😞'];
+const customerEmojis = ['😀','🙂','😅','🙃','😇'];
+let customerSlots = [null, null, null, null]; // 4 slots únicos
+let customerQueue = [];
+let openOrders = new Set();
+let level = 1;
+let preparationTime = 15;
+let customerArrivalInterval = 5000;
+let orderPreparationInterval;
+let gameTimerInterval;
+let isWaiterMoving = false;
 
-// Función para obtener una expresión aleatoria
-function getRandomExpression(emojisArray) {
-  return emojisArray[Math.floor(Math.random() * emojisArray.length)];
-}
+// Variables de tiempo
+let gameTime = 0;
+const dayDuration = 150;
+const startHour = 7;
+const endHour = 12;
 
-// Función para desactivar la selección de texto usando CSS y JavaScript
-function disableTextSelection(element) {
-  if (element) {
-    element.style.userSelect = 'none';
-    element.style.webkitUserSelect = 'none';
-    element.style.msUserSelect = 'none';
-    element.style.mozUserSelect = 'none';
-    element.style.touchAction = 'none';
-    element.style.webkitTouchCallout = 'none';
-    element.onselectstart = () => false;
-    element.onmousedown = () => false;
-    element.onmousemove = () => false;
-    element.onmouseup = () => false;
-  }
-}
-
-// Función para inicializar el juego
-function initializeGame() {
-  pet = document.getElementById('pet');
-  petContainer = document.querySelector('.pet-container');
-  crown = document.getElementById('crown');
-  glasses = document.getElementById('glasses');
-  hat = document.getElementById('hat');
-  hungerFill = document.getElementById('hunger-fill');
-  funFill = document.getElementById('fun-fill');
-  hygieneFill = document.getElementById('hygiene-fill');
-  currencyElement = document.getElementById('currency');
-  xpElement = document.getElementById('xp');
-  levelElement = document.getElementById('level');
-  weatherElement = document.getElementById('weather');
-  eventBar = document.getElementById('eventBar');
-  lightSwitch = document.getElementById('lightSwitch');
-  background = document.getElementById('background');
-  deathOverlay = document.getElementById('deathOverlay');
-  useMedicineBtn = document.getElementById('use-medicine-btn');
-
-  feedBtn = document.getElementById('feed-btn');
-  playBtn = document.getElementById('play-btn');
-  cleanBtn = document.getElementById('clean-btn');
-  shopIcon = document.getElementById('shopIcon');
-
-  shopModal = document.getElementById('shopModal');
-  foodModal = document.getElementById('foodModal');
-  miniGameModal = document.getElementById('miniGameModal');
-
-  // Agregar eventos a los botones de acción
-  if (feedBtn) {
-    feedBtn.addEventListener('click', () => {
-      openModal(foodModal, updateFoodMenu);
-    });
-  }
-  if (playBtn) {
-    playBtn.addEventListener('click', () => {
-      openModal(miniGameModal, startRandomMiniGame);
-    });
-  }
-  if (cleanBtn) {
-    cleanBtn.addEventListener('click', cleanPet);
-  }
-  if (shopIcon) {
-    shopIcon.addEventListener('click', () => {
-      openModal(shopModal, updateShopItems);
-    });
-  }
-
-  // Evento para usar medicina
-  if (useMedicineBtn) {
-    useMedicineBtn.addEventListener('click', useMedicine);
-  }
-
-  // Agregar eventos a los botones de cierre de modales
-  const closeButtons = document.querySelectorAll('.close');
-  closeButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const modal = button.closest('.modal');
-      if (modal) modal.style.display = 'none';
-    });
-  });
-
-  // Cerrar modales al hacer clic fuera del contenido
-  const modals = document.querySelectorAll('.modal');
-  modals.forEach(modal => {
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
-  });
-
-  // Evento para el interruptor de luz (botón de pausa)
-  if (lightSwitch) {
-    lightSwitch.addEventListener('click', togglePause);
-  }
-
-  // Evento para acariciar a la mascota
-if (petContainer) {
-  petContainer.addEventListener('click', (e) => {
-    e.stopPropagation();
-    handleCaressBonus(e); // Pasar el evento 'e'
-  });
-}
-
-  // Desactivar selección de texto en la mascota y accesorios
-  disableTextSelection(pet);
-  disableTextSelection(crown);
-  disableTextSelection(glasses);
-  disableTextSelection(hat);
-  disableTextSelection(petContainer);
-
-  // Cargar el juego y comenzar el ciclo de juego
-  loadGame();
-
-  // Ejecutar el gameLoop cada segundo
-  setInterval(gameLoop, 1000);
-
-  // Iniciar la oscilación del emoji
-  startPetOscillation();
-
-  // Redimensionar la mascota al cargar
-  resizePet();
-  window.addEventListener('resize', resizePet);
-
-  // Actualizar la rejilla del fondo
-  updateGrid();
-}
-
-// Función para cargar el juego desde localStorage
-function loadGame() {
-  const savedState = localStorage.getItem('petState');
-  if (savedState) {
-    Object.assign(petState, JSON.parse(savedState));
-    updateAccessoryDisplay('crown', petState.accessories.crown);
-    updateAccessoryDisplay('glasses', petState.accessories.glasses);
-    updateAccessoryDisplay('hat', petState.accessories.hat);
-    updateStatus();
-    updateExpression();
-  }
-}
-
-
-
-// Función para guardar el estado del juego en localStorage
-function saveGame() {
-  localStorage.setItem('petState', JSON.stringify(petState));
-}
-
-// Función principal para el ciclo del juego
-function gameLoop() {
-  if (petState.isPaused || petState.isDead) {
-    updateExpression();
-    return;
-  }
-
-  // Disminuir gradualmente los niveles
-  decreaseStats();
-
-  // Cambiar el clima si es el momento adecuado
-  changeWeather();
-
-  // Redimensionar los accesorios si es necesario
-  resizeAccessories();
-
-  // Actualizar la expresión de la mascota
-  updateExpression();
-
-  // Generar eventos especiales con mayor frecuencia
-  handleSpecialEvents();
-
-  // Actualizar el estado visual del juego
-  updateStatus();
-
-  // Guardar el estado del juego
-  saveGame();
-}
-
-// Función para disminuir gradualmente los niveles de la mascota
-function decreaseStats() {
-  if (petState.isDead || petState.isPaused) return;
-
-  // Disminuir los niveles, asegurando que no caigan por debajo de 0
-  petState.hunger = Math.max(0, petState.hunger - HUNGER_DECREASE_RATE);
-  console.log("Nivel de hambre actual: ", petState.hunger);  // Esto imprime el nivel de hambre en la consola
-  petState.fun = Math.max(0, petState.fun - FUN_DECREASE_RATE);
-  petState.hygiene = Math.max(0, petState.hygiene - HYGIENE_DECREASE_RATE);
-
-  // Si el hambre llega a 0, la mascota muere
-  if (petState.hunger <= 0) {
-    petDeath();
-    return;  // Termina la función aquí si la mascota muere
-  }
-
-  // Si el hambre llega a 93, la mascota se empacha
-  if (petState.hunger >= 97 && !petState.isSick) {  // Asegurarse de que no vuelva a empacharse
-    petState.isSick = true;
-    changeExpression('🤢');  // Cambiar la expresión a la cara de vomitar
-    addEventToBar("¡Cakiwaki está empachado! Espera a que su hambre baje.", "🤢");
-  }
-
-  // Si el hambre baja de 85 y estaba empachado, la mascota se recupera
-  if (petState.hunger < 90 && petState.isSick) {
-    petState.isSick = false;
-    updateExpression();  // Cambiar la expresión a algo normal o feliz
-    addEventToBar("😊 Cakiwaki se siente mejor. El empacho ha pasado.", "😊");
-  }
-
-  // Posibilidad de que la mascota se enferme aleatoriamente
-  randomSickness();
-}
-
-// Función para manejar la enfermedad aleatoria
-function randomSickness() {
-  if (!petState.isSick && Math.random() < SICKNESS_PROBABILITY) {
-    petState.isSick = true;
-    changeExpression('🤒');
-    addEventToBar(getRandomPhrase('sick'), "Cakiwaki necesita medicina para recuperarse.");
-  }
-}
-
-// Función para manejar la muerte de la mascota
-function petDeath() {
-  petState.isDead = true;
-  changeExpression('💀');
-  addEventToBar(getRandomPhrase('dead'), "Alimenta a Cakiwaki para revivirlo.");
-  deathOverlay.style.display = 'block';
-
-  // Abrir automáticamente el menú de comida para revivirlo
-  openModal(foodModal, updateFoodMenu);
-
-  saveGame();
-}
-
-
-
-// Función para cambiar la expresión de la mascota
-function changeExpression(newExpression) {
-  if (pet) {
-    pet.textContent = newExpression;
-    petState.expression = newExpression;
-    saveGame();
-  }
-}
-
-function updateExpression() {
-  const now = Date.now();
-
-  // Array de emojis aleatorios para cuando la mascota está muerta
-  const deadEmojis = ['💀', '🧟', '👻', '😈', '🥑'];  // Calavera, zombie, fantasma, demonio y aguacate
-
-  // Verificamos si ha pasado suficiente tiempo para cambiar la expresión
-  if (now - petState.lastExpressionChangeTime > petState.expressionChangeInterval) {
-
-    // Si la mascota está muerta
-    if (petState.isDead) {
-      // Selecciona aleatoriamente uno de los emojis del array deadEmojis
-      const randomDeadEmoji = deadEmojis[Math.floor(Math.random() * deadEmojis.length)];
-      changeExpression(randomDeadEmoji);  // Cambia la expresión a uno de los emojis aleatorios
-      pet.style.filter = 'grayscale(100%)';  // Aplica el filtro de escala de grises
-
-    // Si la mascota está empachada (prioridad máxima)
-    } else if (petState.hunger >= 97) {
-      changeExpression('🤢');  // Cara de empacho (verde)
-      pet.style.filter = 'none';  // No aplicamos ningún filtro para el empacho (cara verde)
-
-    // Si el juego está pausado
-    } else if (petState.isPaused) {
-      changeExpression('😴');
-      pet.style.filter = 'none';  // No aplicamos filtro cuando el juego está pausado
-
-    // Si la mascota está enferma por enfermedad aleatoria (y no empachada)
-    } else if (petState.isSick && petState.hunger < 92) {
-      changeExpression('🤒');  // Cara de fiebre (termómetro)
-      pet.style.filter = 'hue-rotate(180deg)';  // Aplica el filtro de cambio de tono para la enfermedad
-
-    // Si la mascota está siendo acariciada
-    } else if (petState.caressing) {
-      changeExpression(getRandomExpression(caressEmojis));  // Muestra una expresión feliz al acariciarlo
-      pet.style.filter = 'none';  // Sin filtro para las caricias
-
-    // Cambia la expresión según el nivel de hambre
-    } else {
-      pet.style.filter = 'none';  // Restablecemos el filtro a ninguno
-
-      // Nivel alto de hambre
-      if (petState.hunger >= 50) {
-        changeExpression(getRandomExpression(highStateEmojis));  // Expresiones para hambre alta
-
-      // Nivel medio de hambre
-      } else if (petState.hunger >= 30) {
-        changeExpression(getRandomExpression(mediumStateEmojis));  // Expresiones para hambre media
-
-      // Nivel bajo de hambre
-      } else {
-        changeExpression(getRandomExpression(lowStateEmojis));  // Expresiones para hambre baja
-      }
-
-      // Aplicamos el brillo solo en estados normales
-      const brightness = 100 + (petState.fun / 2);
-      pet.style.filter += ` brightness(${brightness}%)`;
+// Estadísticas del juego
+let gameStats = {
+    totalCoffeesSold: 0,
+    totalCustomers: 0,
+    satisfiedCustomers: 0,
+    unsatisfiedCustomers: 0,
+    ingredientsUsed: {
+        coffee: 0,
+        milk: 0,
+        sugar: 0
+    },
+    coffeeTypes: {
+        'Solo': 0,
+        'Cortado': 0,
+        'Leche y Leche': 0
     }
+};
 
-    // Actualizamos el tiempo de la última vez que se cambió la expresión
-    petState.lastExpressionChangeTime = now;
-  }
-}
+// Gráfica de beneficios vs gastos
+let benefitsData = [];
+let expensesData = [];
 
-function handleCaressBonus(event) {
-  if (petState.isDead) return;
-
-  petState.caressCount = (petState.caressCount || 0) + 1;
-  petState.caressing = true;
-  changeExpression(getRandomExpression(caressEmojis));
-
-  // Verifica si el evento tiene coordenadas
-  if (event && event.clientX && event.clientY) {
-    const x = event.clientX;
-    const y = event.clientY;
-    console.log('Coordenadas del clic:', x, y); // Añadir un log para verificar las coordenadas
-    showTapEffect(x, y);
-  }
-
-  if (petState.caressCount % 3 === 0) {
-    const funBonus = 10;
-    petState.fun = Math.min(100, petState.fun + funBonus);
-    addEventToBar(`💖 ${getRandomPhrase('caressBonus')} +${funBonus}% diversión`);
-    gainXP(2);
-  }
-
-  clearTimeout(petState.caressTimeout);
-  petState.caressTimeout = setTimeout(() => {
-    petState.caressing = false;
-    updateExpression();
-  }, 1000);
-
-  updateStatus();
-  saveGame();
-}
-
-
-
-
-function cleanPet() {
-  if (petState.shampooCount > 0) {
-    petState.hygiene = Math.min(100, petState.hygiene + 40);
-    petState.shampooCount--;
-    petState.currency += 10;
-    addEventToBar(getRandomPhrase('clean'), "¡Cakiwaki está limpio y feliz!");
-    gainXP(5);
-    updateStatus();
-    saveGame();
-  } else {
-    addEventToBar("❌ No tienes shampoo", "Compra shampoo en la tienda para limpiar a Cakiwaki.");
-  }
-}
-
-function addEventToBar(message, additionalInfo = "") {
-const eventIcon = document.createElement('div');
-eventIcon.classList.add('event-icon');
-eventIcon.innerHTML = `${message}<br><small>${additionalInfo}</small>`;
-eventIcon.style.fontSize = '0.8em';
-eventBar.insertBefore(eventIcon, eventBar.firstChild);
-
-while (eventBar.childNodes.length > 5) {
-eventBar.removeChild(eventBar.lastChild);
-}
-}
-
-function togglePause() {
-  petState.isPaused = !petState.isPaused;
-  if (petState.isPaused) {
-    addEventToBar("💤 Cakiwaki está durmiendo", "Los niveles se detienen.");
-    changeExpression('😴');
-  } else {
-    addEventToBar("⏯️ Cakiwaki ha despertado", "Las necesidades se reanudan.");
-    updateExpression();
-  }
-  saveGame();
-}
-
-function openModal(modal, updateFunction) {
-  modal.style.display = 'block';
-  updateFunction();
-}
-
-function updateShopItems() {
-  const shopItemsContainer = document.getElementById('shop-items');
-  if (shopItemsContainer) {
-    shopItemsContainer.innerHTML = '';
-    shopItems.forEach(item => {
-      const itemElement = createShopItem(item);
-      shopItemsContainer.appendChild(itemElement);
-    });
-  }
-}
-
-function createShopItem(item) {
-  const itemElement = document.createElement('div');
-  itemElement.classList.add('shop-item');
-  itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
-
-  if (petState.level >= item.requiredLevel) {
-    if (['crown', 'glasses', 'hat'].includes(item.type)) {
-      itemElement.onclick = () => toggleAccessoryButtons(item, itemElement);
-    } else {
-      itemElement.onclick = () => buyConsumableItem(item);
+// Funciones del camarero
+function startWaiterWaitAnimation() {
+    if (waiterWaitInterval) {
+        clearTimeout(waiterWaitInterval);
     }
-  } else {
-    itemElement.style.opacity = '0.5';
-    itemElement.style.cursor = 'not-allowed';
-  }
-
-  return itemElement;
-}
-
-function toggleAccessoryButtons(item, itemElement) {
-  if (itemElement.querySelector('.accessory-buttons')) return;
-
-  const buttonsContainer = document.createElement('div');
-  buttonsContainer.classList.add('accessory-buttons');
-
-  const tickButton = document.createElement('button');
-  tickButton.textContent = '✔️';
-  tickButton.classList.add('tick-button');
-  tickButton.style.marginRight = '5px';
-  tickButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    equipAccessory(item, itemElement);
-  });
-
-  const crossButton = document.createElement('button');
-  crossButton.textContent = '❌';
-  crossButton.classList.add('cross-button');
-  crossButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    unequipAccessory(item, itemElement);
-  });
-
-  buttonsContainer.appendChild(tickButton);
-  buttonsContainer.appendChild(crossButton);
-  itemElement.appendChild(buttonsContainer);
-}
-
-function equipAccessory(item, itemElement) {
-  if (petState.currency < item.price || petState.level < item.requiredLevel) {
-    addEventToBar("❌ No tienes suficientes recursos para equipar este accesorio.", "Asegúrate de tener el nivel y monedas necesarios.");
-    removeAccessoryButtons(itemElement);
-    return;
-  }
-
-  petState.currency -= item.price;
-  petState.accessories[getAccessoryType(item.type)] = item.emoji;
-  updateAccessoryDisplay(getAccessoryType(item.type), item.emoji);
-  addEventToBar(`🛍️ Compraste y equipaste: ${item.emoji}`, "¡Cakiwaki luce genial con su nuevo accesorio!");
-  gainXP(10);
-  saveGame();
-  removeAccessoryButtons(itemElement);
-  shopModal.style.display = 'none';
-}
-
-function unequipAccessory(item, itemElement) {
-  if (petState.accessories[getAccessoryType(item.type)] === item.emoji) {
-    petState.accessories[getAccessoryType(item.type)] = '';
-    updateAccessoryDisplay(getAccessoryType(item.type), '');
-    addEventToBar(`❌ Has quitado: ${item.emoji}`, "El accesorio ha sido removido de Cakiwaki.");
-    gainXP(5);
-    saveGame();
-  }
-  removeAccessoryButtons(itemElement);
-}
-
-function updateAccessoryDisplay(type, emoji) {
-  const accessoryElement = document.getElementById(type);
-  if (accessoryElement) {
-    accessoryElement.textContent = emoji;
-  }
-}
-
-function removeAccessoryButtons(itemElement) {
-  const buttonsContainer = itemElement.querySelector('.accessory-buttons');
-  if (buttonsContainer) {
-    buttonsContainer.remove();
-  }
-}
-
-function getAccessoryType(type) {
-  switch (type) {
-    case 'crown':
-    case 'topHat':
-    case 'graduationCap':
-      return 'crown';
-    case 'glasses':
-    case 'goggles':
-      return 'glasses';
-    case 'hat':
-      return 'hat';
-    default:
-      return type;
-  }
-}
-
-function buyConsumableItem(item) {
-  if (petState.currency >= item.price && petState.level >= item.requiredLevel) {
-    petState.currency -= item.price;
-    switch(item.type) {
-      case 'shampoo':
-        petState.shampooCount++;
-        addEventToBar(`🧴 Has comprado shampoo`, "Ahora puedes limpiar a Cakiwaki.");
-        break;
-      case 'medicine':
-        petState.medicineCount++;
-        addEventToBar(`💊 Has comprado medicina`, "Utilízala cuando Cakiwaki esté enfermo.");
-        break;
-    }
-    gainXP(10);
-    saveGame();
-    shopModal.style.display = 'none';
-  } else if (petState.level < item.requiredLevel) {
-    addEventToBar(`❌ Necesitas nivel ${item.requiredLevel} para comprar esto.`, "Sigue cuidando a Cakiwaki para subir de nivel.");
-  } else {
-    addEventToBar("❌ No tienes suficientes monedas.", "Juega minijuegos o completa logros para ganar más monedas.");
-  }
-}
-
-function updateFoodMenu() {
-  const foodItemsContainer = document.getElementById('food-items');
-  foodItemsContainer.innerHTML = '';
-  foodItems.forEach(item => {
-    const itemElement = document.createElement('div');
-    itemElement.classList.add('food-item');
-    itemElement.innerHTML = `${item.emoji}<br>💰${item.price}<br>Nivel ${item.requiredLevel}`;
     
-
-    if (petState.level >= item.requiredLevel && petState.currency >= item.price) {
-      itemElement.onclick = () => feedPet(item);
-    } else {
-      itemElement.style.opacity = '0.5';
-      itemElement.style.cursor = 'not-allowed';
-    }
-
-    foodItemsContainer.appendChild(itemElement);
-  });
-}
-
-function feedPet(food) {
-  if (petState.isDead) {
-    revivePet();
-    foodModal.style.display = 'none';
-    return;
-  }
-
-  if (petState.currency >= food.price && petState.level >= food.requiredLevel) {
-    petState.currency -= food.price;
-    petState.hunger = Math.min(100, petState.hunger + food.hunger);
-    addEventToBar(getRandomPhrase('feed'), `${food.emoji} ¡Delicioso! Cakiwaki ha disfrutado su comida.`);
-    gainXP(5);
-    saveGame();
-    foodModal.style.display = 'none';
-  } else if (petState.level < food.requiredLevel) {
-    addEventToBar(`❌ Necesitas nivel ${food.requiredLevel} para comprar esto.`, "Sigue cuidando a Cakiwaki para subir de nivel.");
-  } else {
-    addEventToBar("❌ No tienes suficientes monedas.", "Juega minijuegos o completa logros para ganar más monedas.");
-  }
-}
-
-function revivePet() {
-  petState.isDead = false;
-  petState.hunger = 50;
-  petState.fun = 50;
-  petState.hygiene = 50;
-  changeExpression('😊');
-  addEventToBar("🎉 ¡Cakiwaki ha revivido!", "Gracias por alimentarlo. Cuídalo bien esta vez.");
-  deathOverlay.style.display = 'none';
-  saveGame();
-}
-
-function useMedicine() {
-  if (petState.isSick && petState.medicineCount > 0) {
-    petState.isSick = false;
-    petState.medicineCount--;
-    updateExpression();
-    addEventToBar("💊 Cakiwaki se ha curado", "¡Bien hecho! Cakiwaki se siente mucho mejor gracias a ti.");
-    gainXP(5);
-    updateStatus();
-    saveGame();
-  } else if (petState.medicineCount <= 0) {
-    addEventToBar("❌ No tienes medicina.", "Compra medicina en la tienda para curar a Cakiwaki.");
-  } else {
-    addEventToBar("ℹ️ Cakiwaki no está enfermo.", "No necesitas usar medicina ahora.");
-  }
-}
-
-function startRandomMiniGame() {
-    const miniGames = [memoryGame, startFollowEmojiGame];
-    const randomGame = miniGames[Math.floor(Math.random() * miniGames.length)];
-    randomGame();
-}
-
-function startFollowEmojiGame() {
-    const gameModal = document.getElementById('miniGameModal');
-    const gameBoard = document.getElementById('mini-game-board');
-    const messageContainer = document.getElementById('mini-game-message');
-    const closeButton = document.querySelector('.close'); // Botón de cierre del modal
-    
-    // Configuración del juego
-    const GAME_DURATION = 10 * 1000; // Duración de 10 segundos
-    const EMOJI_INTERVAL = 200; // Intervalo rápido, emojis cada 200 ms
-    const EMOJI_TYPES = ['🎈', '🎉', '💥', '💣', '🎊', '✨', '🌟', '🍀', '🎂', '🎶', '🍭', '🍬'];
-    let score = 0;
-    let gameActive = false;
-    let emojiCreationInterval;
-    let gameTimer;
-    let countdownInterval; // Intervalo para el contador de tiempo
-    let timeLeft = 10; // Tiempo inicial de 10 segundos para el contador
-
-    // PAUSAR el juego principal mientras se juega el minijuego
-    petState.isPaused = true; // Esto detiene los descensos de niveles
-
-    // Limpiar el tablero de juego
-    gameBoard.innerHTML = '';
-    messageContainer.innerHTML = `🎇<br>Puntos: <span id="emoji-count">${score}</span><br>time: <span id="countdown">${timeLeft}</span> segundos`;
-
-    // Actualizar el contador de tiempo
-    function updateCountdown() {
-        timeLeft--;
-        document.getElementById('countdown').textContent = timeLeft;
-        if (timeLeft <= 0) {
-            clearInterval(countdownInterval);
+    let isFirstImage = true;
+    function toggleWaitImage() {
+        if (currentWaiterState === 'waiting' && !isPreparingOrder) {
+            waiterImg.src = isFirstImage ? WAITER_STATES.WAIT1 : WAITER_STATES.WAIT2;
+            isFirstImage = !isFirstImage;
         }
     }
-
-    // Iniciar el juego
-    gameActive = true;
-    score = 0;
-    timeLeft = 10; // Reinicia el tiempo
-
-    // Crear y hacer caer un emoji
-    function createFallingEmoji() {
-        if (!gameActive) return;
-
-        const emoji = document.createElement('div');
-        emoji.classList.add('falling-emoji');
-        emoji.textContent = EMOJI_TYPES[Math.floor(Math.random() * EMOJI_TYPES.length)];
-        
-        // Tamaño aleatorio entre 30px y 60px
-        const size = Math.floor(Math.random() * 30) + 30;
-        emoji.style.width = `${size}px`;
-        emoji.style.height = `${size}px`;
-        emoji.style.fontSize = `${size}px`;
-        
-        // Posición aleatoria en el eje X
-        const maxLeft = gameBoard.offsetWidth - size;
-        const left = Math.floor(Math.random() * maxLeft);
-        emoji.style.left = `${left}px`;
-        emoji.style.top = `-100px`; // Empieza fuera de la pantalla
-
-        gameBoard.appendChild(emoji);
-
-        // Animación de caída rápida
-        const fallDuration = Math.floor(Math.random() * 2000) + 1000; // Duración entre 1 y 3 segundos
-        setTimeout(() => {
-            emoji.style.transition = `top ${fallDuration}ms linear`;
-            emoji.style.top = `${gameBoard.offsetHeight}px`;
-        }, 50);
-
-        // Remover el emoji si llega al fondo sin ser explotado
-        emoji.addEventListener('transitionend', () => {
-            if (emoji.parentElement === gameBoard) {
-                emoji.remove();
-            }
-        });
-
-        // Efecto al explotar el emoji
-        emoji.addEventListener('click', () => {
-            if (!gameActive) return;
-            explodeEmoji(emoji);
-        });
-    }
-
-    // Función para explotar un emoji
-    function explodeEmoji(emoji) {
-        // Efecto visual de explosión
-        emoji.classList.add('explode');
-        // Incrementar el puntaje
-        score++;
-        // Actualizar el contador de emojis explotados
-        document.getElementById('emoji-count').textContent = score;
-        // Remover el emoji después de la animación
-        setTimeout(() => {
-            if (emoji.parentElement === gameBoard) {
-                emoji.remove();
-            }
-        }, 300); // Duración de la explosión
-    }
-
-    // Función para finalizar el juego
-function endGame() {
-    gameActive = false;
-    clearInterval(emojiCreationInterval);
-    clearTimeout(gameTimer);
     
-    // Remover todos los emojis restantes
-    const remainingEmojis = document.querySelectorAll('.falling-emoji');
-    remainingEmojis.forEach(emoji => emoji.remove());
+    function setRandomInterval() {
+        const randomTime = Math.floor(Math.random() * 2000) + 1000;
+        waiterWaitInterval = setTimeout(() => {
+            toggleWaitImage();
+            if (currentWaiterState === 'waiting') {
+                setRandomInterval();
+            }
+        }, randomTime);
+    }
+    
+    setRandomInterval();
+}
 
-    // Mostrar el puntaje final (sin el texto extra)
-    messageContainer.innerHTML = `⏰ ¡Juego terminado!<br>Has explotado <strong>${score}</strong> emojis.`;
-
-    // Recompensas según el puntaje
-    const coinsEarned = score * 10; // 10 monedas por cada emoji explotado
-    const funEarned = Math.min(100, petState.fun + score * 0.5); // 0.5% diversión por emoji explotado
-
-    // Actualizar el estado de la mascota
-    petState.currency += coinsEarned;
-    petState.fun = funEarned;
-    addEventToBar(`💰 +${coinsEarned} monedas y 😊 +${score * 0.5}% diversión por el minijuego.`);
-    gainXP(score * 2); // 2 XP por cada emoji explotado
-
-    // Reanudar el juego principal (los niveles vuelven a bajar)
-    petState.isPaused = false; // Reanuda el juego principal
-
-    // Actualizar la interfaz
-    updateStatus();
-
-    // Guardar el estado del juego
-    saveGame();
-
-    // Cerrar el modal del minijuego
-    gameModal.style.display = 'none';
-
-    // Si la mascota está muerta, permite revivirla tocándola
-    if (petState.isDead) {
-        messageContainer.innerHTML += "<br>¡Toca a Kakiwaki para revivirlo!";
-        pet.addEventListener('click', function revivePet() {
-            petState.hunger = 50;  // Revive con hambre al 50%
-            petState.isDead = false;
-            addEventToBar("¡Kakiwaki ha revivido tocándolo! 🎉");
-            updateStatus();
-            saveGame();
-            pet.removeEventListener('click', revivePet);  // Remueve el evento después de revivir
-        });
+function stopWaiterWaitAnimation() {
+    if (waiterWaitInterval) {
+        clearTimeout(waiterWaitInterval);
+        waiterWaitInterval = null;
     }
 }
 
-    // Función para cerrar el juego si el usuario cierra el modal
-    function closeGame() {
-        gameActive = false;
-        clearInterval(emojiCreationInterval);
-        clearInterval(countdownInterval); // Detenemos el contador de tiempo
-        clearTimeout(gameTimer); 
-
-        // Reanudar el juego principal (los niveles vuelven a bajar)
-        petState.isPaused = false; // Reanuda el juego principal
-
-        // Cerrar el modal del minijuego
-        gameModal.style.display = 'none';
-    }
-
-    // Iniciar la creación de emojis a intervalos regulares
-    emojiCreationInterval = setInterval(createFallingEmoji, EMOJI_INTERVAL);
-
-    // Iniciar el temporizador del juego
-    gameTimer = setTimeout(endGame, GAME_DURATION);
-
-    // Iniciar el contador de tiempo regresivo
-    countdownInterval = setInterval(updateCountdown, 1000);
-
-    // Evento para cerrar el juego si el usuario cierra el modal
-    if (closeButton) {
-        closeButton.addEventListener('click', closeGame);
-    }
+function initializeWaiter() {
+    const waiterElement = document.getElementById('waiter');
+    const monitorRect = monitor.getBoundingClientRect();
+    const centerX = monitorRect.width / 2;
+    waiterElement.style.left = `${centerX}px`;
+    currentWaiterState = 'waiting';
+    startWaiterWaitAnimation();
 }
 
-function memoryGame() {
-    const gameBoard = document.getElementById('mini-game-board');
-    const messageContainer = document.getElementById('mini-game-message');
-
-    // Limpia el contenido del modal para empezar el nuevo minijuego
-    gameBoard.innerHTML = ''; 
-    messageContainer.innerHTML = 'Encuentra las parejas de emojis iguales';
-
-    // Lista de emojis para el juego
-    const emojiOptions = ['😎', '😊', '😂', '😜', '😍', '🥳', '🤔', '😇', '🤩', '😡'];
-    
-    // Duplicamos los emojis para formar las parejas
-    let emojis = [...emojiOptions, ...emojiOptions];
-
-    // Mezclamos los emojis de forma aleatoria
-    emojis = emojis.sort(() => 0.5 - Math.random());
-
-    // Variables del juego
-    let firstSelection = null;
-    let secondSelection = null;
-    let matches = 0;
-    const totalMatches = emojiOptions.length;
-
-    // Función para crear el tablero de memoria
-    function createMemoryBoard() {
-        emojis.forEach((emoji, index) => {
-            const cell = document.createElement('div');
-            cell.classList.add('mini-game-cell');
-            cell.dataset.emoji = emoji;
-            cell.dataset.index = index;
-            cell.addEventListener('click', handleEmojiClick);
-            gameBoard.appendChild(cell);
-        });
-    }
-
-    // Función que maneja el clic en un emoji
-    function handleEmojiClick(e) {
-        const clickedCell = e.target;
-
-        // Evitar que el mismo emoji se seleccione dos veces
-        if (clickedCell === firstSelection || clickedCell.classList.contains('matched')) {
+async function moveWaiter(targetX) {
+    return new Promise((resolve, reject) => {
+        if (isWaiterMoving) {
+            resolve();
             return;
         }
-
-        clickedCell.textContent = clickedCell.dataset.emoji;
-
-        if (!firstSelection) {
-            // Primera selección
-            firstSelection = clickedCell;
-        } else if (!secondSelection) {
-            // Segunda selección
-            secondSelection = clickedCell;
-
-            // Verificamos si coinciden
-            if (firstSelection.dataset.emoji === secondSelection.dataset.emoji) {
-                firstSelection.classList.add('matched');
-                secondSelection.classList.add('matched');
-                matches++;
-
-                // Comprobamos si el jugador ha encontrado todas las parejas
-                if (matches === totalMatches) {
-                    messageContainer.innerHTML = '¡Felicidades! Has encontrado todas las parejas 🎉';
-                }
-
-                // Reiniciamos la selección
-                firstSelection = null;
-                secondSelection = null;
-            } else {
-                // Si no coinciden, volvemos a ocultar los emojis después de un pequeño retraso
-                setTimeout(() => {
-                    firstSelection.textContent = '';
-                    secondSelection.textContent = '';
-                    firstSelection = null;
-                    secondSelection = null;
-                }, 1000);
+        
+        isWaiterMoving = true;
+        currentWaiterState = 'serving';
+        stopWaiterWaitAnimation();
+        
+        const waiterElement = document.getElementById('waiter');
+        const waiterImgElement = waiterElement.querySelector('img');
+        const monitorRect = monitor.getBoundingClientRect();
+        const currentX = waiterElement.getBoundingClientRect().left - monitorRect.left;
+        
+        targetX = Math.max(waiterElement.offsetWidth/2, 
+            Math.min(targetX, monitorRect.width - waiterElement.offsetWidth/2));
+        
+        waiterImgElement.src = targetX > currentX ? WAITER_STATES.RIGHT : WAITER_STATES.LEFT;
+        
+        requestAnimationFrame(() => {
+            waiterElement.style.left = `${targetX}px`;
+        });
+        
+        setTimeout(() => {
+            isWaiterMoving = false;
+            if (targetX === monitorRect.width / 2) {
+                currentWaiterState = 'waiting';
+                startWaiterWaitAnimation();
             }
-        }
-    }
-
-    // Iniciar el juego
-    createMemoryBoard();
+            resolve();
+        }, 500);
+    });
 }
 
-function gainXP(amount) {
-  petState.xp += amount;
-  if (petState.xp >= petState.level * 100) {
-    levelUp();
-  } else {
-    addEventToBar(`⭐ +${amount} XP`, "¡Sigue así! Cada punto de experiencia te acerca al siguiente nivel.");
-  }
-  updateStatus();
-}
-
-function levelUp() {
-  petState.level++;
-  petState.xp = 0;
-  addEventToBar(getRandomPhrase('levelUp'), "¡Nuevas posibilidades para Cakiwaki!");
-  petState.currency += petState.level * 50;
-  updateStatus();
-}
-
-function handleSpecialEvents() {
-  if (Math.random() < SPECIAL_EVENT_PROBABILITY && !petState.isDead && !petState.isPaused) {
-    const randomEvent = getRandomPhrase('event');
-    addEventToBar(randomEvent);
-  }
-}
-
-function changeWeather() {
-  petState.weatherTimer++;
-  if (petState.weatherTimer >= petState.weatherInterval) {
-    currentWeatherIndex = (currentWeatherIndex + 1) % weatherEmojis.length;
-    weatherElement.textContent = weatherEmojis[currentWeatherIndex];
-    petState.weatherTimer = 0;
-  }
-}
-
-function updateGrid() {
-  const gridContainer = document.getElementById('gridContainer');
-  gridContainer.innerHTML = '';
-  for (let i = 0; i < 16; i++) {
-    const cell = document.createElement('div');
-    cell.classList.add('grid-cell');
-    gridContainer.appendChild(cell);
-  }
-}
-
-const achievements = [
-  { id: 'firstLevel', name: 'Primer Nivel', description: 'Alcanza el nivel 2', check: () => petState.level >= 2, reward: 100 },
-  { id: 'petLover', name: 'Amante de Mascotas', description: 'Realiza 50 caricias', check: () => petState.caressCount >= 50, reward: 150 },
-  { id: 'cleanFreak', name: 'Limpieza Total', description: 'Limpia 10 cacas', check: () => petState.poopsCleaned >= 10, reward: 100 },
-  // ... otros logros
-];
-
-function checkAchievements() {
-  achievements.forEach(achievement => {
-    if (!petState.achievements) petState.achievements = {};
-    if (!petState.achievements[achievement.id] && achievement.check()) {
-      petState.achievements[achievement.id] = true;
-      petState.currency += achievement.reward;
-      addEventToBar(`🏆 ¡Logro desbloqueado: ${achievement.name}!`, `Recompensa: ${achievement.reward} monedas`);
-      saveGame();
-    }
-  });
-}
-
-function createPoop() {
-  if (Math.random() < 0.3 && !petState.isDead && !petState.isPaused) {
-    const poops = document.querySelectorAll('.poop');
-    if (poops.length >= 6) return;
-
-    const poop = document.createElement('div');
-    poop.classList.add('poop');
-    poop.textContent = '💩';
-    poop.style.left = `${Math.random() * 80 + 10}%`;
-    poop.style.top = `${Math.random() * 80 + 10}%`;
-    const size = Math.random() < 0.2 ? Math.random() * 40 + 60 : Math.random() * 20 + 20;
-    poop.style.fontSize = `${size}px`;
-    poop.style.zIndex = 11;
-
-    poop.onclick = () => {
-      poop.remove();
-      petState.hygiene = Math.min(100, petState.hygiene + 5);
-      petState.currency += 5;
-      petState.poopsCleaned = (petState.poopsCleaned || 0) + 1;
-      addEventToBar("🧹 Limpiaste una caca", "+5 monedas y +5% higiene");
-      updateStatus();
-      saveGame();
-    };
-    document.querySelector('.pet-frame').appendChild(poop);
-  }
-}
-
-function updateStatus() {
-  if (hungerFill) hungerFill.style.width = `${petState.hunger}%`;
-  if (funFill) funFill.style.width = `${petState.fun}%`;
-  if (hygieneFill) hygieneFill.style.width = `${petState.hygiene}%`;
-  if (currencyElement) currencyElement.textContent = `💰 ${petState.currency}`;
-  if (xpElement) xpElement.textContent = `⭐ ${petState.xp} / ${petState.level * 100}`;
-  if (levelElement) levelElement.textContent = `🔺 Nivel ${petState.level}`;
-
-  if (petState.isSick && petState.medicineCount > 0) {
-    useMedicineBtn.style.display = 'inline-block';
-  } else {
-    useMedicineBtn.style.display = 'none';
-  }
-
-  applyVisualEffects();
-}
-
-
-
-function showTapEffect(x, y, particleCount = 5, duration = 2000) {
-  const emojis = ['💖', '🌟', '✨', '❤️', '⭐']; // Emojis de partículas
-  
-  for (let i = 0; i < particleCount; i++) {
-    const particle = document.createElement('div');
-    particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    particle.style.position = 'absolute';
-    particle.style.left = `${x}px`;
-    particle.style.top = `${y}px`;
-    particle.style.fontSize = '2.5em';
-    particle.style.pointerEvents = 'none';
-    particle.style.transition = `transform ${duration / 1000}s ease, opacity ${duration / 1000}s ease`;
-    particle.style.zIndex = '9999'; // Asegúrate de que las partículas estén al frente
-
-    // Agregar efecto de transformación para movimiento
-    const angle = Math.random() * 360; // Ángulo aleatorio en grados
-    const distance = Math.random() * 50 + 50; // Distancia aleatoria entre 50 y 100 píxeles
-    const transformX = Math.cos(angle) * distance;
-    const transformY = Math.sin(angle) * distance;
-
-    // Añadir el particle al DOM
-    document.body.appendChild(particle);
-
-    // Aplicar la transformación inicial
-    setTimeout(() => {
-      particle.style.transform = `translate(${transformX}px, ${transformY}px)`;
-      particle.style.opacity = '0'; // Desvanecer las partículas
-    }, 50); // Pequeña pausa antes de empezar la animación
-
-    // Eliminar la partícula después de la duración especificada
-    setTimeout(() => {
-      particle.remove();
-    }, duration);
-  }
-}
-
-function applyVisualEffects() {
-  // Si la mascota está muerta, aplicamos filtro en escala de grises
-  if (petState.isDead) {
-    pet.style.filter = 'grayscale(100%)';
-    changeExpression('💀');  // Cara de muerto
-
-  // Si está empachado (hambre >= 93), aplicamos la cara verde y bloqueamos cualquier otro cambio
-  } else if (petState.hunger >= 93) {
-    pet.style.filter = 'none';  // Desactivamos cualquier filtro (ni brillo ni hue-rotate)
-    changeExpression('🤢');  // Cara de empacho (verde)
+async function serveCustomer(customerElement) {
+    if (!customerElement) return;
     
-    // Nos aseguramos de que el estado de empacho tenga la máxima prioridad y no sea sobreescrito
-
-  // Si está enferma por una enfermedad aleatoria (hambre < 93), aplicamos filtro de termómetro
-  } else if (petState.isSick && petState.hunger < 93) {
-    pet.style.filter = 'hue-rotate(180deg)';  // Cambia el tono para la enfermedad aleatoria
-    changeExpression('🤒');  // Cara de enfermo con termómetro
-
-  // Caso normal (ni empachado, ni muerto, ni enfermo), aplica brillo según la diversión
-  } else {
-    pet.style.filter = 'none';  // Restablecemos el filtro a ninguno
-    updateExpression();  // Cambia la expresión dependiendo del nivel de hambre y diversión
-
-    // Aplicamos el brillo solo en estados normales
-    const brightness = 100 + (petState.fun / 2);
-    pet.style.filter += ` brightness(${brightness}%)`;
-  }
-
-  // Redimensiona la mascota
-  resizePet();
+    const customerRect = customerElement.getBoundingClientRect();
+    const monitorRect = monitor.getBoundingClientRect();
+    const targetX = customerRect.left - monitorRect.left + (customerRect.width / 2);
+    
+    try {
+        await moveWaiter(targetX);
+        await new Promise(resolve => setTimeout(resolve, 300));
+        await moveWaiter(monitorRect.width / 2);
+    } catch (error) {
+        console.error('Error en el movimiento del camarero:', error);
+        isWaiterMoving = false;
+    }
 }
 
-function resizePet() {
-  const petFrame = document.querySelector('.pet-frame');
-  const frameSize = Math.min(petFrame.offsetWidth, petFrame.offsetHeight);
-
-  const hungerLevel = petState.hunger;
-  const petSizeFactor = 0.1 + (hungerLevel / 170);  // Cambia el divisor para hacer crecer o reducir más el emoji
-  const petSize = frameSize * petSizeFactor;
-
-  pet.style.fontSize = `${petSize}px`;
-  resizeAccessories();
+// Funciones de actualización de display
+function updateDisplay() {
+    moneyDisplay.textContent = `Dinero: $${money}`;
+    weatherDisplay.textContent = weather;
+    
+    // Actualización del formato de hora para incluir minutos
+    const minutes = Math.floor((gameTime % 30) * 2);
+    const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    const displayTime = time < 10 ? `0${time}:${displayMinutes}` : `${time}:${displayMinutes}`;
+    timeDisplay.textContent = displayTime;
+    
+    // Actualización de las barras con cálculos porcentuales
+    benefitsBar.style.width = `${Math.min(benefits, 100)}%`;
+    satisfactionBar.style.width = `${Math.min(satisfaction, 100)}%`;
+    
+    coffeeSpan.textContent = inventory.coffee;
+    milkSpan.textContent = inventory.milk;
+    sugarSpan.textContent = inventory.sugar;
 }
 
-function resizeAccessories() {
-  const petSize = pet.getBoundingClientRect();
-  const scaleFactor = petSize.width / 100;
-
-  if (crown) crown.style.transform = `translate(-50%, -50%) scale(${scaleFactor})`;
-  if (glasses) glasses.style.transform = `translate(-50%, -50%) scale(${scaleFactor})`;
-  if (hat) hat.style.transform = `translate(-50%, -50%) scale(${scaleFactor})`;
+// Funciones de gestión de clientes
+function addCustomer() {
+    if((customerQueue.length + customerSlots.filter(slot => slot !== null).length) >= 4) return;
+    
+    const customerEmoji = customerEmojis[Math.floor(Math.random() * customerEmojis.length)];
+    const coffeeTypes = Object.keys(RECIPES);
+    const selectedCoffee = coffeeTypes[Math.floor(Math.random() * coffeeTypes.length)];
+    
+    const order = {
+        id: Date.now() + Math.random(),
+        customer: customerEmoji,
+        coffeeName: selectedCoffee,
+        ingredients: {...RECIPES[selectedCoffee]},
+        requiredIngredients: {...RECIPES[selectedCoffee]},
+        timeLeft: preparationTime,
+        served: false,
+        happy: true
+    };
+    
+    orders.push(order);
+    renderOrders();
+    assignCustomerToSlot(order);
 }
 
-function startPetOscillation() {
-    let angle = 0;
-    const baseAmplitude = 10;
-    let amplitude = baseAmplitude;
+function assignCustomerToSlot(order) {
+    const slotIndex = customerSlots.indexOf(null);
+    if(slotIndex !== -1) {
+        const customerDiv = document.createElement('div');
+        customerDiv.classList.add('customer');
+        customerDiv.style.left = `-10%`;
+        const orderName = order.coffeeName === 'Leche y Leche' ? 'Leche<br/>Y<br/>Leche' : order.coffeeName;
+        customerDiv.innerHTML = `
+            <div class="order-name">${orderName}</div>
+            <div class="customer-emoji">${order.customer}</div>
+        `;
+        monitor.appendChild(customerDiv);
+        order.element = customerDiv;
+        customerSlots[slotIndex] = order;
+        
+        void customerDiv.offsetWidth;
+        
+        const targetLeft = 20 + slotIndex * 20;
+        customerDiv.style.left = `${targetLeft}%`;
+    } else {
+        customerQueue.push(order);
+    }
+}
 
-    function oscillate() {
-        if (!petState.isPaused && !petState.isDead) {
-            if (petState.hunger > 80 && petState.fun > 80 && petState.hygiene > 80) {
-                amplitude = 20;
-                angle += 0.2;
-            } else {
-                amplitude = baseAmplitude;
-                angle += 0.1;
-            }
-
-            // Calculamos el desplazamiento en X para la oscilación
-            const offsetX = amplitude * Math.sin(angle);
-            pet.style.transform = `translate(-50%, -50%) translateX(${offsetX}px)`;
-
-            // Obtener el tamaño actual del emoji para usarlo en los accesorios
-            const petSize = pet.getBoundingClientRect();
-            const scaleFactor = petSize.width / 100; // Ajustar este valor para adaptar el tamaño
-
-            // Oscilar y redimensionar los accesorios
-            const accessories = document.querySelectorAll('.pet-accessory');
-            accessories.forEach(accessory => {
-                // Ajustamos el tamaño de los accesorios con el factor de escala
-                accessory.style.transform = `translate(-50%, -50%) translateX(${offsetX}px) scale(${scaleFactor})`;
-            });
+function removeCustomerFromSlot(order) {
+    const slotIndex = customerSlots.indexOf(order);
+    if(slotIndex !== -1) {
+        customerSlots[slotIndex] = null;
+        if(customerQueue.length > 0) {
+            const nextOrder = customerQueue.shift();
+            assignCustomerToSlot(nextOrder);
         }
-        requestAnimationFrame(oscillate);
     }
-    oscillate();
 }
 
-setInterval(checkAchievements, 1000);
-setInterval(createPoop, 5000);
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0'+secs : secs}`;
+}
 
-window.onload = function() {
-  initializeGame();
-  resizePet();
-  window.addEventListener('resize', resizePet);
+// Funciones de gestión de órdenes
+function renderOrders() {
+    const currentOpenOrders = new Set(openOrders);
+    orderList.innerHTML = '';
+    orders.forEach(order => {
+        const orderDiv = document.createElement('div');
+        orderDiv.classList.add('order');
+        orderDiv.setAttribute('data-id', order.id);
+        
+        const headerDiv = document.createElement('div');
+        headerDiv.classList.add('order-header');
+        
+        const coffeeName = document.createElement('div');
+        coffeeName.classList.add('coffee-name');
+        coffeeName.textContent = order.coffeeName;
+        
+        const timer = document.createElement('div');
+        timer.classList.add('timer');
+        timer.id = `timer-${order.id}`;
+        timer.textContent = formatTime(order.timeLeft);
+        
+        headerDiv.appendChild(coffeeName);
+        headerDiv.appendChild(timer);
+        orderDiv.appendChild(headerDiv);
+        
+        if (currentOpenOrders.has(order.id)) {
+            const ingredientsRow = document.createElement('div');
+            ingredientsRow.classList.add('ingredients-row');
+            
+            const used = {
+                coffee: RECIPES[order.coffeeName].coffee - order.ingredients.coffee,
+                milk: RECIPES[order.coffeeName].milk - order.ingredients.milk,
+                sugar: RECIPES[order.coffeeName].sugar - order.ingredients.sugar
+            };
+            
+            const ingredients = [
+                { name: 'coffee', emoji: '☕️' },
+                { name: 'milk', emoji: '☁️' },
+                { name: 'sugar', emoji: '🍚' }
+            ];
+            
+            ingredients.forEach(ing => {
+                const btn = document.createElement('button');
+                btn.classList.add('ingredient-button');
+                // Reemplazar el emoji con la imagen correspondiente
+                btn.innerHTML = `
+                    <img src="${getIngredientImg(ing.name)}" alt="${capitalizeFirstLetter(ing.name)}" class="ingredient-img">
+                    <div class="ingredient-counter">${Math.abs(used[ing.name])}</div>
+                `;
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    addIngredient(order.id, ing.name);
+                };
+                ingredientsRow.appendChild(btn);
+            });
+            
+            orderDiv.appendChild(ingredientsRow);
+            
+            const serveBtn = document.createElement('button');
+            serveBtn.classList.add('serve-button');
+            serveBtn.textContent = 'Servir';
+            serveBtn.disabled = isWaiterMoving;
+            serveBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (!isWaiterMoving) {
+                    serveOrder(order.id);
+                }
+            };
+            orderDiv.appendChild(serveBtn);
+        }
+        
+        // Control de expansión: al hacer clic en el encabezado, se expande o contrae el pedido
+        headerDiv.onclick = () => toggleOrder(order.id);
+        orderList.appendChild(orderDiv);
+        order.elementList = orderDiv;
+    });
+}
 
-  const pet = document.getElementById('pet');
-
-  // Prevenir selección de texto con selectstart
-  pet.addEventListener('selectstart', (e) => {
-    e.preventDefault();  // Evitar la selección de texto
-  });
-
-  // Permitir los toques sin interferir
-  pet.addEventListener('mousedown', (e) => {
-    if (e.button === 0) {  // Solo prevenir la selección en clic izquierdo (ratón)
-      e.preventDefault();  // Evita la selección de texto pero permite el toque
+function toggleOrder(id) {
+    if (openOrders.has(id)) {
+        openOrders.delete(id);
+    } else {
+        openOrders.clear(); // Solo un pedido puede estar expandido a la vez
+        openOrders.add(id);
     }
-  });
+    renderOrders();
+}
 
-  // Asegurar que no aparezca el menú contextual en long tap o clic derecho
-  pet.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-  });
+function addIngredient(id, item) {
+    const order = orders.find(o => o.id === id);
+    if(order && inventory[item] > 0 && !order.served) {
+        if (!isPreparingOrder) {
+            isPreparingOrder = true;
+            currentWaiterState = 'preparing';
+            stopWaiterWaitAnimation();
+            waiterImg.src = WAITER_STATES.PREP;
+        }
+        
+        order.ingredients[item] = (order.ingredients[item] || 0) - 1;
+        inventory[item]--;
+        gameStats.ingredientsUsed[item]++;
+        renderOrders();
+        updateDisplay();
+        
+        clearTimeout(window.preparationTimeout);
+        window.preparationTimeout = setTimeout(() => {
+            isPreparingOrder = false;
+            if (!isWaiterMoving) {
+                currentWaiterState = 'waiting';
+                startWaiterWaitAnimation();
+            }
+        }, 1000);
+    } else {
+        satisfaction = Math.max(satisfaction - 5, 0);
+        satisfactionTotal -= 5;
+        updateDisplay();
+    }
+}
+
+async function serveOrder(id) {
+    const order = orders.find(o => o.id === id);
+    if(order && !order.served && !isWaiterMoving) {
+        let correct = true;
+        for(let key in order.requiredIngredients) {
+            if(order.ingredients[key] !== 0) {
+                correct = false;
+                break;
+            }
+        }
+        
+        await serveCustomer(order.element);
+        
+        if(correct) {
+            benefits +=10;
+            satisfaction +=10;
+            benefits = Math.min(benefits, 100);
+            satisfaction = Math.min(satisfaction, 100);
+            money += parseInt(coffeePriceInput.value) || 5;
+            sold += 1;
+            gameStats.totalCoffeesSold++;
+            gameStats.satisfiedCustomers++;
+            gameStats.coffeeTypes[order.coffeeName]++;
+            gameStats.ingredientsUsed.coffee += RECIPES[order.coffeeName].coffee;
+            gameStats.ingredientsUsed.milk += RECIPES[order.coffeeName].milk;
+            gameStats.ingredientsUsed.sugar += RECIPES[order.coffeeName].sugar;
+            benefitsData.push(benefits);
+            expensesData.push(totalExpense);
+            serveCorrectly(order);
+        } else {
+            satisfaction = Math.max(satisfaction - 10, 0);
+            satisfactionTotal -= 10;
+            gameStats.unsatisfiedCustomers++;
+            serveIncorrectly(order);
+        }
+        
+        // Incrementar total de clientes al servir (correctamente o incorrectamente)
+        gameStats.totalCustomers++;
+        
+        // Eliminar el pedido inmediatamente de la lista
+        openOrders.delete(order.id);
+        orders = orders.filter(o => o.id !== id);
+        removeCustomerFromSlot(order);
+        renderOrders();
+        updateDisplay();
+    }
+}
+
+function serveCorrectly(order) {
+    const orderName = order.element.querySelector('.order-name');
+    if(orderName) orderName.remove();
+    
+    const cupEmoji = document.createElement('div');
+    cupEmoji.classList.add('large-cup');
+    cupEmoji.textContent = '☕️';
+    order.element.appendChild(cupEmoji);
+    
+    setTimeout(() => {
+        const customerEmoji = order.element.querySelector('.customer-emoji');
+        customerEmoji.textContent = '😄';
+        cupEmoji.remove();
+        setTimeout(() => animateDeparture(order), 1000);
+    }, 2000);
+}
+
+function serveIncorrectly(order) {
+    const orderName = order.element.querySelector('.order-name');
+    if(orderName) orderName.remove();
+    
+    const cupEmoji = document.createElement('div');
+    cupEmoji.classList.add('large-cup');
+    cupEmoji.textContent = '☕️';
+    order.element.appendChild(cupEmoji);
+    
+    const customerEmoji = order.element.querySelector('.customer-emoji');
+    customerEmoji.textContent = '😞';
+    
+    setTimeout(() => {
+        cupEmoji.remove();
+        animateDeparture(order);
+    }, 1500);
+}
+
+function animateDeparture(order) {
+    if(order.element) {
+        order.element.style.left = `-10%`;
+        order.element.style.top = `54%`;
+        setTimeout(() => {
+            if(order.element && order.element.parentNode) {
+                monitor.removeChild(order.element);
+            }
+        }, 2000);
+        removeCustomerFromSlot(order);
+    }
+}
+
+// Eventos de botones de inventario y precio
+inventoryButtons.forEach(btn => {
+    btn.onclick = () => {
+        const item = btn.getAttribute('data-item');
+        if(inventory[item] + 10 <= 50 && money >= 20) {
+            inventory[item] += 10;
+            money -= 20;
+            totalExpense += 20; // Cada compra cuesta $20
+            updateDisplay();
+        }
+    };
+});
+
+increasePriceBtn.onclick = () => {
+    let currentPrice = parseInt(coffeePriceInput.value) || 5;
+    coffeePriceInput.value = currentPrice + 1;
 };
 
+decreasePriceBtn.onclick = () => {
+    let currentPrice = parseInt(coffeePriceInput.value) || 5;
+    if(currentPrice > 1) {
+        coffeePriceInput.value = currentPrice - 1;
+    }
+};
 
+// Funciones de control del juego
+function showSummary() {
+    const mostPopularCoffeeEntry = Object.entries(gameStats.coffeeTypes)
+        .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
+    const mostPopularCoffee = mostPopularCoffeeEntry[0] || 'ninguno';
+    
+    totalBenefits.textContent = benefits;
+    totalExpenses.textContent = totalExpense;
+    netBenefits.textContent = benefits - totalExpense;
+    totalSold.textContent = gameStats.totalCoffeesSold;
+    totalCustomers.textContent = gameStats.totalCustomers;
+    satisfiedCustomers.textContent = gameStats.satisfiedCustomers;
+    unsatisfiedCustomers.textContent = gameStats.unsatisfiedCustomers;
+    averageSatisfaction.textContent = gameStats.totalCustomers > 0 ? Math.floor((gameStats.satisfiedCustomers * 100) / gameStats.totalCustomers) : 0;
+    usedCoffee.textContent = gameStats.ingredientsUsed.coffee;
+    usedMilk.textContent = gameStats.ingredientsUsed.milk;
+    usedSugar.textContent = gameStats.ingredientsUsed.sugar;
+    mostPopular.textContent = mostPopularCoffee;
+    
+    // Generar gráfica de beneficios vs gastos
+    generateGraph();
+    
+    summary.style.display = 'flex';
+    clearInterval(orderPreparationInterval);
+    clearInterval(gameTimerInterval);
+}
+
+function generateGraph() {
+    // Limpiar datos anteriores
+    benefitsData = [benefits];
+    expensesData = [totalExpense];
+    
+    if (chart) {
+        chart.destroy();
+    }
+    
+    chart = new Chart(benefitsGraphCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Beneficios', 'Gastos'],
+            datasets: [{
+                label: 'Resumen Financiero',
+                data: [benefits, totalExpense],
+                backgroundColor: [
+                    'rgba(0, 255, 0, 0.6)', // Verde Game Boy
+                    'rgba(255, 0, 0, 0.6)'  // Rojo Game Boy
+                ],
+                borderColor: [
+                    'rgba(0, 255, 0, 1)',
+                    'rgba(255, 0, 0, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#00ff00'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#555555'
+                    },
+                    ticks: {
+                        color: '#00ff00'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function startNextDay() {
+    clearInterval(orderPreparationInterval);
+    clearInterval(gameTimerInterval);
+    stopWaiterWaitAnimation();
+    currentWaiterState = 'waiting';
+    isPreparingOrder = false;
+    summary.style.display = 'none';
+    level++;
+    customerArrivalInterval = Math.max(1000, customerArrivalInterval - 1000);
+    preparationTime = Math.max(5, preparationTime - 1);
+    gameTime = 0;
+    time = startHour;
+    benefits = 0;
+    satisfaction = 50; // Inicializar satisfacción en 50%
+    inventory = { coffee: 10, milk: 10, sugar: 10 };
+    orders = [];
+    sold = 0;
+    satisfactionTotal = 0;
+    customerQueue = [];
+    customerSlots = [null, null, null, null];
+    openOrders = new Set();
+    totalExpense = 0;
+    
+    gameStats = {
+        totalCoffeesSold: 0,
+        totalCustomers: 0,
+        satisfiedCustomers: 0,
+        unsatisfiedCustomers: 0,
+        ingredientsUsed: {
+            coffee: 0,
+            milk: 0,
+            sugar: 0
+        },
+        coffeeTypes: {
+            'Solo': 0,
+            'Cortado': 0,
+            'Leche y Leche': 0
+        }
+    };
+    
+    monitor.innerHTML = '';
+    monitor.appendChild(waiter);
+    waiterImg.src = WAITER_STATES.WAIT1;
+    
+    updateDisplay();
+    initializeWaiter();
+    renderOrders();
+    startGame();
+}
+
+function startGame() {
+    updateDisplay();
+    initializeWaiter();
+    
+    orderPreparationInterval = setInterval(() => {
+        orders.forEach(order => {
+            order.timeLeft--;
+            const timerSpan = document.getElementById(`timer-${order.id}`);
+            if(timerSpan) {
+                timerSpan.textContent = formatTime(order.timeLeft);
+                if(order.timeLeft <= 60 && order.timeLeft > 30) {
+                    timerSpan.style.color = '#ffaa00';
+                }
+                if(order.timeLeft <= 30 && order.timeLeft > 0) {
+                    timerSpan.style.color = '#ff0000';
+                }
+            }
+            if(order.timeLeft <= 0 && !order.served) {
+                satisfaction = Math.max(satisfaction - 10, 0);
+                satisfactionTotal -= 10;
+                gameStats.unsatisfiedCustomers++;
+                
+                // Incrementar total de clientes al que se va sin servir
+                gameStats.totalCustomers++;
+                
+                // Actualizar el emoji del cliente a '😞' y eliminar la taza si existe
+                if(order.element) {
+                    const customerEmoji = order.element.querySelector('.customer-emoji');
+                    if(customerEmoji) {
+                        customerEmoji.textContent = '😞';
+                    }
+                    const cupEmoji = order.element.querySelector('.large-cup');
+                    if(cupEmoji) {
+                        cupEmoji.remove();
+                    }
+                }
+                
+                animateDeparture(order); // Cliente insatisfecho se va
+                removeCustomerFromSlot(order);
+                openOrders.delete(order.id);
+                orders = orders.filter(o => o.id !== order.id);
+                renderOrders();
+                updateDisplay();
+            }
+        });
+    }, 1000);
+    
+    const customerArrivalTimer = setInterval(() => {
+        addCustomer();
+    }, customerArrivalInterval);
+    
+    gameTimerInterval = setInterval(() => {
+        gameTime += 2; // Incrementa el tiempo el doble de rápido
+        const currentHour = startHour + Math.floor(gameTime / 30);
+        if(currentHour > endHour) {
+            clearInterval(gameTimerInterval);
+            clearInterval(orderPreparationInterval);
+            clearInterval(customerArrivalTimer);
+            showSummary();
+        } else {
+            time = currentHour;
+            updateDisplay();
+        }
+    }, 1000);
+}
+
+// Inicialización del juego
+window.addEventListener('load', () => {
+    initializeWaiter();
+    startGame();
+});
 </script>
-
 </body>
 </html>
-   
-   
-
